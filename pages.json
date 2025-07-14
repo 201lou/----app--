@@ -1,0 +1,92 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"app-plus": {
+					//导航栏设置
+					"titleNView": {
+						//搜索框配置
+						"searchInput": {
+							"align": "center",
+							"backgroundColor": "#F5F4F2",
+							"borderRadius": "4px",
+							"disabled": true,
+							"placeholder": "搜索帖子",
+							"placeholderColor": "#6D6C67"
+						},
+						"buttons": [
+							{
+								"color": "#333333",
+								"colorPressed": "#1296db",
+								"float": "right",
+								"fontSize": "20px",
+								"fontSrc": "/static/iconfont.ttf",
+								"text": "\ue615"
+							}
+						]
+					}
+				}
+			}
+		},
+		{
+			"path" : "pages/msg/msg",
+			"style" : 
+			{
+				"navigationBarTitleText" : ""
+			}
+		},
+		{
+			"path" : "pages/owner/owner",
+			"style" : 
+			{
+				"navigationBarTitleText" : ""
+			}
+		},
+		{
+			"path" : "pages/find/find",
+			"style" : 
+			{
+				"navigationBarTitleText" : ""
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#FFFFFF",
+		"backgroundColor": "#ffffff"
+	},
+	"tabBar": {
+		"color": "#3333333",
+		"selectedColor": "black",
+		"backgroundColor": "#ffffff",
+		"borderStyle": "black",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"text": "首页",
+				"iconPath": "/static/tabber/firstpage.png",
+				"selectedIconPath": "/static/tabber/firstpage2.png"
+			},
+			{
+				"pagePath": "pages/find/find",
+				"text": "发现",
+				"iconPath": "/static/tabber/find.png",
+				"selectedIconPath": "/static/tabber/found.png"
+			},
+			{
+				"pagePath": "pages/msg/msg",
+				"text": "消息",
+				"iconPath": "/static/tabber/msg.png",
+				"selectedIconPath": "/static/tabber/msg2.png"
+			},
+			{
+				"pagePath": "pages/owner/owner",
+				"text": "我的",
+				"iconPath": "/static/tabber/owner.png",
+				"selectedIconPath": "/static/tabber/owner2.png"
+			}
+		]
+	}
+}
