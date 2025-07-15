@@ -1,11 +1,5 @@
 import App from './App'
 
-// // 引入全局组件
-// import divider from './components/common/divider.vue';
-// Vue.component('divider',divider)
-// console.log('Divider component:', Divider) // 确认是否成功导入
-
-
 // #ifndef VUE3
 import Vue from 'vue'
 import './uni.promisify.adaptor'
@@ -17,11 +11,15 @@ const app = new Vue({
 app.$mount()
 // #endif
 
+// import noThing from './components/common/no-thing.vue'; // 确保路径正确
+// Vue.component('no-thing', noThing) // Vue2 全局注册
 
 // #ifdef VUE3
 import { createSSRApp } from 'vue'
+import noThing from './components/common/no-thing.vue';
 export function createApp() {
   const app = createSSRApp(App)
+  app.component('no-thing', noThing) // Vue3 全局注册
   return {
     app
   }

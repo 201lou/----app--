@@ -108,3 +108,21 @@
 		border-bottom-style: solid;
 		border-bottom-color: #e5e5e5;
 }
+
+
+.cell-pd[data-v-ac335ed3] {
+		padding: 0.6875rem 0.9375rem;
+}
+.list-pd[data-v-ac335ed3] {
+		margin-top: 1.5625rem;
+}
+
+
+.footer-btn {
+		width: 2.6875rem;
+		height: 2.6875rem;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-size: 1.5625rem;
+}
