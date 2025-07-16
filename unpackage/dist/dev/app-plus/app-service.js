@@ -235,7 +235,7 @@ if (uni.restoreGlobal) {
     ]);
   }
   const loadMore = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__file", "F:/project/社区交友/components/common/load-more.vue"]]);
-  const demo$1 = [
+  const demo$2 = [
     {
       username: "昵称",
       userpic: "/static/tabber/msg2.png",
@@ -354,7 +354,7 @@ if (uni.restoreGlobal) {
             list: []
           };
           if (i < 3) {
-            obj.list = demo$1;
+            obj.list = demo$2;
           }
           arr.push(obj);
         }
@@ -886,12 +886,62 @@ if (uni.restoreGlobal) {
     ]);
   }
   const uniNavBar = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-49ede2a5"], ["__file", "F:/project/社区交友/components/uni-uni/uni-nav-bar/uni-nav-bar.vue"]]);
+  const demo$1 = [
+    {
+      username: "昵称",
+      userpic: "/static/tabber/msg2.png",
+      nowstime: "2019-10-20 下午04:30",
+      isFollow: true,
+      title: "我是标题",
+      titlepic: "/static/demo/屏幕截图 2025-07-14 081555.png",
+      liked: {
+        type: "liked",
+        liked_count: 1,
+        disliked_count: 2
+      },
+      comment_count: 2,
+      share_count: 2
+    },
+    {
+      username: "昵称",
+      userpic: "/static/tabber/msg2.png",
+      nowstime: "2019-10-20 下午04:30",
+      isFollow: true,
+      title: "我是标题",
+      titlepic: "",
+      liked: {
+        type: "disliked",
+        liked_count: 1,
+        disliked_count: 2
+      },
+      comment_count: 2,
+      share_count: 2
+    },
+    {
+      username: "昵称",
+      userpic: "/static/tabber/msg2.png",
+      nowstime: "2019-10-20 下午04:30",
+      isFollow: true,
+      title: "我是标题",
+      titlepic: "/static/demo/屏幕截图 2025-07-14 081555.png",
+      liked: {
+        type: "",
+        liked_count: 1,
+        disliked_count: 2
+      },
+      comment_count: 2,
+      share_count: 2
+    }
+  ];
   const _sfc_main$5 = {
     components: {
-      uniNavBar
+      uniNavBar,
+      commonList,
+      loadMore
     },
     data() {
       return {
+        scrollH: 500,
         tabIndex: 0,
         tabBar: [
           {
@@ -900,8 +950,18 @@ if (uni.restoreGlobal) {
           {
             name: "话题"
           }
-        ]
+        ],
+        list: [],
+        loadmore: "上拉加载更多"
       };
+    },
+    onLoad() {
+      uni.getSystemInfo({
+        success: (res) => {
+          this.scrollH = res.windowHeight - res.statusBarHeight - 44;
+        }
+      });
+      this.list = demo$1;
     },
     methods: {
       // 打开发布页
@@ -913,11 +973,45 @@ if (uni.restoreGlobal) {
       //切换选项
       changeTab(index) {
         this.tabIndex = index;
+      },
+      // 欢动切换
+      onChangeTab(e) {
+        this.tabIndex = e.detail.current;
+      },
+      // 赞踩事件
+      liked(e) {
+        let item = this.list[e.index];
+        let msg = e.type === "liked" ? "赞" : "踩";
+        if (item.liked.type === "") {
+          item.liked[e.type + "_count"]++;
+        } else if (item.liked.type === "liked" && e.type === "disliked") {
+          item.liked.liked_count--;
+          item.liked.disliked_count++;
+        } else if (item.liked.type === "disliked" && e.type === "liked") {
+          item.liked.liked_count++;
+          item.liked.disliked_count--;
+        }
+        item.liked.type = e.type;
+        uni.showToast({
+          title: msg + "成功"
+        });
+      },
+      // 上拉加载
+      loadmoreEvent() {
+        if (this.loadmore !== "上拉加载更多")
+          return;
+        this.loadmore = "加载中";
+        setTimeout(() => {
+          this.list = [...this.list, ...this.list];
+          this.loadmore = "上拉加载更多";
+        }, 2e3);
       }
     }
   };
   function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_nav_bar = vue.resolveComponent("uni-nav-bar");
+    const _component_common_list = vue.resolveComponent("common-list");
+    const _component_load_more = vue.resolveComponent("load-more");
     return vue.openBlock(), vue.createElementBlock("view", null, [
       vue.createCommentVNode(" 导航 "),
       vue.createVNode(_component_uni_nav_bar, {
@@ -949,7 +1043,87 @@ if (uni.restoreGlobal) {
         ]),
         _: 1
         /* STABLE */
-      }, 8, ["onClickRight"])
+      }, 8, ["onClickRight"]),
+      vue.createCommentVNode(" 划动界面 "),
+      vue.createElementVNode("swiper", {
+        current: $data.tabIndex,
+        duration: 150,
+        onChange: _cache[1] || (_cache[1] = (...args) => $options.onChangeTab && $options.onChangeTab(...args)),
+        style: vue.normalizeStyle("height:" + $data.scrollH + "px;")
+      }, [
+        vue.createCommentVNode(" 关注 "),
+        vue.createElementVNode("swiper-item", null, [
+          vue.createElementVNode(
+            "scroll-view",
+            {
+              "scroll-y": "true",
+              style: vue.normalizeStyle("height:" + $data.scrollH + "px;"),
+              onScrolltolower: _cache[0] || (_cache[0] = (...args) => $options.loadmoreEvent && $options.loadmoreEvent(...args))
+            },
+            [
+              (vue.openBlock(true), vue.createElementBlock(
+                vue.Fragment,
+                null,
+                vue.renderList($data.list, (item, index) => {
+                  return vue.openBlock(), vue.createElementBlock(
+                    vue.Fragment,
+                    { key: index },
+                    [
+                      vue.createVNode(_component_common_list, {
+                        item,
+                        index,
+                        onLiked: $options.liked
+                      }, null, 8, ["item", "index", "onLiked"]),
+                      vue.createElementVNode("view", { class: "divider" })
+                    ],
+                    64
+                    /* STABLE_FRAGMENT */
+                  );
+                }),
+                128
+                /* KEYED_FRAGMENT */
+              )),
+              vue.createVNode(_component_load_more, { loadmore: $data.loadmore }, null, 8, ["loadmore"])
+            ],
+            36
+            /* STYLE, NEED_HYDRATION */
+          )
+        ]),
+        vue.createCommentVNode(" 话题 "),
+        vue.createElementVNode("swiper-item", null, [
+          vue.createElementVNode(
+            "scroll-view",
+            {
+              "scroll-y": "true",
+              style: vue.normalizeStyle("height:" + $data.scrollH + "px;")
+            },
+            [
+              vue.createCommentVNode(" 热门分类 "),
+              vue.createElementVNode("view", { class: "flex align-center justify-between px-2" }, [
+                vue.createElementVNode("text", { class: "font-md" }, "热门分类"),
+                vue.createElementVNode("view", {
+                  class: "felx align-center font text-secondary animated",
+                  "hover-class": "rubberBand"
+                }, [
+                  vue.createTextVNode(" 更多 "),
+                  vue.createElementVNode("text", { class: "iconfont icon-xiangyou1" })
+                ])
+              ]),
+              vue.createElementVNode("view", { class: "flex align-center py-3 px-2 border-bottom" }, [
+                vue.createElementVNode("view", {
+                  class: "border rounded bg-light mx-1 px-2 animated",
+                  "hover-class": "rubberBand"
+                }, " 关注 ")
+              ]),
+              vue.createCommentVNode(" 搜索框 "),
+              vue.createCommentVNode(" 轮播图 "),
+              vue.createCommentVNode(" 最近更新 ")
+            ],
+            4
+            /* STYLE */
+          )
+        ])
+      ], 44, ["current"])
     ]);
   }
   const PagesFindFind = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__file", "F:/project/社区交友/pages/find/find.vue"]]);

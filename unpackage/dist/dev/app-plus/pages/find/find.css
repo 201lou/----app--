@@ -108,3 +108,8 @@
 		border-bottom-style: solid;
 		border-bottom-color: #e5e5e5;
 }
+
+
+.liked-active[data-v-047d201c]{
+		color: #1296db;
+}
