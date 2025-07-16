@@ -31,17 +31,7 @@
 			<swiper-item>				
 				<scroll-view scroll-y="true" :style="'height:'+scrollH+'px;'">
 					<!-- 热门分类 -->
-					<view class="flex align-center justify-between px-2">
-						<text class="font-md">热门分类</text>
-						<view class="felx align-center font text-secondary animated" hover-class="rubberBand">
-							更多 <text class="iconfont icon-xiangyou1"></text>
-						</view>
-					</view>
-					<view class="flex align-center py-3 px-2 border-bottom">
-						<view class="border rounded bg-light mx-1 px-2 animated" hover-class="rubberBand">
-							关注
-						</view>
-					</view>
+					<hot-click :hotClick="hotClick"></hot-click>
 					<!-- 搜索框 -->
 					<!-- 轮播图 -->
 					<!-- 最近更新 -->
@@ -103,11 +93,13 @@
 	import uniNavBar from '@/components/uni-uni/uni-nav-bar/uni-nav-bar.vue';
 	import commonList from '@/components/common/common-list.vue';
 	import loadMore from '@/components/common/load-more.vue';
+	import hotClick from '@/components/find/hot-click.vue';
 	export default {
 		components:{
 			uniNavBar,
 			commonList,
-			loadMore
+			loadMore,
+			hotClick
 		},
 		data() {
 			return {
@@ -122,7 +114,20 @@
 					}
 				],
 				list : [],
-				loadmore : "上拉加载更多"
+				loadmore : "上拉加载更多",
+				hotClick:[{
+					name:"关注"
+				},{
+					name:"推荐"
+				},{
+					name:"体育"
+				},{
+					name:"热点"
+				},{
+					name:"财经"
+				},{
+					name:"娱乐"
+				}]
 			}
 		},
 		onLoad() {
