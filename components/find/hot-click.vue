@@ -21,7 +21,9 @@
 		props : ['hotClick'],
 		methods: {
 			openMore() {
-				console.log('打开分类')
+				uni.navigateTo({
+					url:'/pages/topic-nav/topic-nav'
+				})
 			},
 			openDetail() {
 				console.log('打开话题详情页')

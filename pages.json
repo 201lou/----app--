@@ -9,7 +9,7 @@
 						//搜索框配置
 						"searchInput": {
 							"align": "center",
-							"backgroundColor": "#F5F4F2",
+							"backgroundColor": "#F0F8FF",
 							"borderRadius": "4px",
 							"disabled": true,
 							"placeholder": "搜索帖子",
@@ -33,8 +33,26 @@
 			"path" : "pages/msg/msg",
 			"style" : 
 			{
+				"navigationBarTitleText":"消息列表",
+				"enablePullDownRefresh": true,
 				"app-plus": {
-					"titleNView" : false
+					"titleNView" : {
+						"buttons": [{
+							"color": "#333333",
+							"colorPressed": "#1296db",
+							"float": "left",
+							"fontSize": "20px",
+							"fontSrc": "/static/iconfont.ttf",
+							"text": "\ue625"
+						},{
+							"color": "#333333",
+							"colorPressed": "#1296db",
+							"float": "right",
+							"fontSize": "20px",
+							"fontSrc": "/static/iconfont.ttf",
+							"text": "\ue699"
+						}]
+					}
 				}
 			}
 		},
@@ -64,7 +82,7 @@
 						//搜索框配置
 						"searchInput": {
 							"align": "center",
-							"backgroundColor": "#F5F4F2",
+							"backgroundColor": "#f0f8ff",
 							"borderRadius": "4px",
 							"disabled": false,
 							"placeholder": "搜索帖子",
@@ -89,6 +107,60 @@
 			{
 				"app-plus": {
 					"titleNView": false
+				}
+			}
+		},
+		{
+			"path" : "pages/topic-nav/topic-nav",
+			"style" : 
+			{
+				"navigationBarTitleText" : "话题分类"
+			}
+		},
+		{
+			"path" : "pages/topic-detail/topic-detail",
+			"style" : 
+			{
+				"app-plus": {
+					"titleNView": {
+						"type": "transparent",
+						"buttons": [{
+							"type":"menu"
+						}]
+					}
+				}
+			}
+		},
+		{
+			"path" : "pages/friend-list/friend-list",
+			"style" : 
+			{
+				"app-plus": {
+					// 从左进入,动画效果
+					"animationType": "slide-in-left",
+					//导航栏设置
+					"titleNView": {
+						// 取消返回按钮
+						"autoBackButton": false,
+						//搜索框配置
+						"searchInput": {
+							"align": "center",
+							"backgroundColor": "#F0F8FF",
+							"borderRadius": "4px",
+							"disabled": true,
+							"placeholder": "搜索用户",
+							"placeholderColor": "#6D6C67"
+						},
+						"buttons": [
+							{
+								"color": "#333333",
+								"colorPressed": "#1296db",
+								"float": "right",
+								"fontSize": "15px",								
+								"text": "取消"
+							}
+						]
+					}
 				}
 			}
 		}

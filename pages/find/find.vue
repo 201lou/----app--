@@ -33,8 +33,26 @@
 					<!-- 热门分类 -->
 					<hot-click :hotClick="hotClick"></hot-click>
 					<!-- 搜索框 -->
+					<view class="p-2">
+						<view class="color-aliceblue rounded flex align-center justify-center py-2 text-secondary">
+							<text class="iconfont icon-sousuo mr-2"></text>
+							搜索话题
+						</view>
+					</view>
 					<!-- 轮播图 -->
+					<swiper class="px-2 pb-2" :indicator-dots="true" :autoplay="true" :interval="3000" :duration="1000">
+						<swiper-item>
+							<image src="/static/common/demo2.jpg"
+							style="height: 300rpx;" class="w-100 rounded"></image>
+						</swiper-item>						
+					</swiper>
+					<view class="divider"></view>
 					<!-- 最近更新 -->
+					<view class="p-2 font-md">最近更新</view>
+					<!-- 话题列表组件 -->
+					<block v-for="(item,index) in topicList" :key="index">
+						<topic-list :item="item" :index="index"></topic-list>
+					</block>
 				</scroll-view>												
 			</swiper-item>
 		</swiper>
@@ -49,7 +67,7 @@
 		nowstime:"2019-10-20 下午04:30",
 		isFollow:true,
 		title:"我是标题",
-		titlepic:"/static/demo/屏幕截图 2025-07-14 081555.png",
+		titlepic:"/static/common/demo2.jpg",
 		liked:{
 			type:"liked",
 			liked_count:1,
@@ -79,7 +97,7 @@
 		nowstime:"2019-10-20 下午04:30",
 		isFollow:true,
 		title:"我是标题",
-		titlepic:"/static/demo/屏幕截图 2025-07-14 081555.png",
+		titlepic:"/static/common/demo2.jpg",
 		liked:{
 			type:"",
 			liked_count:1,
@@ -94,12 +112,14 @@
 	import commonList from '@/components/common/common-list.vue';
 	import loadMore from '@/components/common/load-more.vue';
 	import hotClick from '@/components/find/hot-click.vue';
+	import topicList from '@/components/find/topic-list.vue';
 	export default {
 		components:{
 			uniNavBar,
 			commonList,
 			loadMore,
-			hotClick
+			hotClick,
+			topicList
 		},
 		data() {
 			return {
@@ -127,6 +147,31 @@
 					name:"财经"
 				},{
 					name:"娱乐"
+				}],
+				topicList:[{
+					cover:"/static/common/demo10.jpg",
+					title:"话题名称",
+					desc:"话题描述",
+					today_count:0,
+					news_count:10
+				},{
+					cover:"/static/common/demo10.jpg",
+					title:"话题名称",
+					desc:"话题描述",
+					today_count:0,
+					news_count:10
+				},{
+					cover:"/static/common/demo10.jpg",
+					title:"话题名称",
+					desc:"话题描述",
+					today_count:0,
+					news_count:10
+				},{
+					cover:"/static/common/demo10.jpg",
+					title:"话题名称",
+					desc:"话题描述",
+					today_count:0,
+					news_count:10
 				}]
 			}
 		},
@@ -150,7 +195,7 @@
 			changeTab(index){
 				this.tabIndex = index
 			},
-			// 欢动切换
+			// 滑动切换
 			onChangeTab(e) {
 				this.tabIndex = e.detail.current
 			},

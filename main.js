@@ -16,7 +16,9 @@ app.$mount()
 
 // #ifdef VUE3
 import { createSSRApp } from 'vue'
+// 引入全局组件
 import noThing from './components/common/no-thing.vue';
+
 export function createApp() {
   const app = createSSRApp(App)
   app.component('no-thing', noThing) // Vue3 全局注册

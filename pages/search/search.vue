@@ -5,7 +5,7 @@
 			<view class="py-2 font-md px-2">搜索历史</view>
 			<view class="flex flex-wrap">
 				<view class="border rounded font mx-2 my-1 px-2" v-for="(item,index) in list" 
-				:key="index" hover-class="bg-light" @click="clickSearchHistory(item)">{{item}}</view>
+				:key="index" hover-class="color-aliceblue" @click="clickSearchHistory(item)">{{item}}</view>
 			</view>
 		</template>
 		<template v-else>			

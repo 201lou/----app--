@@ -16,8 +16,8 @@
 					<template v-if="item.list.length > 0">
 					<!-- 列表 -->
 					<block v-for="(item2,index2) in item.list" :key="index2">
-						<!-- 列表样式 -->
-						<common-list :item="item2" :index="index2" @follow="follow" @liked="liked"></common-list>
+						<!-- 列表样式 -->						
+						<topic-list :item="item2" :index="index2"></topic-list>
 						<!-- 全局分割线 -->
 						<view class="divider"></view>
 					</block>
@@ -38,57 +38,36 @@
 <script>
 	
 	const demo = [{
-		username:"昵称",
-		userpic:"/static/common/demo5.jpg",
-		nowstime:"2019-10-20 下午04:30",
-		isFollow:false,
-		title:"我是标题",
-		titlepic:"/static/common/demo2.jpg",
-		liked:{
-			type:"liked",
-			liked_count:1,
-			disliked_count:2
-		},
-		comment_count:2,
-		share_count:2
-	},
-	{
-		username:"昵称",
-		userpic:"/static/common/demo5.jpg",
-		nowstime:"2019-10-20 下午04:30",
-		isFollow:false,
-		title:"我是标题",
-		titlepic:"",
-		liked:{
-			type:"disliked",
-			liked_count:1,
-			disliked_count:2
-		},
-		comment_count:2,
-		share_count:2
-	},
-	{
-		username:"昵称",
-		userpic:"/static/common/demo5.jpg",
-		nowstime:"2019-10-20 下午04:30",
-		isFollow:false,
-		title:"我是标题",
-		titlepic:"/static/common/demo2.jpg",
-		liked:{
-			type:"",
-			liked_count:1,
-			disliked_count:2
-		},
-		comment_count:2,
-		share_count:2
-	}
-	];
+		cover:"/static/common/banner2.jpg",
+		title:"话题名称",
+		desc:"话题描述",
+		today_count:0,
+		news_count:10
+	},{
+		cover:"/static/common/banner2.jpg",
+		title:"话题名称",
+		desc:"话题描述",
+		today_count:0,
+		news_count:10
+	},{
+		cover:"/static/common/banner2.jpg",
+		title:"话题名称",
+		desc:"话题描述",
+		today_count:0,
+		news_count:10
+	},{
+		cover:"/static/common/banner2.jpg",
+		title:"话题名称",
+		desc:"话题描述",
+		today_count:0,
+		news_count:10
+				}];
 	
-	import commonList from '@/components/common/common-list.vue';
+	import topicList from '@/components/find/topic-list.vue';
 	import loadMore from '@/components/common/load-more.vue';
 	export default {
 		components: {
-			commonList,
+			topicList ,
 			loadMore
 		},
 		data() {
@@ -145,7 +124,6 @@
 					this.scrollH = res.windowHeight - uni.upx2px(100)
 				}
 			})
-			// 根据选项生成列表
 			this.getData()
 		},
 		methods: {
