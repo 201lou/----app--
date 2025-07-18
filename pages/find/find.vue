@@ -34,7 +34,7 @@
 					<hot-click :hotClick="hotClick"></hot-click>
 					<!-- 搜索框 -->
 					<view class="p-2">
-						<view class="color-aliceblue rounded flex align-center justify-center py-2 text-secondary">
+						<view class="color-aliceblue rounded flex align-center justify-center py-2 text-secondary" @click="openSearch()">
 							<text class="iconfont icon-sousuo mr-2"></text>
 							搜索话题
 						</view>
@@ -234,6 +234,12 @@
 					// 设置加载状态
 					this.loadmore = '上拉加载更多'
 				},2000)
+			},
+			// 打开搜索页
+			openSearch(){
+				uni.navigateTo({
+					url:'/pages/search/search?type=topic'
+				})
 			}
 		}
 	}

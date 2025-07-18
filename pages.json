@@ -60,7 +60,14 @@
 			"path" : "pages/owner/owner",
 			"style" : 
 			{
-				"navigationBarTitleText" : ""
+				"navigationBarTitleText" : "我的",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"type": "menu"
+						}]
+					}
+				}
 			}
 		},
 		{
@@ -160,6 +167,39 @@
 								"text": "取消"
 							}
 						]
+					}
+				}
+			}
+		},
+		{
+			"path" : "pages/users-chat/users-chat",
+			"style" : 
+			{
+				"app-plus": {
+					"bounce": false,
+					"titleNView": {
+						"buttons": [{
+							"color": "#333333",
+							"colorPressed": "#1296db",
+							"float": "right",
+							"fontSize": "20px",
+							"fontSrc": "/static/iconfont.ttf",
+							"text": "\ue610"
+						}]
+					}
+				}
+			}
+		},
+		{
+			"path" : "pages/post-detail/post-detail",
+			"style" : 
+			{
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"type":"menu",
+							"float":"right"
+							}]
 					}
 				}
 			}

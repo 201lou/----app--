@@ -12,11 +12,11 @@
 		<!-- 弹出层 -->
 		<uni-popup ref="popup" type="top">
 			<view class="flex align-center justify-center color-aliceblue w-100 font-md border-bottom py-1" 
-			style="height: 100rpx;" hover-class="color-global" @click="popupEvent(friend)">
+			style="height: 100rpx;" hover-class="color-global" @click="popupEvent('friend')">
 				<text class="iconfont icon-icon-1 mr-2"></text> 添加好友
 			</view>
 			<view class="flex align-center justify-center color-aliceblue w-100 font-md py-1"
-			style="height: 100rpx;" hover-class="color-global" @click="popupEvent(clear)">
+			style="height: 100rpx;" hover-class="color-global" @click="popupEvent('clear')">
 				<text class="iconfont icon-qingchu mr-2"></text> 清除列表
 			</view>
 		</uni-popup>
@@ -105,7 +105,9 @@
 			popupEvent(e) {
 				switch (e) {
 					case 'friend':
-					console.log('agree');
+						uni.navigateTo({
+							url:"/pages/search/search?type=user",
+						})
 					break;
 					case 'clear':
 					console.log('clear');

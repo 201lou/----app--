@@ -97,7 +97,7 @@
 		// 监听点击输入框事件
 		onNavigationBarSearchInputClicked() {
 			uni.navigateTo({
-				url: '/pages/search/search',				
+				url: '/pages/search/search?type=user',				
 			});
 		},
 		onNavigationBarButtonTap() {

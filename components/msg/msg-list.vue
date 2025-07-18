@@ -1,5 +1,5 @@
 <template>
-	<view class="flex align-center p-2 border-bottom border-light-secondary" hover-class="bg-light">
+	<view class="flex align-center p-2 border-bottom border-light-secondary" hover-class="bg-light" @click="openChat">
 		<image class="rounded-circle mr-2" :src="item.headshot" 
 		style="width: 80rpx;height: 80rpx;"></image>
 		<view class="flex flex-column flex-1">
@@ -29,6 +29,11 @@
 		methods: {
 			formaTime(value) {
 				return $T.gettime(value);
+			},
+			openChat() {
+				uni.navigateTo({
+					url:'/pages/users-chat/users-chat'
+				})
 			}
 		}
 	}

@@ -19,9 +19,12 @@
 		</view>
 		<!-- 标题 -->
 		<view class="font my-2" @click="openDetail">{{item.title}}</view>
-		<!-- 图片 -->
-		<image v-if="item.titlepic" calss="rounded" :src="item.titlepic" 
-		style="height: 350rpx;width: 100%;" @click="openDetail"></image>
+		<!-- 帖子详情 -->
+		<slot>
+			<!-- 图片 -->
+			<image v-if="item.titlepic" calss="rounded" :src="item.titlepic" 
+			style="height: 350rpx;width: 100%;" @click="openDetail" mode="widthFix"></image>
+		</slot>
 		<!-- 图标按钮 -->
 		<view class="flex align-center">
 			<!-- 顶 -->
@@ -40,7 +43,7 @@
 			</view>
 			<!-- 评论 -->
 			<view class="flex align-center justify-center flex-1 animated faster" 
-			hover-class="jello color-global" @click="openDetail">
+			hover-class="jello color-global" @click="doComment">
 				<text class="iconfont icon-pinglun2 mr-1"></text>
 				<text>{{item.comment_count > 0 ? item.commont : '评论'}}</text>
 			</view>
@@ -58,7 +61,14 @@
 	export default {
 		props: {
 			item: Object,
-			index:Number
+			index:{
+				type:Number,
+				default:-1
+			},
+			isdetail:{
+				type:Boolean,
+				default:false
+			}
 		},
 		methods: {
 			//打开个人空间
@@ -67,7 +77,11 @@
 			},
 			//打开详情页
 			openDetail(){
-				console.log('打开详情页');
+				// 处于详情页中
+				if (this.isdetail) return;
+				uni.navigateTo({
+					url:'/pages/post-detail/post-detail?detail='+JSON.stringify(this.item)
+				})
 			},
 			//关注操作
 			follow(){
@@ -81,9 +95,19 @@
 					index:this.index
 					})
 			},
+			// 评论
+			doComment(){
+				if (this.isdetail) {
+					return this.openDetail()
+				}
+				this.$emit('doComment')
+			},
 			//分享操作
 			shared(){
-				console.log('分享到');
+				if (this.isdetail) {
+					return this.openDetail()
+				}
+				this.$emit('shared')
 			}
 		}
 	}

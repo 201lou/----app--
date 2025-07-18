@@ -130,7 +130,7 @@
 		//监听点击导航栏搜索框
 		onNavigationBarSearchInputClicked() {
 			uni.navigateTo({
-				url:"/pages/search/search",
+				url:"/pages/search/search?type=post",
 			})
 		},
 		//监听导航按钮点击事件
