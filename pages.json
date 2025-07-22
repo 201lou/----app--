@@ -203,6 +203,48 @@
 					}
 				}
 			}
+		},
+		{
+			"path" : "pages/user-setting/user-setting",
+			"style" : 
+			{
+				"navigationBarTitleText" : "设置"
+			}
+		},
+		{
+			"path" : "pages/user-password/user-password",
+			"style" : 
+			{
+				"navigationBarTitleText" : "修改密码"
+			}
+		},
+		{
+			"path" : "pages/user-email/user-email",
+			"style" : 
+			{
+				"navigationBarTitleText" : "绑定邮箱"
+			}
+		},
+		{
+			"path" : "pages/user-ownerinfo/user-ownerinfo",
+			"style" : 
+			{
+				"navigationBarTitleText" : "修改资料"
+			}
+		},
+		{
+			"path" : "pages/user-feedback/user-feedback",
+			"style" : 
+			{
+				"navigationBarTitleText" : "意见反馈"
+			}
+		},
+		{
+			"path" : "pages/about/about",
+			"style" : 
+			{
+				"navigationBarTitleText" : "关于社区"
+			}
 		}
 	],
 	"globalStyle": {

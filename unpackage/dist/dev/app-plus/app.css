@@ -3402,7 +3402,10 @@ to {
 
 	/* 本项目样式库 */
 .bg-color{
-	background-color: #1296db;
+	background-color: #1296db!important;
+}
+.bg-color-disabled{
+	background-color: #11acdb!important;
 }
 .divider{
 	height: 0.46875rem;
