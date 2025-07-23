@@ -64,7 +64,7 @@
 			liked_count:1,
 			disliked_count:2
 		},
-		comment_count:2,
+		comment_count:0,
 		share_count:2
 	},
 	{
@@ -139,7 +139,8 @@
 				url:'/pages/add-input/add-input',
 			})
 		},
-		onLoad() {
+		onLoad() {		
+			
 			uni.getSystemInfo({
 				success:res=>{
 					this.scrollH = res.windowHeight - uni.upx2px(100)
@@ -180,14 +181,16 @@
 			},
 			//关注
 			follow(e){
-				this.list[e].isFollow = true
+				let list = this.newList[this.tabIndex].list
+				list[e].isFollow = true
 				uni.showToast({
 					title:'关注成功'
 				})
 			},
 			//顶踩
 			liked(e){
-				let item = this.list[e.index];
+				let list = this.newList[this.tabIndex].list
+				let item = list[e.index];
 				let msg = e.type === 'liked' ? '赞':'踩'
 				if (item.liked.type === ''){
 					item.liked[e.type+'_count']++

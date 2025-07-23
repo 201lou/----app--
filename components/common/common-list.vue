@@ -45,7 +45,7 @@
 			<view class="flex align-center justify-center flex-1 animated faster" 
 			hover-class="jello color-global" @click="doComment">
 				<text class="iconfont icon-pinglun2 mr-1"></text>
-				<text>{{item.comment_count > 0 ? item.commont : '评论'}}</text>
+				<text>{{item.comment_count > 0 ? item.comment_count : '评论'}}</text>
 			</view>
 			<!-- 分享 -->
 			<view class="flex align-center justify-center flex-1 animated faster" 
@@ -73,7 +73,9 @@
 		methods: {
 			//打开个人空间
 			openSpace(){
-				console.log('打开个人空间');
+				uni.navigateTo({
+					url:'/pages/user-space/user-space'
+				})
 			},
 			//打开详情页
 			openDetail(){

@@ -245,6 +245,31 @@
 			{
 				"navigationBarTitleText" : "关于社区"
 			}
+		},
+		{
+			"path" : "pages/login/login",
+			"style" : 
+			{
+				"app-plus": {
+					"titleNView": false
+				}
+			}
+		},
+		{
+			"path" : "pages/user-space/user-space",
+			"style" : 
+			{
+				"navigationBarTitleText" : "个人空间",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [
+							{
+								"type": "menu"
+							}
+						]
+					}
+				}
+			}
 		}
 	],
 	"globalStyle": {
