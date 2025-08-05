@@ -3,9 +3,16 @@ import App from './App'
 // #ifndef VUE3
 import Vue from 'vue'
 import './uni.promisify.adaptor'
+
+import Vuex from 'vuex'
+
+Vue.use(Vuex)
+Vue.prototype.$store = store
 Vue.config.productionTip = false
+
 App.mpType = 'app'
 const app = new Vue({
+	store,
   ...App
 })
 app.$mount()
@@ -25,11 +32,46 @@ import $C from './common/config.js';
 // 挂载助手函数库
 import $U from './common/utill.js';
 
+import store from './store/index.js'
+
+const checkAuth = (callback)=>{
+  	// 权限验证
+  	if (!store.state.loginStatus) {
+  		uni.showToast({
+  			title:'请先登录',
+			icon:'none'
+  		});
+  		return uni.navigateTo({
+  			url:'/pages/login/login'
+  		})
+  	}
+  	callback()
+}
+
+// 权限验证跳转
+const navigateTo = (options)=>{
+	if (!store.state.loginStatus) {
+		uni.showToast({
+			title:'请先登录',
+			icon:'none'
+		});
+		return uni.navigateTo({
+			url:'/pages/login/login'
+		})
+	}
+	uni.navigateTo(options);
+}
+
 export function createApp() {
   const app = createSSRApp(App)
+  
   app.component('no-thing', noThing) // Vue3 全局注册
   app.config.globalProperties.$C = $C
   app.config.globalProperties.$U = $U
+  app.config.globalProperties.$store = store
+  app.config.globalProperties.checkAuth = checkAuth
+  app.config.globalProperties.navigateTo = navigateTo
+  app.use(store)
   return {
     app
   }

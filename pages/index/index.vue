@@ -129,18 +129,19 @@
 		},
 		//监听点击导航栏搜索框
 		onNavigationBarSearchInputClicked() {
-			uni.navigateTo({
+			this.navigateTo({
 				url:"/pages/search/search?type=post",
 			})
 		},
 		//监听导航按钮点击事件
 		onNavigationBarButtonTap() {
-			uni.navigateTo({
+			this.navigateTo({
 				url:'/pages/add-input/add-input',
 			})
 		},
-		onLoad() {		
-			
+		onLoad() {
+			// this.$store.commit('changeLoginStatus',{num:"123"})
+			// console.log(this.$store.state.loginStatus);			
 			uni.getSystemInfo({
 				success:res=>{
 					this.scrollH = res.windowHeight - uni.upx2px(100)

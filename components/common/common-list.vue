@@ -87,22 +87,28 @@
 			},
 			//关注操作
 			follow(){
+				this.checkAuth(()=>{
 				//通知父组件
 				this.$emit('follow',this.index)
+				})
 			},
 			//顶踩操作
 			liked(type){
-				this.$emit('liked',{
-					type,
-					index:this.index
-					})
+				this.checkAuth(()=>{
+					this.$emit('liked',{
+						type,
+						index:this.index
+						})					
+				})
 			},
 			// 评论
 			doComment(){
-				if (this.isdetail) {
-					return this.openDetail()
-				}
-				this.$emit('doComment')
+				this.checkAuth(()=>{
+					if (this.isdetail) {
+						return this.openDetail()
+					}
+					this.$emit('doComment')
+				})
 			},
 			//分享操作
 			shared(){

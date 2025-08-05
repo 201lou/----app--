@@ -4,7 +4,7 @@
     "iPhone",
     "iPad"
   ],
-  "id": "",
+  "id": "__UNI__1F0AD22",
   "name": "社区交友",
   "version": {
     "name": "1.0.0",
@@ -36,6 +36,11 @@
     "launchwebview": {
       "id": "1",
       "kernel": "WKWebview"
+    },
+    "optimization": {
+      "treeShaking": {
+        "enable": false
+      }
     },
     "usingComponents": true,
     "nvueStyleCompiler": "uni-app",
@@ -74,6 +79,7 @@
       "style": "dark",
       "background": "#FFFFFF"
     },
+    "arguments": "{\"name\":\"\",\"path\":\"\",\"query\":\"\"}",
     "uniStatistics": {
       "enable": false
     },
