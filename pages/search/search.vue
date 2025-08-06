@@ -24,6 +24,8 @@
 					<user-list :item="item" :indexe="index"></user-list>
 				</template>
 			</block>
+			<!-- 上拉加载 -->
+			<load-more :loadmore="loadmore"></load-more>
 		</template>
 	</view>
 </template>
@@ -131,20 +133,24 @@
 	import commonList from '@/components/common/common-list.vue';
 	import topicList from '@/components/find/topic-list.vue';
 	import userList from '@/components/user-list/user-list.vue';
+	import loadMore from '@/components/common/load-more.vue';
 	export default {
 		components: {
 			commonList,
 			topicList,
-			userList
+			userList,
+			loadMore
 		},
 		data() {
 			return {
 				searchText:"",
-				list:['uni-app第二季商城类实战开发','uni-app第三季仿微信实战开发','实战教程','系列教程'],
+				list:[],
 				// 搜索结果
 				searchList:[],
 				// 当前搜索类型
-				type:"post"
+				type:"post",
+				loadmore:"上拉加载更多",
+				page:1
 			}
 		},
 		// 监听导航搜入
@@ -190,41 +196,105 @@
 			//     }
 			// })
 			// // #endif
+			this.updateSearchPlaceholder()
+			// 取出搜索历史
+			let list = uni.getStorageSync('historySearchText')
+			if (list) {
+				this.list = JSON.parse(list)
+			}
+		},
+		// 监听下拉刷新
+		onPullDownRefresh() {
+			if(this.searchText === '') {
+				return uni.stopPullDownRefresh()
+			}
+			this.getDate(true,()=>{
+				// 关闭下拉刷新状态
+				uni.stopPullDownRefresh()
+			})
+		},
+		// 监听上拉加载
+		onReachBottom() {
+			if (this.loadmore !== '上拉加载更多') {
+				return;
+			}
+			this.loadmore = "加载中..."
+			this.getData(false)
 		},
 		methods: {
 			// 点击搜索历史
 			clickSearchHistory(text) {
-				this.searchtext = text
+				this.searchText = text
 				this.searchEvent()
 			},
 			//搜索事件
 			searchEvent() {
 				// 收起键盘
 				uni.hideKeyboard()
+				// 加入搜索历史
+				let index = this.list.findIndex(v=>v===this.searchText)
+				if(index !== -1) {
+					this.$U.__toFirst(this.list,index)
+				} else {
+					this.list.unshift(this.searchText)
+				}
+				uni.setStorageSync('historySearchText',JSON.stringify(this.list))
+				// 请求搜索
+				this.getDate()
+			},
+			getDate(isrefresh = true,callback = false) {
 				//处于显示请求中
 				uni.showLoading({
 					title: '加载中...',
 					mask: false
 				})
 				// 请求搜索
-				setTimeout(()=>{
-					switch (this.type){
+				this.page = isrefresh ? 1 : (this.page + 1)
+				this.$H.post('/search/'+this.type,{
+					keyword:this.searchText,
+					page:this.page
+				}).then(res=>{
+					// 整理格式
+					let list = []
+					switch (this.type) {
 						case 'post':
-						this.searchList = demo_post
-						break;
+						list = res.data.data.list.map(v=>{
+						return this.$U.formatCommonList(v)
+					})
+							break;
 						case 'topic':
-						this.searchList = demo_topic
-						break;
+						list = res.data.data.list.map(v=>{
+							return {
+								id:v.id,
+								cover:v.titlepic,
+								title:v.title,
+								desc:v.desc,
+								today_count:v.today_count,
+								news_count:v.news_count
+							}
+						})
+							break;
 						case 'user':
-						this.searchList = demo_user
-						break;
+						pageTitle = '用户'
+							break;
 					}
-					
-					// 隐藏请求中
+					// 渲染到页面
+					this.searchList = isrefresh ? [...list] : [...this.searchList,...list]
+					// 加载情况
+					this.loadmore = list.length < 10 ? '没有更多了' : '上拉加载更多'
 					uni.hideLoading()
-				},3000)
-				
+					if (typeof callback === 'function'){
+						callback()
+					}
+				}).catch(err => {
+					this.page--
+				    uni.hideLoading()
+					if (typeof callback === 'function'){
+						callback()
+					}					
+				})
 			},
+			// 更新搜索占位符
 			updateSearchPlaceholder() {
 			  let placeholder = '搜索帖子';
 			  switch (this.type) {

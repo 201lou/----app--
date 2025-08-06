@@ -261,53 +261,6 @@ if (uni.restoreGlobal) {
     ]);
   }
   const loadMore = /* @__PURE__ */ _export_sfc(_sfc_main$G, [["render", _sfc_render$F], ["__file", "F:/project/社区交友/components/common/load-more.vue"]]);
-  const demo$6 = [
-    {
-      username: "昵称",
-      userpic: "/static/common/demo5.jpg",
-      nowstime: "2019-10-20 下午04:30",
-      isFollow: false,
-      title: "我是标题",
-      titlepic: "/static/common/demo2.jpg",
-      liked: {
-        type: "liked",
-        liked_count: 1,
-        disliked_count: 2
-      },
-      comment_count: 2,
-      share_count: 2
-    },
-    {
-      username: "昵称",
-      userpic: "/static/common/demo5.jpg",
-      nowstime: "2019-10-20 下午04:30",
-      isFollow: false,
-      title: "我是标题",
-      titlepic: "",
-      liked: {
-        type: "disliked",
-        liked_count: 1,
-        disliked_count: 2
-      },
-      comment_count: 0,
-      share_count: 2
-    },
-    {
-      username: "昵称",
-      userpic: "/static/common/demo5.jpg",
-      nowstime: "2019-10-20 下午04:30",
-      isFollow: false,
-      title: "我是标题",
-      titlepic: "/static/common/demo2.jpg",
-      liked: {
-        type: "",
-        liked_count: 1,
-        disliked_count: 2
-      },
-      comment_count: 2,
-      share_count: 2
-    }
-  ];
   const _sfc_main$F = {
     components: {
       commonList,
@@ -320,38 +273,13 @@ if (uni.restoreGlobal) {
         // 顶部选项卡
         scrollInto: "",
         tabIndex: 0,
-        tabBars: [
-          {
-            name: "关注"
-          },
-          {
-            name: "推荐"
-          },
-          {
-            name: "热点"
-          },
-          {
-            name: "新闻"
-          },
-          {
-            name: "财经"
-          },
-          {
-            name: "娱乐"
-          },
-          {
-            name: "军事"
-          },
-          {
-            name: "体育"
-          }
-        ],
+        tabBars: [],
         newList: []
       };
     },
     //监听点击导航栏搜索框
     onNavigationBarSearchInputClicked() {
-      this.navigateTo({
+      uni.navigateTo({
         url: "/pages/search/search?type=post"
       });
     },
@@ -372,19 +300,46 @@ if (uni.restoreGlobal) {
     methods: {
       //获取数据
       getData() {
-        var arr = [];
-        for (let i = 0; i < this.tabBars.length; i++) {
-          let obj = {
-            //1.上拉加载更多 2.加载中 3...没有更多了
-            loadmore: "上拉加载更多",
-            list: []
-          };
-          if (i < 3) {
-            obj.list = demo$6;
+        this.$H.get("/postclass").then((res) => {
+          this.tabBars = res.data.data.list;
+          var arr = [];
+          for (let i = 0; i < this.tabBars.length; i++) {
+            arr.push({
+              //1.上拉加载更多 2.加载中 3...没有更多了
+              loadmore: "上拉加载更多",
+              list: [],
+              page: 1,
+              firstLoad: false
+            });
           }
-          arr.push(obj);
-        }
-        this.newList = arr;
+          this.newList = arr;
+          if (this.tabBars.length) {
+            this.getList();
+          }
+        });
+      },
+      // 获取指定分类下的列表数据
+      getList() {
+        let index = this.tabIndex;
+        let id = this.tabBars[index].id;
+        let page = this.newList[index].page;
+        let isrefresh = page === 1;
+        this.$H.get("/postclass/" + id + "/post/" + page).then((res2) => {
+          let list = res2.data.data.list.map((v) => {
+            return this.$U.formatCommonList(v);
+          });
+          this.newList[index].list = isrefresh ? list : [
+            ...this.newList[index].list,
+            ...list
+          ], this.newList[index].loadmore = list.length < 10 ? "没有更多了" : "上拉加载更多";
+          if (isrefresh) {
+            this.newList[index].firstLoad = true;
+          }
+        }).catch((err) => {
+          if (!isrefresh) {
+            this.newList[index].page--;
+          }
+        });
       },
       //监听滑动
       onChangeTab(e) {
@@ -397,6 +352,9 @@ if (uni.restoreGlobal) {
         }
         this.tabIndex = index;
         this.scrollInto = "tab" + index;
+        if (!this.newList[this.tabIndex].firstLoad) {
+          this.getList();
+        }
       },
       //关注
       follow(e) {
@@ -431,10 +389,8 @@ if (uni.restoreGlobal) {
         if (item.loadmore !== "上拉加载更多")
           return;
         item.loadmore = "加载中...";
-        setTimeout(() => {
-          item.list = [...item.list, ...item.list];
-          item.loadmore = "上拉加载更多";
-        }, 2e3);
+        item.page++;
+        this.getList();
       }
     }
   };
@@ -460,7 +416,7 @@ if (uni.restoreGlobal) {
               class: vue.normalizeClass(["scroll-row-item px-3 py-2", $data.tabIndex === index ? "color-global font-lg font-weight-bold" : ""]),
               id: "tab" + index,
               onClick: ($event) => $options.changeTab(index)
-            }, vue.toDisplayString(item.name), 11, ["id", "onClick"]);
+            }, vue.toDisplayString(item.classname), 11, ["id", "onClick"]);
           }),
           128
           /* KEYED_FRAGMENT */
@@ -520,9 +476,21 @@ if (uni.restoreGlobal) {
                   ],
                   64
                   /* STABLE_FRAGMENT */
-                )) : (vue.openBlock(), vue.createElementBlock(
+                )) : !item.firstload ? (vue.openBlock(), vue.createElementBlock(
                   vue.Fragment,
                   { key: 1 },
+                  [
+                    vue.createCommentVNode(" 加载中 "),
+                    vue.createElementVNode("view", {
+                      class: "text-light-muted flex align-center justify-center font-md",
+                      style: { "height": "200rpx" }
+                    }, "加载中")
+                  ],
+                  64
+                  /* STABLE_FRAGMENT */
+                )) : (vue.openBlock(), vue.createElementBlock(
+                  vue.Fragment,
+                  { key: 2 },
                   [
                     vue.createCommentVNode(" 没有数据 "),
                     vue.createVNode(_component_no_thing)
@@ -764,12 +732,12 @@ if (uni.restoreGlobal) {
     ]);
   }
   const msgList = /* @__PURE__ */ _export_sfc(_sfc_main$D, [["render", _sfc_render$C], ["__file", "F:/project/社区交友/components/msg/msg-list.vue"]]);
-  const _imports_0$3 = "/static/common/nothing.png";
+  const _imports_0$2 = "/static/common/nothing.png";
   const _sfc_main$C = {};
   function _sfc_render$B(_ctx, _cache) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "flex flex-column align-center justify-center pt-5" }, [
       vue.createElementVNode("image", {
-        src: _imports_0$3,
+        src: _imports_0$2,
         style: { "width": "300rpx", "height": "300rpx" }
       }),
       vue.createElementVNode("text", { class: "font-md" }, "什么都没有")
@@ -1111,7 +1079,7 @@ if (uni.restoreGlobal) {
     )) : vue.createCommentVNode("v-if", true);
   }
   const uniPopup = /* @__PURE__ */ _export_sfc(_sfc_main$A, [["render", _sfc_render$z], ["__scopeId", "data-v-fda68b36"], ["__file", "F:/project/社区交友/components/uni-uni/uni-popup/uni-popup.vue"]]);
-  const demo$5 = [{
+  const demo$3 = [{
     headshot: "/static/common/demo6.jpg",
     username: "星期四的微信",
     update_time: 1752722735,
@@ -1149,7 +1117,7 @@ if (uni.restoreGlobal) {
     },
     // 页面加载
     onLoad() {
-      this.list = demo$5;
+      this.list = demo$3;
     },
     // 监听原生导航栏按钮事件
     onNavigationBarButtonTap(e) {
@@ -1179,7 +1147,7 @@ if (uni.restoreGlobal) {
       //下拉刷新
       refresh() {
         setTimeout(() => {
-          this.list = demo$5;
+          this.list = demo$3;
           uni.stopPullDownRefresh();
         }, 2e3);
       },
@@ -1618,12 +1586,1194 @@ if (uni.restoreGlobal) {
     ]);
   }
   const uniList = /* @__PURE__ */ _export_sfc(_sfc_main$w, [["render", _sfc_render$v], ["__scopeId", "data-v-3751c120"], ["__file", "F:/project/社区交友/components/uni-uni/uni-list/uni-list.vue"]]);
-  const _imports_0$2 = "/static/common/demo6.jpg";
-  const _imports_1 = "/static/common/banner2.jpg";
   const _sfc_main$v = {
+    data() {
+      return {
+        providerList: []
+      };
+    },
+    mounted() {
+      uni.getProvider({
+        service: "oauth",
+        success: (result) => {
+          this.providerList = result.provider.map((value) => {
+            let providerName = "";
+            let icon = "";
+            let bgColor = "";
+            switch (value) {
+              case "weixin":
+                providerName = "微信登录";
+                icon = "icon-weixin";
+                bgColor = "bg-success";
+                break;
+              case "qq":
+                providerName = "QQ登录";
+                icon = "icon-qq";
+                bgColor = "bg-primary";
+                break;
+              case "sinaweibo":
+                providerName = "新浪微博登录";
+                icon = "icon-weibo";
+                bgColor = "bg-warning";
+                break;
+            }
+            return {
+              name: providerName,
+              icon,
+              bgColor,
+              id: value
+            };
+          }).filter((item) => item.name);
+        },
+        fail: (error) => {
+          formatAppLog("log", "at components/common/other-login.vue:55", "获取登录通道失败", error);
+        }
+      });
+    }
+  };
+  function _sfc_render$u(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createElementBlock("view", { class: "flex align-center justify-center px-2 py-3" }, [
+      (vue.openBlock(true), vue.createElementBlock(
+        vue.Fragment,
+        null,
+        vue.renderList($data.providerList, (item, index) => {
+          return vue.openBlock(), vue.createElementBlock("view", {
+            class: "flex-1 flex align-center justify-center",
+            key: index
+          }, [
+            vue.createElementVNode(
+              "view",
+              {
+                class: vue.normalizeClass([item.icon + " " + item.bgColor, "iconfont font-lg text-white flex align-center justify-center rounded-circle"]),
+                style: { "width": "100rpx", "height": "100rpx" }
+              },
+              null,
+              2
+              /* CLASS */
+            )
+          ]);
+        }),
+        128
+        /* KEYED_FRAGMENT */
+      ))
+    ]);
+  }
+  const otherLogin = /* @__PURE__ */ _export_sfc(_sfc_main$v, [["render", _sfc_render$u], ["__file", "F:/project/社区交友/components/common/other-login.vue"]]);
+  function getDevtoolsGlobalHook() {
+    return getTarget().__VUE_DEVTOOLS_GLOBAL_HOOK__;
+  }
+  function getTarget() {
+    return typeof navigator !== "undefined" && typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : {};
+  }
+  const isProxyAvailable = typeof Proxy === "function";
+  const HOOK_SETUP = "devtools-plugin:setup";
+  const HOOK_PLUGIN_SETTINGS_SET = "plugin:settings:set";
+  class ApiProxy {
+    constructor(plugin, hook) {
+      this.target = null;
+      this.targetQueue = [];
+      this.onQueue = [];
+      this.plugin = plugin;
+      this.hook = hook;
+      const defaultSettings = {};
+      if (plugin.settings) {
+        for (const id in plugin.settings) {
+          const item = plugin.settings[id];
+          defaultSettings[id] = item.defaultValue;
+        }
+      }
+      const localSettingsSaveId = `__vue-devtools-plugin-settings__${plugin.id}`;
+      let currentSettings = { ...defaultSettings };
+      try {
+        const raw = localStorage.getItem(localSettingsSaveId);
+        const data = JSON.parse(raw);
+        Object.assign(currentSettings, data);
+      } catch (e) {
+      }
+      this.fallbacks = {
+        getSettings() {
+          return currentSettings;
+        },
+        setSettings(value) {
+          try {
+            localStorage.setItem(localSettingsSaveId, JSON.stringify(value));
+          } catch (e) {
+          }
+          currentSettings = value;
+        }
+      };
+      hook.on(HOOK_PLUGIN_SETTINGS_SET, (pluginId, value) => {
+        if (pluginId === this.plugin.id) {
+          this.fallbacks.setSettings(value);
+        }
+      });
+      this.proxiedOn = new Proxy({}, {
+        get: (_target, prop) => {
+          if (this.target) {
+            return this.target.on[prop];
+          } else {
+            return (...args) => {
+              this.onQueue.push({
+                method: prop,
+                args
+              });
+            };
+          }
+        }
+      });
+      this.proxiedTarget = new Proxy({}, {
+        get: (_target, prop) => {
+          if (this.target) {
+            return this.target[prop];
+          } else if (prop === "on") {
+            return this.proxiedOn;
+          } else if (Object.keys(this.fallbacks).includes(prop)) {
+            return (...args) => {
+              this.targetQueue.push({
+                method: prop,
+                args,
+                resolve: () => {
+                }
+              });
+              return this.fallbacks[prop](...args);
+            };
+          } else {
+            return (...args) => {
+              return new Promise((resolve) => {
+                this.targetQueue.push({
+                  method: prop,
+                  args,
+                  resolve
+                });
+              });
+            };
+          }
+        }
+      });
+    }
+    async setRealTarget(target) {
+      this.target = target;
+      for (const item of this.onQueue) {
+        this.target.on[item.method](...item.args);
+      }
+      for (const item of this.targetQueue) {
+        item.resolve(await this.target[item.method](...item.args));
+      }
+    }
+  }
+  function setupDevtoolsPlugin(pluginDescriptor, setupFn) {
+    const target = getTarget();
+    const hook = getDevtoolsGlobalHook();
+    const enableProxy = isProxyAvailable && pluginDescriptor.enableEarlyProxy;
+    if (hook && (target.__VUE_DEVTOOLS_PLUGIN_API_AVAILABLE__ || !enableProxy)) {
+      hook.emit(HOOK_SETUP, pluginDescriptor, setupFn);
+    } else {
+      const proxy = enableProxy ? new ApiProxy(pluginDescriptor, hook) : null;
+      const list = target.__VUE_DEVTOOLS_PLUGINS__ = target.__VUE_DEVTOOLS_PLUGINS__ || [];
+      list.push({
+        pluginDescriptor,
+        setupFn,
+        proxy
+      });
+      if (proxy)
+        setupFn(proxy.proxiedTarget);
+    }
+  }
+  /*!
+   * vuex v4.1.0
+   * (c) 2022 Evan You
+   * @license MIT
+   */
+  var storeKey = "store";
+  function forEachValue(obj, fn) {
+    Object.keys(obj).forEach(function(key) {
+      return fn(obj[key], key);
+    });
+  }
+  function isObject(obj) {
+    return obj !== null && typeof obj === "object";
+  }
+  function isPromise(val) {
+    return val && typeof val.then === "function";
+  }
+  function assert(condition, msg) {
+    if (!condition) {
+      throw new Error("[vuex] " + msg);
+    }
+  }
+  function partial(fn, arg) {
+    return function() {
+      return fn(arg);
+    };
+  }
+  function genericSubscribe(fn, subs, options) {
+    if (subs.indexOf(fn) < 0) {
+      options && options.prepend ? subs.unshift(fn) : subs.push(fn);
+    }
+    return function() {
+      var i = subs.indexOf(fn);
+      if (i > -1) {
+        subs.splice(i, 1);
+      }
+    };
+  }
+  function resetStore(store2, hot) {
+    store2._actions = /* @__PURE__ */ Object.create(null);
+    store2._mutations = /* @__PURE__ */ Object.create(null);
+    store2._wrappedGetters = /* @__PURE__ */ Object.create(null);
+    store2._modulesNamespaceMap = /* @__PURE__ */ Object.create(null);
+    var state = store2.state;
+    installModule(store2, state, [], store2._modules.root, true);
+    resetStoreState(store2, state, hot);
+  }
+  function resetStoreState(store2, state, hot) {
+    var oldState = store2._state;
+    var oldScope = store2._scope;
+    store2.getters = {};
+    store2._makeLocalGettersCache = /* @__PURE__ */ Object.create(null);
+    var wrappedGetters = store2._wrappedGetters;
+    var computedObj = {};
+    var computedCache = {};
+    var scope = vue.effectScope(true);
+    scope.run(function() {
+      forEachValue(wrappedGetters, function(fn, key) {
+        computedObj[key] = partial(fn, store2);
+        computedCache[key] = vue.computed(function() {
+          return computedObj[key]();
+        });
+        Object.defineProperty(store2.getters, key, {
+          get: function() {
+            return computedCache[key].value;
+          },
+          enumerable: true
+          // for local getters
+        });
+      });
+    });
+    store2._state = vue.reactive({
+      data: state
+    });
+    store2._scope = scope;
+    if (store2.strict) {
+      enableStrictMode(store2);
+    }
+    if (oldState) {
+      if (hot) {
+        store2._withCommit(function() {
+          oldState.data = null;
+        });
+      }
+    }
+    if (oldScope) {
+      oldScope.stop();
+    }
+  }
+  function installModule(store2, rootState, path, module, hot) {
+    var isRoot = !path.length;
+    var namespace = store2._modules.getNamespace(path);
+    if (module.namespaced) {
+      if (store2._modulesNamespaceMap[namespace] && true) {
+        console.error("[vuex] duplicate namespace " + namespace + " for the namespaced module " + path.join("/"));
+      }
+      store2._modulesNamespaceMap[namespace] = module;
+    }
+    if (!isRoot && !hot) {
+      var parentState = getNestedState(rootState, path.slice(0, -1));
+      var moduleName = path[path.length - 1];
+      store2._withCommit(function() {
+        {
+          if (moduleName in parentState) {
+            console.warn(
+              '[vuex] state field "' + moduleName + '" was overridden by a module with the same name at "' + path.join(".") + '"'
+            );
+          }
+        }
+        parentState[moduleName] = module.state;
+      });
+    }
+    var local = module.context = makeLocalContext(store2, namespace, path);
+    module.forEachMutation(function(mutation, key) {
+      var namespacedType = namespace + key;
+      registerMutation(store2, namespacedType, mutation, local);
+    });
+    module.forEachAction(function(action, key) {
+      var type = action.root ? key : namespace + key;
+      var handler = action.handler || action;
+      registerAction(store2, type, handler, local);
+    });
+    module.forEachGetter(function(getter, key) {
+      var namespacedType = namespace + key;
+      registerGetter(store2, namespacedType, getter, local);
+    });
+    module.forEachChild(function(child, key) {
+      installModule(store2, rootState, path.concat(key), child, hot);
+    });
+  }
+  function makeLocalContext(store2, namespace, path) {
+    var noNamespace = namespace === "";
+    var local = {
+      dispatch: noNamespace ? store2.dispatch : function(_type, _payload, _options) {
+        var args = unifyObjectStyle(_type, _payload, _options);
+        var payload = args.payload;
+        var options = args.options;
+        var type = args.type;
+        if (!options || !options.root) {
+          type = namespace + type;
+          if (!store2._actions[type]) {
+            console.error("[vuex] unknown local action type: " + args.type + ", global type: " + type);
+            return;
+          }
+        }
+        return store2.dispatch(type, payload);
+      },
+      commit: noNamespace ? store2.commit : function(_type, _payload, _options) {
+        var args = unifyObjectStyle(_type, _payload, _options);
+        var payload = args.payload;
+        var options = args.options;
+        var type = args.type;
+        if (!options || !options.root) {
+          type = namespace + type;
+          if (!store2._mutations[type]) {
+            console.error("[vuex] unknown local mutation type: " + args.type + ", global type: " + type);
+            return;
+          }
+        }
+        store2.commit(type, payload, options);
+      }
+    };
+    Object.defineProperties(local, {
+      getters: {
+        get: noNamespace ? function() {
+          return store2.getters;
+        } : function() {
+          return makeLocalGetters(store2, namespace);
+        }
+      },
+      state: {
+        get: function() {
+          return getNestedState(store2.state, path);
+        }
+      }
+    });
+    return local;
+  }
+  function makeLocalGetters(store2, namespace) {
+    if (!store2._makeLocalGettersCache[namespace]) {
+      var gettersProxy = {};
+      var splitPos = namespace.length;
+      Object.keys(store2.getters).forEach(function(type) {
+        if (type.slice(0, splitPos) !== namespace) {
+          return;
+        }
+        var localType = type.slice(splitPos);
+        Object.defineProperty(gettersProxy, localType, {
+          get: function() {
+            return store2.getters[type];
+          },
+          enumerable: true
+        });
+      });
+      store2._makeLocalGettersCache[namespace] = gettersProxy;
+    }
+    return store2._makeLocalGettersCache[namespace];
+  }
+  function registerMutation(store2, type, handler, local) {
+    var entry = store2._mutations[type] || (store2._mutations[type] = []);
+    entry.push(function wrappedMutationHandler(payload) {
+      handler.call(store2, local.state, payload);
+    });
+  }
+  function registerAction(store2, type, handler, local) {
+    var entry = store2._actions[type] || (store2._actions[type] = []);
+    entry.push(function wrappedActionHandler(payload) {
+      var res = handler.call(store2, {
+        dispatch: local.dispatch,
+        commit: local.commit,
+        getters: local.getters,
+        state: local.state,
+        rootGetters: store2.getters,
+        rootState: store2.state
+      }, payload);
+      if (!isPromise(res)) {
+        res = Promise.resolve(res);
+      }
+      if (store2._devtoolHook) {
+        return res.catch(function(err) {
+          store2._devtoolHook.emit("vuex:error", err);
+          throw err;
+        });
+      } else {
+        return res;
+      }
+    });
+  }
+  function registerGetter(store2, type, rawGetter, local) {
+    if (store2._wrappedGetters[type]) {
+      {
+        console.error("[vuex] duplicate getter key: " + type);
+      }
+      return;
+    }
+    store2._wrappedGetters[type] = function wrappedGetter(store22) {
+      return rawGetter(
+        local.state,
+        // local state
+        local.getters,
+        // local getters
+        store22.state,
+        // root state
+        store22.getters
+        // root getters
+      );
+    };
+  }
+  function enableStrictMode(store2) {
+    vue.watch(function() {
+      return store2._state.data;
+    }, function() {
+      {
+        assert(store2._committing, "do not mutate vuex store state outside mutation handlers.");
+      }
+    }, { deep: true, flush: "sync" });
+  }
+  function getNestedState(state, path) {
+    return path.reduce(function(state2, key) {
+      return state2[key];
+    }, state);
+  }
+  function unifyObjectStyle(type, payload, options) {
+    if (isObject(type) && type.type) {
+      options = payload;
+      payload = type;
+      type = type.type;
+    }
+    {
+      assert(typeof type === "string", "expects string as the type, but found " + typeof type + ".");
+    }
+    return { type, payload, options };
+  }
+  var LABEL_VUEX_BINDINGS = "vuex bindings";
+  var MUTATIONS_LAYER_ID = "vuex:mutations";
+  var ACTIONS_LAYER_ID = "vuex:actions";
+  var INSPECTOR_ID = "vuex";
+  var actionId = 0;
+  function addDevtools(app, store2) {
+    setupDevtoolsPlugin(
+      {
+        id: "org.vuejs.vuex",
+        app,
+        label: "Vuex",
+        homepage: "https://next.vuex.vuejs.org/",
+        logo: "https://vuejs.org/images/icons/favicon-96x96.png",
+        packageName: "vuex",
+        componentStateTypes: [LABEL_VUEX_BINDINGS]
+      },
+      function(api) {
+        api.addTimelineLayer({
+          id: MUTATIONS_LAYER_ID,
+          label: "Vuex Mutations",
+          color: COLOR_LIME_500
+        });
+        api.addTimelineLayer({
+          id: ACTIONS_LAYER_ID,
+          label: "Vuex Actions",
+          color: COLOR_LIME_500
+        });
+        api.addInspector({
+          id: INSPECTOR_ID,
+          label: "Vuex",
+          icon: "storage",
+          treeFilterPlaceholder: "Filter stores..."
+        });
+        api.on.getInspectorTree(function(payload) {
+          if (payload.app === app && payload.inspectorId === INSPECTOR_ID) {
+            if (payload.filter) {
+              var nodes = [];
+              flattenStoreForInspectorTree(nodes, store2._modules.root, payload.filter, "");
+              payload.rootNodes = nodes;
+            } else {
+              payload.rootNodes = [
+                formatStoreForInspectorTree(store2._modules.root, "")
+              ];
+            }
+          }
+        });
+        api.on.getInspectorState(function(payload) {
+          if (payload.app === app && payload.inspectorId === INSPECTOR_ID) {
+            var modulePath = payload.nodeId;
+            makeLocalGetters(store2, modulePath);
+            payload.state = formatStoreForInspectorState(
+              getStoreModule(store2._modules, modulePath),
+              modulePath === "root" ? store2.getters : store2._makeLocalGettersCache,
+              modulePath
+            );
+          }
+        });
+        api.on.editInspectorState(function(payload) {
+          if (payload.app === app && payload.inspectorId === INSPECTOR_ID) {
+            var modulePath = payload.nodeId;
+            var path = payload.path;
+            if (modulePath !== "root") {
+              path = modulePath.split("/").filter(Boolean).concat(path);
+            }
+            store2._withCommit(function() {
+              payload.set(store2._state.data, path, payload.state.value);
+            });
+          }
+        });
+        store2.subscribe(function(mutation, state) {
+          var data = {};
+          if (mutation.payload) {
+            data.payload = mutation.payload;
+          }
+          data.state = state;
+          api.notifyComponentUpdate();
+          api.sendInspectorTree(INSPECTOR_ID);
+          api.sendInspectorState(INSPECTOR_ID);
+          api.addTimelineEvent({
+            layerId: MUTATIONS_LAYER_ID,
+            event: {
+              time: Date.now(),
+              title: mutation.type,
+              data
+            }
+          });
+        });
+        store2.subscribeAction({
+          before: function(action, state) {
+            var data = {};
+            if (action.payload) {
+              data.payload = action.payload;
+            }
+            action._id = actionId++;
+            action._time = Date.now();
+            data.state = state;
+            api.addTimelineEvent({
+              layerId: ACTIONS_LAYER_ID,
+              event: {
+                time: action._time,
+                title: action.type,
+                groupId: action._id,
+                subtitle: "start",
+                data
+              }
+            });
+          },
+          after: function(action, state) {
+            var data = {};
+            var duration = Date.now() - action._time;
+            data.duration = {
+              _custom: {
+                type: "duration",
+                display: duration + "ms",
+                tooltip: "Action duration",
+                value: duration
+              }
+            };
+            if (action.payload) {
+              data.payload = action.payload;
+            }
+            data.state = state;
+            api.addTimelineEvent({
+              layerId: ACTIONS_LAYER_ID,
+              event: {
+                time: Date.now(),
+                title: action.type,
+                groupId: action._id,
+                subtitle: "end",
+                data
+              }
+            });
+          }
+        });
+      }
+    );
+  }
+  var COLOR_LIME_500 = 8702998;
+  var COLOR_DARK = 6710886;
+  var COLOR_WHITE = 16777215;
+  var TAG_NAMESPACED = {
+    label: "namespaced",
+    textColor: COLOR_WHITE,
+    backgroundColor: COLOR_DARK
+  };
+  function extractNameFromPath(path) {
+    return path && path !== "root" ? path.split("/").slice(-2, -1)[0] : "Root";
+  }
+  function formatStoreForInspectorTree(module, path) {
+    return {
+      id: path || "root",
+      // all modules end with a `/`, we want the last segment only
+      // cart/ -> cart
+      // nested/cart/ -> cart
+      label: extractNameFromPath(path),
+      tags: module.namespaced ? [TAG_NAMESPACED] : [],
+      children: Object.keys(module._children).map(
+        function(moduleName) {
+          return formatStoreForInspectorTree(
+            module._children[moduleName],
+            path + moduleName + "/"
+          );
+        }
+      )
+    };
+  }
+  function flattenStoreForInspectorTree(result, module, filter, path) {
+    if (path.includes(filter)) {
+      result.push({
+        id: path || "root",
+        label: path.endsWith("/") ? path.slice(0, path.length - 1) : path || "Root",
+        tags: module.namespaced ? [TAG_NAMESPACED] : []
+      });
+    }
+    Object.keys(module._children).forEach(function(moduleName) {
+      flattenStoreForInspectorTree(result, module._children[moduleName], filter, path + moduleName + "/");
+    });
+  }
+  function formatStoreForInspectorState(module, getters, path) {
+    getters = path === "root" ? getters : getters[path];
+    var gettersKeys = Object.keys(getters);
+    var storeState = {
+      state: Object.keys(module.state).map(function(key) {
+        return {
+          key,
+          editable: true,
+          value: module.state[key]
+        };
+      })
+    };
+    if (gettersKeys.length) {
+      var tree = transformPathsToObjectTree(getters);
+      storeState.getters = Object.keys(tree).map(function(key) {
+        return {
+          key: key.endsWith("/") ? extractNameFromPath(key) : key,
+          editable: false,
+          value: canThrow(function() {
+            return tree[key];
+          })
+        };
+      });
+    }
+    return storeState;
+  }
+  function transformPathsToObjectTree(getters) {
+    var result = {};
+    Object.keys(getters).forEach(function(key) {
+      var path = key.split("/");
+      if (path.length > 1) {
+        var target = result;
+        var leafKey = path.pop();
+        path.forEach(function(p) {
+          if (!target[p]) {
+            target[p] = {
+              _custom: {
+                value: {},
+                display: p,
+                tooltip: "Module",
+                abstract: true
+              }
+            };
+          }
+          target = target[p]._custom.value;
+        });
+        target[leafKey] = canThrow(function() {
+          return getters[key];
+        });
+      } else {
+        result[key] = canThrow(function() {
+          return getters[key];
+        });
+      }
+    });
+    return result;
+  }
+  function getStoreModule(moduleMap, path) {
+    var names = path.split("/").filter(function(n) {
+      return n;
+    });
+    return names.reduce(
+      function(module, moduleName, i) {
+        var child = module[moduleName];
+        if (!child) {
+          throw new Error('Missing module "' + moduleName + '" for path "' + path + '".');
+        }
+        return i === names.length - 1 ? child : child._children;
+      },
+      path === "root" ? moduleMap : moduleMap.root._children
+    );
+  }
+  function canThrow(cb) {
+    try {
+      return cb();
+    } catch (e) {
+      return e;
+    }
+  }
+  var Module = function Module2(rawModule, runtime) {
+    this.runtime = runtime;
+    this._children = /* @__PURE__ */ Object.create(null);
+    this._rawModule = rawModule;
+    var rawState = rawModule.state;
+    this.state = (typeof rawState === "function" ? rawState() : rawState) || {};
+  };
+  var prototypeAccessors$1 = { namespaced: { configurable: true } };
+  prototypeAccessors$1.namespaced.get = function() {
+    return !!this._rawModule.namespaced;
+  };
+  Module.prototype.addChild = function addChild(key, module) {
+    this._children[key] = module;
+  };
+  Module.prototype.removeChild = function removeChild(key) {
+    delete this._children[key];
+  };
+  Module.prototype.getChild = function getChild(key) {
+    return this._children[key];
+  };
+  Module.prototype.hasChild = function hasChild(key) {
+    return key in this._children;
+  };
+  Module.prototype.update = function update(rawModule) {
+    this._rawModule.namespaced = rawModule.namespaced;
+    if (rawModule.actions) {
+      this._rawModule.actions = rawModule.actions;
+    }
+    if (rawModule.mutations) {
+      this._rawModule.mutations = rawModule.mutations;
+    }
+    if (rawModule.getters) {
+      this._rawModule.getters = rawModule.getters;
+    }
+  };
+  Module.prototype.forEachChild = function forEachChild(fn) {
+    forEachValue(this._children, fn);
+  };
+  Module.prototype.forEachGetter = function forEachGetter(fn) {
+    if (this._rawModule.getters) {
+      forEachValue(this._rawModule.getters, fn);
+    }
+  };
+  Module.prototype.forEachAction = function forEachAction(fn) {
+    if (this._rawModule.actions) {
+      forEachValue(this._rawModule.actions, fn);
+    }
+  };
+  Module.prototype.forEachMutation = function forEachMutation(fn) {
+    if (this._rawModule.mutations) {
+      forEachValue(this._rawModule.mutations, fn);
+    }
+  };
+  Object.defineProperties(Module.prototype, prototypeAccessors$1);
+  var ModuleCollection = function ModuleCollection2(rawRootModule) {
+    this.register([], rawRootModule, false);
+  };
+  ModuleCollection.prototype.get = function get(path) {
+    return path.reduce(function(module, key) {
+      return module.getChild(key);
+    }, this.root);
+  };
+  ModuleCollection.prototype.getNamespace = function getNamespace(path) {
+    var module = this.root;
+    return path.reduce(function(namespace, key) {
+      module = module.getChild(key);
+      return namespace + (module.namespaced ? key + "/" : "");
+    }, "");
+  };
+  ModuleCollection.prototype.update = function update$1(rawRootModule) {
+    update2([], this.root, rawRootModule);
+  };
+  ModuleCollection.prototype.register = function register(path, rawModule, runtime) {
+    var this$1$1 = this;
+    if (runtime === void 0)
+      runtime = true;
+    {
+      assertRawModule(path, rawModule);
+    }
+    var newModule = new Module(rawModule, runtime);
+    if (path.length === 0) {
+      this.root = newModule;
+    } else {
+      var parent = this.get(path.slice(0, -1));
+      parent.addChild(path[path.length - 1], newModule);
+    }
+    if (rawModule.modules) {
+      forEachValue(rawModule.modules, function(rawChildModule, key) {
+        this$1$1.register(path.concat(key), rawChildModule, runtime);
+      });
+    }
+  };
+  ModuleCollection.prototype.unregister = function unregister(path) {
+    var parent = this.get(path.slice(0, -1));
+    var key = path[path.length - 1];
+    var child = parent.getChild(key);
+    if (!child) {
+      {
+        console.warn(
+          "[vuex] trying to unregister module '" + key + "', which is not registered"
+        );
+      }
+      return;
+    }
+    if (!child.runtime) {
+      return;
+    }
+    parent.removeChild(key);
+  };
+  ModuleCollection.prototype.isRegistered = function isRegistered(path) {
+    var parent = this.get(path.slice(0, -1));
+    var key = path[path.length - 1];
+    if (parent) {
+      return parent.hasChild(key);
+    }
+    return false;
+  };
+  function update2(path, targetModule, newModule) {
+    {
+      assertRawModule(path, newModule);
+    }
+    targetModule.update(newModule);
+    if (newModule.modules) {
+      for (var key in newModule.modules) {
+        if (!targetModule.getChild(key)) {
+          {
+            console.warn(
+              "[vuex] trying to add a new module '" + key + "' on hot reloading, manual reload is needed"
+            );
+          }
+          return;
+        }
+        update2(
+          path.concat(key),
+          targetModule.getChild(key),
+          newModule.modules[key]
+        );
+      }
+    }
+  }
+  var functionAssert = {
+    assert: function(value) {
+      return typeof value === "function";
+    },
+    expected: "function"
+  };
+  var objectAssert = {
+    assert: function(value) {
+      return typeof value === "function" || typeof value === "object" && typeof value.handler === "function";
+    },
+    expected: 'function or object with "handler" function'
+  };
+  var assertTypes = {
+    getters: functionAssert,
+    mutations: functionAssert,
+    actions: objectAssert
+  };
+  function assertRawModule(path, rawModule) {
+    Object.keys(assertTypes).forEach(function(key) {
+      if (!rawModule[key]) {
+        return;
+      }
+      var assertOptions = assertTypes[key];
+      forEachValue(rawModule[key], function(value, type) {
+        assert(
+          assertOptions.assert(value),
+          makeAssertionMessage(path, key, type, value, assertOptions.expected)
+        );
+      });
+    });
+  }
+  function makeAssertionMessage(path, key, type, value, expected) {
+    var buf = key + " should be " + expected + ' but "' + key + "." + type + '"';
+    if (path.length > 0) {
+      buf += ' in module "' + path.join(".") + '"';
+    }
+    buf += " is " + JSON.stringify(value) + ".";
+    return buf;
+  }
+  function createStore(options) {
+    return new Store(options);
+  }
+  var Store = function Store2(options) {
+    var this$1$1 = this;
+    if (options === void 0)
+      options = {};
+    {
+      assert(typeof Promise !== "undefined", "vuex requires a Promise polyfill in this browser.");
+      assert(this instanceof Store2, "store must be called with the new operator.");
+    }
+    var plugins = options.plugins;
+    if (plugins === void 0)
+      plugins = [];
+    var strict = options.strict;
+    if (strict === void 0)
+      strict = false;
+    var devtools = options.devtools;
+    this._committing = false;
+    this._actions = /* @__PURE__ */ Object.create(null);
+    this._actionSubscribers = [];
+    this._mutations = /* @__PURE__ */ Object.create(null);
+    this._wrappedGetters = /* @__PURE__ */ Object.create(null);
+    this._modules = new ModuleCollection(options);
+    this._modulesNamespaceMap = /* @__PURE__ */ Object.create(null);
+    this._subscribers = [];
+    this._makeLocalGettersCache = /* @__PURE__ */ Object.create(null);
+    this._scope = null;
+    this._devtools = devtools;
+    var store2 = this;
+    var ref = this;
+    var dispatch2 = ref.dispatch;
+    var commit2 = ref.commit;
+    this.dispatch = function boundDispatch(type, payload) {
+      return dispatch2.call(store2, type, payload);
+    };
+    this.commit = function boundCommit(type, payload, options2) {
+      return commit2.call(store2, type, payload, options2);
+    };
+    this.strict = strict;
+    var state = this._modules.root.state;
+    installModule(this, state, [], this._modules.root);
+    resetStoreState(this, state);
+    plugins.forEach(function(plugin) {
+      return plugin(this$1$1);
+    });
+  };
+  var prototypeAccessors = { state: { configurable: true } };
+  Store.prototype.install = function install(app, injectKey) {
+    app.provide(injectKey || storeKey, this);
+    app.config.globalProperties.$store = this;
+    var useDevtools = this._devtools !== void 0 ? this._devtools : true;
+    if (useDevtools) {
+      addDevtools(app, this);
+    }
+  };
+  prototypeAccessors.state.get = function() {
+    return this._state.data;
+  };
+  prototypeAccessors.state.set = function(v) {
+    {
+      assert(false, "use store.replaceState() to explicit replace store state.");
+    }
+  };
+  Store.prototype.commit = function commit(_type, _payload, _options) {
+    var this$1$1 = this;
+    var ref = unifyObjectStyle(_type, _payload, _options);
+    var type = ref.type;
+    var payload = ref.payload;
+    var options = ref.options;
+    var mutation = { type, payload };
+    var entry = this._mutations[type];
+    if (!entry) {
+      {
+        console.error("[vuex] unknown mutation type: " + type);
+      }
+      return;
+    }
+    this._withCommit(function() {
+      entry.forEach(function commitIterator(handler) {
+        handler(payload);
+      });
+    });
+    this._subscribers.slice().forEach(function(sub) {
+      return sub(mutation, this$1$1.state);
+    });
+    if (options && options.silent) {
+      console.warn(
+        "[vuex] mutation type: " + type + ". Silent option has been removed. Use the filter functionality in the vue-devtools"
+      );
+    }
+  };
+  Store.prototype.dispatch = function dispatch(_type, _payload) {
+    var this$1$1 = this;
+    var ref = unifyObjectStyle(_type, _payload);
+    var type = ref.type;
+    var payload = ref.payload;
+    var action = { type, payload };
+    var entry = this._actions[type];
+    if (!entry) {
+      {
+        console.error("[vuex] unknown action type: " + type);
+      }
+      return;
+    }
+    try {
+      this._actionSubscribers.slice().filter(function(sub) {
+        return sub.before;
+      }).forEach(function(sub) {
+        return sub.before(action, this$1$1.state);
+      });
+    } catch (e) {
+      {
+        console.warn("[vuex] error in before action subscribers: ");
+        console.error(e);
+      }
+    }
+    var result = entry.length > 1 ? Promise.all(entry.map(function(handler) {
+      return handler(payload);
+    })) : entry[0](payload);
+    return new Promise(function(resolve, reject) {
+      result.then(function(res) {
+        try {
+          this$1$1._actionSubscribers.filter(function(sub) {
+            return sub.after;
+          }).forEach(function(sub) {
+            return sub.after(action, this$1$1.state);
+          });
+        } catch (e) {
+          {
+            console.warn("[vuex] error in after action subscribers: ");
+            console.error(e);
+          }
+        }
+        resolve(res);
+      }, function(error) {
+        try {
+          this$1$1._actionSubscribers.filter(function(sub) {
+            return sub.error;
+          }).forEach(function(sub) {
+            return sub.error(action, this$1$1.state, error);
+          });
+        } catch (e) {
+          {
+            console.warn("[vuex] error in error action subscribers: ");
+            console.error(e);
+          }
+        }
+        reject(error);
+      });
+    });
+  };
+  Store.prototype.subscribe = function subscribe(fn, options) {
+    return genericSubscribe(fn, this._subscribers, options);
+  };
+  Store.prototype.subscribeAction = function subscribeAction(fn, options) {
+    var subs = typeof fn === "function" ? { before: fn } : fn;
+    return genericSubscribe(subs, this._actionSubscribers, options);
+  };
+  Store.prototype.watch = function watch$1(getter, cb, options) {
+    var this$1$1 = this;
+    {
+      assert(typeof getter === "function", "store.watch only accepts a function.");
+    }
+    return vue.watch(function() {
+      return getter(this$1$1.state, this$1$1.getters);
+    }, cb, Object.assign({}, options));
+  };
+  Store.prototype.replaceState = function replaceState(state) {
+    var this$1$1 = this;
+    this._withCommit(function() {
+      this$1$1._state.data = state;
+    });
+  };
+  Store.prototype.registerModule = function registerModule(path, rawModule, options) {
+    if (options === void 0)
+      options = {};
+    if (typeof path === "string") {
+      path = [path];
+    }
+    {
+      assert(Array.isArray(path), "module path must be a string or an Array.");
+      assert(path.length > 0, "cannot register the root module by using registerModule.");
+    }
+    this._modules.register(path, rawModule);
+    installModule(this, this.state, path, this._modules.get(path), options.preserveState);
+    resetStoreState(this, this.state);
+  };
+  Store.prototype.unregisterModule = function unregisterModule(path) {
+    var this$1$1 = this;
+    if (typeof path === "string") {
+      path = [path];
+    }
+    {
+      assert(Array.isArray(path), "module path must be a string or an Array.");
+    }
+    this._modules.unregister(path);
+    this._withCommit(function() {
+      var parentState = getNestedState(this$1$1.state, path.slice(0, -1));
+      delete parentState[path[path.length - 1]];
+    });
+    resetStore(this);
+  };
+  Store.prototype.hasModule = function hasModule(path) {
+    if (typeof path === "string") {
+      path = [path];
+    }
+    {
+      assert(Array.isArray(path), "module path must be a string or an Array.");
+    }
+    return this._modules.isRegistered(path);
+  };
+  Store.prototype.hotUpdate = function hotUpdate(newOptions) {
+    this._modules.update(newOptions);
+    resetStore(this, true);
+  };
+  Store.prototype._withCommit = function _withCommit(fn) {
+    var committing = this._committing;
+    this._committing = true;
+    fn();
+    this._committing = committing;
+  };
+  Object.defineProperties(Store.prototype, prototypeAccessors);
+  var mapState = normalizeNamespace(function(namespace, states) {
+    var res = {};
+    if (!isValidMap(states)) {
+      console.error("[vuex] mapState: mapper parameter must be either an Array or an Object");
+    }
+    normalizeMap(states).forEach(function(ref) {
+      var key = ref.key;
+      var val = ref.val;
+      res[key] = function mappedState() {
+        var state = this.$store.state;
+        var getters = this.$store.getters;
+        if (namespace) {
+          var module = getModuleByNamespace(this.$store, "mapState", namespace);
+          if (!module) {
+            return;
+          }
+          state = module.context.state;
+          getters = module.context.getters;
+        }
+        return typeof val === "function" ? val.call(this, state, getters) : state[val];
+      };
+      res[key].vuex = true;
+    });
+    return res;
+  });
+  function normalizeMap(map) {
+    if (!isValidMap(map)) {
+      return [];
+    }
+    return Array.isArray(map) ? map.map(function(key) {
+      return { key, val: key };
+    }) : Object.keys(map).map(function(key) {
+      return { key, val: map[key] };
+    });
+  }
+  function isValidMap(map) {
+    return Array.isArray(map) || isObject(map);
+  }
+  function normalizeNamespace(fn) {
+    return function(namespace, map) {
+      if (typeof namespace !== "string") {
+        map = namespace;
+        namespace = "";
+      } else if (namespace.charAt(namespace.length - 1) !== "/") {
+        namespace += "/";
+      }
+      return fn(namespace, map);
+    };
+  }
+  function getModuleByNamespace(store2, helper, namespace) {
+    var module = store2._modulesNamespaceMap[namespace];
+    if (!module) {
+      console.error("[vuex] module namespace not found in " + helper + "(): " + namespace);
+    }
+    return module;
+  }
+  const _imports_0$1 = "/static/common/demo6.jpg";
+  const _imports_1 = "/static/common/banner2.jpg";
+  const _sfc_main$u = {
     components: {
       uniListItem,
-      uniList
+      uniList,
+      otherLogin
     },
     data() {
       return {
@@ -1647,29 +2797,66 @@ if (uni.restoreGlobal) {
         url: "/pages/user-setting/user-setting"
       });
     },
-    methods: {}
+    computed: {
+      ...mapState({
+        loginStatus: (state) => state.loginStatus
+      })
+    },
+    methods: {
+      // 打开登录页
+      openLogin() {
+        uni.navigateTo({
+          url: "/pages/login/login"
+        });
+      }
+    }
   };
-  function _sfc_render$u(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$t(_ctx, _cache, $props, $setup, $data, $options) {
+    const _component_other_login = vue.resolveComponent("other-login");
     const _component_uni_list_item = vue.resolveComponent("uni-list-item");
     const _component_uni_list = vue.resolveComponent("uni-list");
     return vue.openBlock(), vue.createElementBlock("view", null, [
-      vue.createElementVNode("navigator", { url: "/pages/login/login" }, [
-        vue.createElementVNode("view", {
-          class: "flex align-center p-2",
-          "hover-class": "bg-light"
-        }, [
-          vue.createElementVNode("image", {
-            src: _imports_0$2,
-            style: { "width": "100rpx", "height": "100rpx" },
-            class: "rounded-circle"
-          }),
-          vue.createElementVNode("view", { class: "flex flex-column flex-1 px-2" }, [
-            vue.createElementVNode("text", { class: "font-lg font-weight-bold" }, "昵称"),
-            vue.createElementVNode("text", { class: "font text-muted" }, "总帖子10 今日发帖0")
-          ]),
-          vue.createElementVNode("text", { class: "iconfont icon-xiangyou1" })
-        ])
-      ]),
+      vue.createCommentVNode(" 未登录 "),
+      !_ctx.loginStatus ? (vue.openBlock(), vue.createElementBlock(
+        vue.Fragment,
+        { key: 0 },
+        [
+          vue.createElementVNode("view", { class: "flex align-center justify-center py-2 font" }, " 登录社区，体验更多功能 "),
+          vue.createVNode(_component_other_login),
+          vue.createElementVNode("view", {
+            class: "flex align-center justify-center py-2 font text-secondary",
+            onClick: _cache[0] || (_cache[0] = (...args) => $options.openLogin && $options.openLogin(...args))
+          }, [
+            vue.createTextVNode(" 账号/邮箱/手机登录"),
+            vue.createElementVNode("text", { class: "ml-2 iconfont icon-xiangyou1" })
+          ])
+        ],
+        64
+        /* STABLE_FRAGMENT */
+      )) : (vue.openBlock(), vue.createElementBlock(
+        vue.Fragment,
+        { key: 1 },
+        [
+          vue.createCommentVNode(" 已登录 "),
+          vue.createElementVNode("view", {
+            class: "flex align-center p-2",
+            "hover-class": "bg-light"
+          }, [
+            vue.createElementVNode("image", {
+              src: _imports_0$1,
+              style: { "width": "100rpx", "height": "100rpx" },
+              class: "rounded-circle"
+            }),
+            vue.createElementVNode("view", { class: "flex flex-column flex-1 px-2" }, [
+              vue.createElementVNode("text", { class: "font-lg font-weight-bold" }, "昵称"),
+              vue.createElementVNode("text", { class: "font text-muted" }, "总帖子10 今日发帖0")
+            ]),
+            vue.createElementVNode("text", { class: "iconfont icon-xiangyou1" })
+          ])
+        ],
+        2112
+        /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */
+      )),
       vue.createElementVNode("view", { class: "flex align-center px-3 py-2" }, [
         (vue.openBlock(true), vue.createElementBlock(
           vue.Fragment,
@@ -1745,9 +2932,9 @@ if (uni.restoreGlobal) {
       })
     ]);
   }
-  const PagesOwnerOwner = /* @__PURE__ */ _export_sfc(_sfc_main$v, [["render", _sfc_render$u], ["__file", "F:/project/社区交友/pages/owner/owner.vue"]]);
+  const PagesOwnerOwner = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["render", _sfc_render$t], ["__file", "F:/project/社区交友/pages/owner/owner.vue"]]);
   var statusBarHeight = uni.getSystemInfoSync().statusBarHeight + "px";
-  const _sfc_main$u = {
+  const _sfc_main$t = {
     name: "UniStatusBar",
     data() {
       return {
@@ -1755,7 +2942,7 @@ if (uni.restoreGlobal) {
       };
     }
   };
-  function _sfc_render$t(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$s(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -1769,8 +2956,8 @@ if (uni.restoreGlobal) {
       /* STYLE */
     );
   }
-  const uniStatusBar = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["render", _sfc_render$t], ["__scopeId", "data-v-25810fe1"], ["__file", "F:/project/社区交友/components/uni-uni/uni-status-bar/uni-status-bar.vue"]]);
-  const _sfc_main$t = {
+  const uniStatusBar = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["render", _sfc_render$s], ["__scopeId", "data-v-25810fe1"], ["__file", "F:/project/社区交友/components/uni-uni/uni-status-bar/uni-status-bar.vue"]]);
+  const _sfc_main$s = {
     name: "UniNavBar",
     components: {
       uniStatusBar,
@@ -1836,7 +3023,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$s(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$r(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_status_bar = vue.resolveComponent("uni-status-bar");
     const _component_uni_icons = vue.resolveComponent("uni-icons");
     return vue.openBlock(), vue.createElementBlock("view", { class: "uni-navbar" }, [
@@ -1962,21 +3149,18 @@ if (uni.restoreGlobal) {
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const uniNavBar = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["render", _sfc_render$s], ["__scopeId", "data-v-49ede2a5"], ["__file", "F:/project/社区交友/components/uni-uni/uni-nav-bar/uni-nav-bar.vue"]]);
-  const _sfc_main$s = {
+  const uniNavBar = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["render", _sfc_render$r], ["__scopeId", "data-v-49ede2a5"], ["__file", "F:/project/社区交友/components/uni-uni/uni-nav-bar/uni-nav-bar.vue"]]);
+  const _sfc_main$r = {
     props: ["hotClick"],
     methods: {
       openMore() {
         uni.navigateTo({
           url: "/pages/topic-nav/topic-nav"
         });
-      },
-      openDetail() {
-        formatAppLog("log", "at components/find/hot-click.vue:29", "打开话题详情页");
       }
     }
   };
-  function _sfc_render$r(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$q(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", null, [
       vue.createElementVNode("view", { class: "flex align-center justify-between px-2" }, [
         vue.createElementVNode("text", { class: "font-md" }, "热门分类"),
@@ -1994,12 +3178,18 @@ if (uni.restoreGlobal) {
           vue.Fragment,
           null,
           vue.renderList($props.hotClick, (item, index) => {
-            return vue.openBlock(), vue.createElementBlock("view", {
-              class: "border rounded bg-light mx-1 px-2 animated",
-              "hover-class": "rubberBand",
-              key: index,
-              onClick: ($event) => $options.openDetail(item)
-            }, vue.toDisplayString(item.name), 9, ["onClick"]);
+            return vue.openBlock(), vue.createElementBlock(
+              "view",
+              {
+                class: "border rounded bg-light mx-1 px-2 animated",
+                "hover-class": "rubberBand",
+                key: index,
+                onClick: _cache[1] || (_cache[1] = (...args) => $options.openMore && $options.openMore(...args))
+              },
+              vue.toDisplayString(item.name),
+              1
+              /* TEXT */
+            );
           }),
           128
           /* KEYED_FRAGMENT */
@@ -2007,8 +3197,8 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const hotClick = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["render", _sfc_render$r], ["__file", "F:/project/社区交友/components/find/hot-click.vue"]]);
-  const _sfc_main$r = {
+  const hotClick = /* @__PURE__ */ _export_sfc(_sfc_main$r, [["render", _sfc_render$q], ["__file", "F:/project/社区交友/components/find/hot-click.vue"]]);
+  const _sfc_main$q = {
     props: {
       item: Object,
       index: Number
@@ -2021,7 +3211,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$q(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$p(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "flex align-center p-2" }, [
       vue.createElementVNode("image", {
         src: $props.item.cover,
@@ -2065,9 +3255,8 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const topicList = /* @__PURE__ */ _export_sfc(_sfc_main$r, [["render", _sfc_render$q], ["__file", "F:/project/社区交友/components/find/topic-list.vue"]]);
-  const _imports_0$1 = "/static/common/demo2.jpg";
-  const demo$4 = [
+  const topicList = /* @__PURE__ */ _export_sfc(_sfc_main$q, [["render", _sfc_render$p], ["__file", "F:/project/社区交友/components/find/topic-list.vue"]]);
+  const demo$2 = [
     {
       username: "昵称",
       userpic: "/static/tabber/msg2.png",
@@ -2114,7 +3303,7 @@ if (uni.restoreGlobal) {
       share_count: 2
     }
   ];
-  const _sfc_main$q = {
+  const _sfc_main$p = {
     components: {
       uniNavBar,
       commonList,
@@ -2136,44 +3325,9 @@ if (uni.restoreGlobal) {
         ],
         list: [],
         loadmore: "上拉加载更多",
-        hotClick: [{
-          name: "关注"
-        }, {
-          name: "推荐"
-        }, {
-          name: "体育"
-        }, {
-          name: "热点"
-        }, {
-          name: "财经"
-        }, {
-          name: "娱乐"
-        }],
-        topicList: [{
-          cover: "/static/common/demo10.jpg",
-          title: "话题名称",
-          desc: "话题描述",
-          today_count: 0,
-          news_count: 10
-        }, {
-          cover: "/static/common/demo10.jpg",
-          title: "话题名称",
-          desc: "话题描述",
-          today_count: 0,
-          news_count: 10
-        }, {
-          cover: "/static/common/demo10.jpg",
-          title: "话题名称",
-          desc: "话题描述",
-          today_count: 0,
-          news_count: 10
-        }, {
-          cover: "/static/common/demo10.jpg",
-          title: "话题名称",
-          desc: "话题描述",
-          today_count: 0,
-          news_count: 10
-        }]
+        hotClick: [],
+        topicList: [],
+        swiperList: []
       };
     },
     onLoad() {
@@ -2182,9 +3336,44 @@ if (uni.restoreGlobal) {
           this.scrollH = res.windowHeight - res.statusBarHeight - 44;
         }
       });
-      this.list = demo$4;
+      this.list = demo$2;
+      this.getTopicNav();
+      this.getHotTopic();
+      this.getSwipers();
     },
     methods: {
+      // 获取热门分类
+      getTopicNav() {
+        this.$H.get("/topicclass").then((res) => {
+          this.hotClick = res.data.data.list.map((item) => {
+            return {
+              id: item.id,
+              name: item.classname
+            };
+          });
+        });
+      },
+      // 获取热门话题
+      getHotTopic() {
+        this.$H.get("/hottopic").then((res) => {
+          this.topicList = res.data.data.list.map((item) => {
+            return {
+              id: item.id,
+              cover: item.titlepic,
+              title: item.title,
+              desc: item.desc,
+              today_count: item.today_count,
+              news_count: item.post_count
+            };
+          });
+        });
+      },
+      // 获取轮播图
+      getSwipers() {
+        this.$H.get("/adsense/0").then((res) => {
+          this.swiperList = res.data.data.list;
+        });
+      },
       // 打开发布页
       openInput() {
         uni.navigateTo({
@@ -2235,7 +3424,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$p(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$o(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_nav_bar = vue.resolveComponent("uni-nav-bar");
     const _component_common_list = vue.resolveComponent("common-list");
     const _component_load_more = vue.resolveComponent("load-more");
@@ -2347,13 +3536,21 @@ if (uni.restoreGlobal) {
                 interval: 3e3,
                 duration: 1e3
               }, [
-                vue.createElementVNode("swiper-item", null, [
-                  vue.createElementVNode("image", {
-                    src: _imports_0$1,
-                    style: { "height": "300rpx" },
-                    class: "w-100 rounded"
-                  })
-                ])
+                (vue.openBlock(true), vue.createElementBlock(
+                  vue.Fragment,
+                  null,
+                  vue.renderList($data.swiperList, (item, index) => {
+                    return vue.openBlock(), vue.createElementBlock("swiper-item", { key: index }, [
+                      vue.createElementVNode("image", {
+                        src: item.src,
+                        style: { "height": "300rpx" },
+                        class: "w-100 rounded"
+                      }, null, 8, ["src"])
+                    ]);
+                  }),
+                  128
+                  /* KEYED_FRAGMENT */
+                ))
               ]),
               vue.createElementVNode("view", { class: "divider" }),
               vue.createCommentVNode(" 最近更新 "),
@@ -2380,8 +3577,8 @@ if (uni.restoreGlobal) {
       ], 44, ["current"])
     ]);
   }
-  const PagesFindFind = /* @__PURE__ */ _export_sfc(_sfc_main$q, [["render", _sfc_render$p], ["__file", "F:/project/社区交友/pages/find/find.vue"]]);
-  const _sfc_main$p = {
+  const PagesFindFind = /* @__PURE__ */ _export_sfc(_sfc_main$p, [["render", _sfc_render$o], ["__file", "F:/project/社区交友/pages/find/find.vue"]]);
+  const _sfc_main$o = {
     components: {
       uniBadge
     },
@@ -2390,7 +3587,7 @@ if (uni.restoreGlobal) {
       indexe: Number
     }
   };
-  function _sfc_render$o(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$n(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_badge = vue.resolveComponent("uni-badge");
     return vue.openBlock(), vue.createElementBlock("view", {
       class: "flex align-center p-2 border-bottom border-light-secondary",
@@ -2442,122 +3639,24 @@ if (uni.restoreGlobal) {
       )
     ]);
   }
-  const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main$p, [["render", _sfc_render$o], ["__file", "F:/project/社区交友/components/user-list/user-list.vue"]]);
-  const demo_post = [
-    {
-      username: "昵称",
-      userpic: "/static/tabber/msg2.png",
-      nowstime: "2019-10-20 下午04:30",
-      isFollow: false,
-      title: "我是标题",
-      titlepic: "/static/demo/屏幕截图 2025-07-14 081555.png",
-      liked: {
-        type: "liked",
-        liked_count: 1,
-        disliked_count: 2
-      },
-      comment_count: 2,
-      share_count: 2
-    },
-    {
-      username: "昵称",
-      userpic: "/static/tabber/msg2.png",
-      nowstime: "2019-10-20 下午04:30",
-      isFollow: false,
-      title: "我是标题",
-      titlepic: "",
-      liked: {
-        type: "disliked",
-        liked_count: 1,
-        disliked_count: 2
-      },
-      comment_count: 2,
-      share_count: 2
-    },
-    {
-      username: "昵称",
-      userpic: "/static/tabber/msg2.png",
-      nowstime: "2019-10-20 下午04:30",
-      isFollow: false,
-      title: "我是标题",
-      titlepic: "/static/demo/屏幕截图 2025-07-14 081555.png",
-      liked: {
-        type: "",
-        liked_count: 1,
-        disliked_count: 2
-      },
-      comment_count: 2,
-      share_count: 2
-    }
-  ];
-  const demo_topic = [{
-    cover: "/static/common/banner2.jpg",
-    title: "话题名称",
-    desc: "话题描述",
-    today_count: 0,
-    news_count: 10
-  }, {
-    cover: "/static/common/banner2.jpg",
-    title: "话题名称",
-    desc: "话题描述",
-    today_count: 0,
-    news_count: 10
-  }, {
-    cover: "/static/common/banner2.jpg",
-    title: "话题名称",
-    desc: "话题描述",
-    today_count: 0,
-    news_count: 10
-  }, {
-    cover: "/static/common/banner2.jpg",
-    title: "话题名称",
-    desc: "话题描述",
-    today_count: 0,
-    news_count: 10
-  }];
-  const demo_user = [{
-    headshot: "/static/common/demo6.jpg",
-    username: "烦躁杏鲍菇",
-    gender: 1,
-    //0未知 1女性 2男性
-    age: 24,
-    isFollow: true
-  }, {
-    headshot: "/static/common/demo6.jpg",
-    username: "烦躁杏鲍菇",
-    gender: 0,
-    //0未知 1女性 2男性
-    age: 24,
-    isFollow: true
-  }, {
-    headshot: "/static/common/demo6.jpg",
-    username: "烦躁杏鲍菇",
-    gender: 2,
-    //0未知 1女性 2男性
-    age: 24,
-    isFollow: true
-  }, {
-    headshot: "/static/common/demo6.jpg",
-    username: "烦躁杏鲍菇",
-    gender: 1,
-    //0未知 1女性 2男性
-    age: 24,
-    isFollow: false
-  }];
-  const _sfc_main$o = {
+  const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["render", _sfc_render$n], ["__file", "F:/project/社区交友/components/user-list/user-list.vue"]]);
+  const _sfc_main$n = {
     components: {
       commonList,
       topicList,
-      userList: __easycom_0
+      userList: __easycom_0,
+      loadMore
     },
     data() {
       return {
         searchText: "",
-        list: ["uni-app第二季商城类实战开发", "uni-app第三季仿微信实战开发", "实战教程", "系列教程"],
+        list: [],
         // 搜索结果
         searchList: [],
         // 当前搜索类型
-        type: "post"
+        type: "post",
+        loadmore: "上拉加载更多",
+        page: 1
       };
     },
     // 监听导航搜入
@@ -2575,35 +3674,95 @@ if (uni.restoreGlobal) {
         this.type = e.type;
       }
       this.updateSearchPlaceholder();
+      this.updateSearchPlaceholder();
+      let list = uni.getStorageSync("historySearchText");
+      if (list) {
+        this.list = JSON.parse(list);
+      }
+    },
+    // 监听下拉刷新
+    onPullDownRefresh() {
+      if (this.searchText === "") {
+        return uni.stopPullDownRefresh();
+      }
+      this.getDate(true, () => {
+        uni.stopPullDownRefresh();
+      });
+    },
+    // 监听上拉加载
+    onReachBottom() {
+      if (this.loadmore !== "上拉加载更多") {
+        return;
+      }
+      this.loadmore = "加载中...";
+      this.getData(false);
     },
     methods: {
       // 点击搜索历史
       clickSearchHistory(text) {
-        this.searchtext = text;
+        this.searchText = text;
         this.searchEvent();
       },
       //搜索事件
       searchEvent() {
         uni.hideKeyboard();
+        let index = this.list.findIndex((v) => v === this.searchText);
+        if (index !== -1) {
+          this.$U.__toFirst(this.list, index);
+        } else {
+          this.list.unshift(this.searchText);
+        }
+        uni.setStorageSync("historySearchText", JSON.stringify(this.list));
+        this.getDate();
+      },
+      getDate(isrefresh = true, callback = false) {
         uni.showLoading({
           title: "加载中...",
           mask: false
         });
-        setTimeout(() => {
+        this.page = isrefresh ? 1 : this.page + 1;
+        this.$H.post("/search/" + this.type, {
+          keyword: this.searchText,
+          page: this.page
+        }).then((res) => {
+          let list = [];
           switch (this.type) {
             case "post":
-              this.searchList = demo_post;
+              list = res.data.data.list.map((v) => {
+                return this.$U.formatCommonList(v);
+              });
               break;
             case "topic":
-              this.searchList = demo_topic;
+              list = res.data.data.list.map((v) => {
+                return {
+                  id: v.id,
+                  cover: v.titlepic,
+                  title: v.title,
+                  desc: v.desc,
+                  today_count: v.today_count,
+                  news_count: v.news_count
+                };
+              });
               break;
             case "user":
-              this.searchList = demo_user;
+              pageTitle = "用户";
               break;
           }
+          this.searchList = isrefresh ? [...list] : [...this.searchList, ...list];
+          this.loadmore = list.length < 10 ? "没有更多了" : "上拉加载更多";
           uni.hideLoading();
-        }, 3e3);
+          if (typeof callback === "function") {
+            callback();
+          }
+        }).catch((err) => {
+          this.page--;
+          uni.hideLoading();
+          if (typeof callback === "function") {
+            callback();
+          }
+        });
       },
+      // 更新搜索占位符
       updateSearchPlaceholder() {
         let placeholder = "搜索帖子";
         switch (this.type) {
@@ -2629,10 +3788,11 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$n(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$m(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_common_list = vue.resolveComponent("common-list");
     const _component_topic_list = vue.resolveComponent("topic-list");
     const _component_user_list = resolveEasycom(vue.resolveDynamicComponent("user-list"), __easycom_0);
+    const _component_load_more = vue.resolveComponent("load-more");
     return vue.openBlock(), vue.createElementBlock("view", null, [
       $data.searchList.length === 0 ? (vue.openBlock(), vue.createElementBlock(
         vue.Fragment,
@@ -2716,14 +3876,16 @@ if (uni.restoreGlobal) {
             }),
             128
             /* KEYED_FRAGMENT */
-          ))
+          )),
+          vue.createCommentVNode(" 上拉加载 "),
+          vue.createVNode(_component_load_more, { loadmore: $data.loadmore }, null, 8, ["loadmore"])
         ],
         64
         /* STABLE_FRAGMENT */
       ))
     ]);
   }
-  const PagesSearchSearch = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["render", _sfc_render$n], ["__file", "F:/project/社区交友/pages/search/search.vue"]]);
+  const PagesSearchSearch = /* @__PURE__ */ _export_sfc(_sfc_main$n, [["render", _sfc_render$m], ["__file", "F:/project/社区交友/pages/search/search.vue"]]);
   var isIOS;
   function album() {
     var result = 0;
@@ -2962,7 +4124,7 @@ if (uni.restoreGlobal) {
     ["original"],
     ["compressed", "original"]
   ];
-  const _sfc_main$n = {
+  const _sfc_main$m = {
     props: {
       list: Array,
       show: {
@@ -3084,7 +4246,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$m(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$l(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "px-2" }, [
       $props.show ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 0,
@@ -3140,8 +4302,8 @@ if (uni.restoreGlobal) {
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const uploadImage = /* @__PURE__ */ _export_sfc(_sfc_main$n, [["render", _sfc_render$m], ["__scopeId", "data-v-ac335ed3"], ["__file", "F:/project/社区交友/components/common/upload-image.vue"]]);
-  const _sfc_main$m = {
+  const uploadImage = /* @__PURE__ */ _export_sfc(_sfc_main$m, [["render", _sfc_render$l], ["__scopeId", "data-v-ac335ed3"], ["__file", "F:/project/社区交友/components/common/upload-image.vue"]]);
+  const _sfc_main$l = {
     components: {
       uniNavBar,
       uploadImage
@@ -3222,7 +4384,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$l(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$k(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_nav_bar = vue.resolveComponent("uni-nav-bar");
     const _component_upload_image = vue.resolveComponent("upload-image");
     return vue.openBlock(), vue.createElementBlock("view", null, [
@@ -3289,33 +4451,8 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesAddInputAddInput = /* @__PURE__ */ _export_sfc(_sfc_main$m, [["render", _sfc_render$l], ["__file", "F:/project/社区交友/pages/add-input/add-input.vue"]]);
-  const demo$3 = [{
-    cover: "/static/common/banner2.jpg",
-    title: "话题名称",
-    desc: "话题描述",
-    today_count: 0,
-    news_count: 10
-  }, {
-    cover: "/static/common/banner2.jpg",
-    title: "话题名称",
-    desc: "话题描述",
-    today_count: 0,
-    news_count: 10
-  }, {
-    cover: "/static/common/banner2.jpg",
-    title: "话题名称",
-    desc: "话题描述",
-    today_count: 0,
-    news_count: 10
-  }, {
-    cover: "/static/common/banner2.jpg",
-    title: "话题名称",
-    desc: "话题描述",
-    today_count: 0,
-    news_count: 10
-  }];
-  const _sfc_main$l = {
+  const PagesAddInputAddInput = /* @__PURE__ */ _export_sfc(_sfc_main$l, [["render", _sfc_render$k], ["__file", "F:/project/社区交友/pages/add-input/add-input.vue"]]);
+  const _sfc_main$k = {
     components: {
       topicList,
       loadMore
@@ -3327,32 +4464,7 @@ if (uni.restoreGlobal) {
         // 顶部选项卡
         scrollInto: "",
         tabIndex: 0,
-        tabBars: [
-          {
-            name: "关注"
-          },
-          {
-            name: "推荐"
-          },
-          {
-            name: "热点"
-          },
-          {
-            name: "新闻"
-          },
-          {
-            name: "财经"
-          },
-          {
-            name: "娱乐"
-          },
-          {
-            name: "军事"
-          },
-          {
-            name: "体育"
-          }
-        ],
+        tabBars: [],
         newList: []
       };
     },
@@ -3379,19 +4491,54 @@ if (uni.restoreGlobal) {
     methods: {
       //获取数据
       getData() {
-        var arr = [];
-        for (let i = 0; i < this.tabBars.length; i++) {
-          let obj = {
-            //1.上拉加载更多 2.加载中 3...没有更多了
-            loadmore: "上拉加载更多",
-            list: []
-          };
-          if (i < 3) {
-            obj.list = demo$3;
+        this.$H.get("/postclass").then((res) => {
+          this.tabBars = res.data.data.list;
+          var arr = [];
+          for (let i = 0; i < this.tabBars.length; i++) {
+            let obj = {
+              //1.上拉加载更多 2.加载中 3...没有更多了
+              loadmore: "上拉加载更多",
+              list: [],
+              page: 1,
+              firstLoad: false
+            };
+            arr.push(obj);
           }
-          arr.push(obj);
-        }
-        this.newList = arr;
+          this.newList = arr;
+          if (this.tabBars.length) {
+            this.getList();
+          }
+        });
+      },
+      // 获取指定分类下的列表数据
+      getList() {
+        let index = this.tabIndex;
+        let id = this.tabBars[index].id;
+        let page = this.newList[index].page;
+        let isrefresh = page === 1;
+        this.$H.get("/topicclass/" + id + "/topic/" + page).then((res2) => {
+          let list = res2.data.data.list.map((item) => {
+            return {
+              id: item.id,
+              cover: item.titlepic,
+              title: item.title,
+              desc: item.desc,
+              today_count: item.today_count,
+              news_count: item.post_count
+            };
+          });
+          this.newList[index].list = isrefresh ? list : [
+            ...this.newList[index].list,
+            ...list
+          ], this.newList[index].loadmore = list.length < 10 ? "没有更多了" : "上拉加载更多";
+          if (isrefresh) {
+            this.newList[index].firstLoad = true;
+          }
+        }).catch((err) => {
+          if (!isrefresh) {
+            this.newList[index].page--;
+          }
+        });
       },
       //监听滑动
       onChangeTab(e) {
@@ -3404,31 +4551,9 @@ if (uni.restoreGlobal) {
         }
         this.tabIndex = index;
         this.scrollInto = "tab" + index;
-      },
-      //关注
-      follow(e) {
-        this.list[e].isFollow = true;
-        uni.showToast({
-          title: "关注成功"
-        });
-      },
-      //顶踩
-      liked(e) {
-        let item = this.list[e.index];
-        let msg = e.type === "liked" ? "赞" : "踩";
-        if (item.liked.type === "") {
-          item.liked[e.type + "_count"]++;
-        } else if (item.liked.type === "liked" && e.type === "disliked") {
-          item.liked.liked_count--;
-          item.liked.disliked_count++;
-        } else if (item.liked.type === "disliked" && e.type === "liked") {
-          item.liked.liked_count++;
-          item.liked.disliked_count--;
+        if (!this.newList[this.tabIndex].firstLoad) {
+          this.getList();
         }
-        item.liked.type = e.type;
-        uni.showToast({
-          title: msg + "成功"
-        });
       },
       //上拉加载更多
       loadmore(index) {
@@ -3436,14 +4561,12 @@ if (uni.restoreGlobal) {
         if (item.loadmore !== "上拉加载更多")
           return;
         item.loadmore = "加载中...";
-        setTimeout(() => {
-          item.list = [...item.list, ...item.list];
-          item.loadmore = "上拉加载更多";
-        }, 2e3);
+        item.page++;
+        this.getList();
       }
     }
   };
-  function _sfc_render$k(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$j(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_topic_list = vue.resolveComponent("topic-list");
     const _component_load_more = vue.resolveComponent("load-more");
     const _component_no_thing = vue.resolveComponent("no-thing");
@@ -3465,7 +4588,7 @@ if (uni.restoreGlobal) {
               class: vue.normalizeClass(["scroll-row-item px-3 py-2", $data.tabIndex === index ? "color-global font-lg font-weight-bold" : ""]),
               id: "tab" + index,
               onClick: ($event) => $options.changeTab(index)
-            }, vue.toDisplayString(item.name), 11, ["id", "onClick"]);
+            }, vue.toDisplayString(item.classname), 11, ["id", "onClick"]);
           }),
           128
           /* KEYED_FRAGMENT */
@@ -3523,9 +4646,21 @@ if (uni.restoreGlobal) {
                   ],
                   64
                   /* STABLE_FRAGMENT */
-                )) : (vue.openBlock(), vue.createElementBlock(
+                )) : !item.firstLoad ? (vue.openBlock(), vue.createElementBlock(
                   vue.Fragment,
                   { key: 1 },
+                  [
+                    vue.createCommentVNode(" 加载中 "),
+                    vue.createElementVNode("view", {
+                      class: "text-light-muted flex align-center justify-center font-md",
+                      style: { "height": "200rpx" }
+                    }, "加载中")
+                  ],
+                  64
+                  /* STABLE_FRAGMENT */
+                )) : (vue.openBlock(), vue.createElementBlock(
+                  vue.Fragment,
+                  { key: 2 },
                   [
                     vue.createCommentVNode(" 没有数据 "),
                     vue.createVNode(_component_no_thing)
@@ -3542,11 +4677,11 @@ if (uni.restoreGlobal) {
       ], 44, ["current"])
     ]);
   }
-  const PagesTopicNavTopicNav = /* @__PURE__ */ _export_sfc(_sfc_main$l, [["render", _sfc_render$k], ["__file", "F:/project/社区交友/pages/topic-nav/topic-nav.vue"]]);
-  const _sfc_main$k = {
+  const PagesTopicNavTopicNav = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["render", _sfc_render$j], ["__file", "F:/project/社区交友/pages/topic-nav/topic-nav.vue"]]);
+  const _sfc_main$j = {
     props: ["info"]
   };
-  function _sfc_render$j(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$i(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", null, [
       vue.createElementVNode("view", { class: "position-relative" }, [
         vue.createElementVNode("image", {
@@ -3600,55 +4735,8 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const topicInfo = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["render", _sfc_render$j], ["__file", "F:/project/社区交友/components/topic-detail/topic-info.vue"]]);
-  const demo$2 = [
-    {
-      username: "昵称",
-      userpic: "/static/tabber/msg2.png",
-      nowstime: "2019-10-20 下午04:30",
-      isFollow: false,
-      title: "我是标题",
-      titlepic: "/static/common/banner2.jpg",
-      liked: {
-        type: "liked",
-        liked_count: 1,
-        disliked_count: 2
-      },
-      comment_count: 2,
-      share_count: 2
-    },
-    {
-      username: "昵称",
-      userpic: "/static/tabber/msg2.png",
-      nowstime: "2019-10-20 下午04:30",
-      isFollow: false,
-      title: "我是标题",
-      titlepic: "",
-      liked: {
-        type: "disliked",
-        liked_count: 1,
-        disliked_count: 2
-      },
-      comment_count: 2,
-      share_count: 2
-    },
-    {
-      username: "昵称",
-      userpic: "/static/tabber/msg2.png",
-      nowstime: "2019-10-20 下午04:30",
-      isFollow: false,
-      title: "我是标题",
-      titlepic: "/static/common/banner2.jpg",
-      liked: {
-        type: "",
-        liked_count: 1,
-        disliked_count: 2
-      },
-      comment_count: 2,
-      share_count: 2
-    }
-  ];
-  const _sfc_main$j = {
+  const topicInfo = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["render", _sfc_render$i], ["__file", "F:/project/社区交友/components/topic-detail/topic-info.vue"]]);
+  const _sfc_main$i = {
     components: {
       topicInfo,
       commonList,
@@ -3678,9 +4766,13 @@ if (uni.restoreGlobal) {
         // 热门
         list1: [],
         loadtext1: "上拉加载更多",
+        page1: 1,
+        firstLoad1: false,
         // 最新
         list2: [],
-        loadtext2: "上拉加载更多"
+        loadtext2: "上拉加载更多",
+        page2: 1,
+        firstLoad2: false
       };
     },
     computed: {
@@ -3701,9 +4793,12 @@ if (uni.restoreGlobal) {
     },
     onLoad(e) {
       if (e.detail) {
-        JSON.parse(e.detail);
+        this.info = JSON.parse(e.detail);
+        uni.setNavigationBarTitle({
+          title: this.info.title
+        });
       }
-      this.list1 = demo$2;
+      this.getData();
     },
     // 触底事件
     onReachBottom() {
@@ -3713,6 +4808,28 @@ if (uni.restoreGlobal) {
       // tab切换
       changeTab(index) {
         this.tabIndex = index;
+        if (!this["firstLoad" + (index + 1)]) {
+          this.getData();
+        }
+      },
+      // 加载数据
+      getData() {
+        let no = this.tabIndex + 1;
+        let page = this["page" + no];
+        let isrefresh = page === 1;
+        this.$H.get("/topic/" + this.info.id + "/post/" + page).then((res) => {
+          let list = res.data.data.list.map((v) => {
+            return this.$U.formatCommonList(v);
+          });
+          this["list" + no] = isrefresh ? list : [...this["list" + no], ...list], this["loadtext" + no] = list.length < 10 ? "没有更多了" : "上拉加载更多";
+          if (isrefresh) {
+            this["firstLoad" + no] = true;
+          }
+        }).catch((err) => {
+          if (!isrefresh) {
+            page--;
+          }
+        });
       },
       // 上拉加载更多
       loadmore() {
@@ -3720,14 +4837,12 @@ if (uni.restoreGlobal) {
         if (this.loadtext !== "上拉加载更多")
           return;
         this["loadtext" + (index + 1)] = "加载中...";
-        setTimeout(() => {
-          this["list" + (index + 1)] = [...this["list" + (index + 1)], ...this["list" + (index + 1)]];
-          this["loadtext" + index + 1] = "上拉加载更多";
-        }, 2e3);
+        this["page" + (index + 1)]++;
+        this.getData();
       }
     }
   };
-  function _sfc_render$i(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$h(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_topic_info = vue.resolveComponent("topic-info");
     const _component_common_list = vue.resolveComponent("common-list");
     const _component_no_thing = vue.resolveComponent("no-thing");
@@ -3801,7 +4916,7 @@ if (uni.restoreGlobal) {
       vue.createVNode(_component_load_more, { loadmore: $options.loadtext }, null, 8, ["loadmore"])
     ]);
   }
-  const PagesTopicDetailTopicDetail = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["render", _sfc_render$i], ["__file", "F:/project/社区交友/pages/topic-detail/topic-detail.vue"]]);
+  const PagesTopicDetailTopicDetail = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$h], ["__file", "F:/project/社区交友/pages/topic-detail/topic-detail.vue"]]);
   const demo$1 = [{
     headshot: "/static/common/demo6.jpg",
     username: "烦躁杏鲍菇",
@@ -3831,7 +4946,7 @@ if (uni.restoreGlobal) {
     age: 24,
     isFollow: false
   }];
-  const _sfc_main$i = {
+  const _sfc_main$h = {
     components: {
       loadMore,
       noThing,
@@ -3912,7 +5027,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$h(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$g(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_user_list = resolveEasycom(vue.resolveDynamicComponent("user-list"), __easycom_0);
     const _component_load_more = vue.resolveComponent("load-more");
     const _component_no_thing = vue.resolveComponent("no-thing");
@@ -4022,9 +5137,9 @@ if (uni.restoreGlobal) {
       ], 44, ["current"])
     ]);
   }
-  const PagesFriendListFriendList = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$h], ["__file", "F:/project/社区交友/pages/friend-list/friend-list.vue"]]);
+  const PagesFriendListFriendList = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["render", _sfc_render$g], ["__file", "F:/project/社区交友/pages/friend-list/friend-list.vue"]]);
   const uid = 1;
-  const _sfc_main$h = {
+  const _sfc_main$g = {
     props: {
       item: Object,
       index: Number,
@@ -4041,7 +5156,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$g(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$f(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", null, [
       vue.createCommentVNode(" 时间 "),
       $options.shortTime ? (vue.openBlock(), vue.createElementBlock(
@@ -4083,8 +5198,8 @@ if (uni.restoreGlobal) {
       )
     ]);
   }
-  const userChatPage = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["render", _sfc_render$g], ["__file", "F:/project/社区交友/components/users-chat/user-chat-page.vue"]]);
-  const _sfc_main$g = {
+  const userChatPage = /* @__PURE__ */ _export_sfc(_sfc_main$g, [["render", _sfc_render$f], ["__file", "F:/project/社区交友/components/users-chat/user-chat-page.vue"]]);
+  const _sfc_main$f = {
     data() {
       return {
         content: ""
@@ -4103,7 +5218,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$f(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$e(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", {
       class: "fixed-bottom flex align-center border-top bg-white",
       style: { "height": "100rpx" }
@@ -4132,8 +5247,8 @@ if (uni.restoreGlobal) {
       })
     ]);
   }
-  const bottomInput = /* @__PURE__ */ _export_sfc(_sfc_main$g, [["render", _sfc_render$f], ["__file", "F:/project/社区交友/components/common/bottom-input.vue"]]);
-  const _sfc_main$f = {
+  const bottomInput = /* @__PURE__ */ _export_sfc(_sfc_main$f, [["render", _sfc_render$e], ["__file", "F:/project/社区交友/components/common/bottom-input.vue"]]);
+  const _sfc_main$e = {
     components: {
       userChatPage,
       bottomInput
@@ -4243,7 +5358,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$e(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$d(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_user_chat_page = vue.resolveComponent("user-chat-page");
     const _component_bottom_input = vue.resolveComponent("bottom-input");
     return vue.openBlock(), vue.createElementBlock("view", null, [
@@ -4278,35 +5393,44 @@ if (uni.restoreGlobal) {
       vue.createCommentVNode(' <view class="fixed-bottom flex align-center border-top bg-white" \r\n		style="height: 100rpx;">\r\n			<input type="text" v-model="content2" class="flex-1 rounded bg-light ml-2" \r\n			 style="padding: 5rpx; "placeholder="文明发言" @confirm="submit" />\r\n			<view class="iconfont icon-fabu flex align-center justify-center font-md animated" \r\n			style="width: 100rpx;" hover-class="rubberBand color-global" @click="submit()"></view>\r\n		</view> ')
     ]);
   }
-  const PagesUsersChatUsersChat = /* @__PURE__ */ _export_sfc(_sfc_main$f, [["render", _sfc_render$e], ["__file", "F:/project/社区交友/pages/users-chat/users-chat.vue"]]);
-  const _sfc_main$e = {
+  const PagesUsersChatUsersChat = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["render", _sfc_render$d], ["__file", "F:/project/社区交友/pages/users-chat/users-chat.vue"]]);
+  const _sfc_main$d = {
     components: {
       uniPopup
     },
     data() {
       return {
-        title: "share",
-        shareText: "uni-app可以同时发布成原生App、小程序、H5，邀请你一起体验！",
-        href: "https://uniapp.dcloud.io",
+        title: "",
+        shareText: "",
+        href: "",
         image: "",
-        shareType: 1,
-        providerList: [{
-          name: "微信好友",
-          icon: "icon-weixin",
-          color: "bg-success"
-        }, {
-          name: "新浪微博",
-          icon: "icon-qq",
-          color: "bg-danger"
-        }, {
-          name: "新浪微博",
-          icon: "icon-qq",
-          color: "bg-danger"
-        }, {
-          name: "新浪微博",
-          icon: "icon-qq",
-          color: "bg-danger"
-        }]
+        shareType: 0,
+        providerList: [
+          {
+            name: "微信好友",
+            icon: "icon-weixin",
+            color: "bg-success",
+            id: "weixin"
+          },
+          {
+            name: "新浪微博",
+            icon: "icon-qq",
+            color: "bg-danger",
+            id: "weixin"
+          },
+          {
+            name: "新浪微博",
+            icon: "icon-qq",
+            color: "bg-danger",
+            id: "weixin"
+          },
+          {
+            name: "新浪微博",
+            icon: "icon-qq",
+            color: "bg-danger",
+            id: "weixin"
+          }
+        ]
       };
     },
     computed: {
@@ -4334,72 +5458,76 @@ if (uni.restoreGlobal) {
       this.shareText = "uni-app可以同时发布成原生App、小程序、H5，邀请你一起体验！", this.href = "https://uniapp.dcloud.io", this.image = "";
     },
     onReady() {
-      uni.getProvider({
-        service: "share",
-        success: (e) => {
-          formatAppLog("log", "at components/common/share-to.vue:80", "success", e);
-          formatAppLog("log", "at components/common/share-to.vue:81", "分享渠道数据:", this.providerList);
-          let data = [];
-          for (let i = 0; i < e.provider.length; i++) {
-            switch (e.provider[i]) {
+      this.loadShareProviders();
+    },
+    methods: {
+      async loadShareProviders() {
+        try {
+          const res = await uni.getProvider({ service: "share" });
+          const providers = [];
+          res.provider.forEach((service) => {
+            switch (service) {
               case "weixin":
-                data.push({
+                providers.push({
                   name: "微信好友",
                   icon: "icon-weixin",
                   color: "bg-success",
-                  id: "weixin",
-                  sort: 0
-                });
-                data.push({
+                  id: "weixin"
+                }, {
                   name: "朋友圈",
-                  icon: "icon-qq",
+                  icon: "icon-weixincircle",
                   color: "bg-dark",
                   id: "weixin",
-                  type: "WXSenceTimeline",
-                  sort: 1
+                  type: "WXSenceTimeline"
                 });
                 break;
               case "sinaweibo":
-                data.push({
+                providers.push({
                   name: "新浪微博",
-                  icon: "icon-qq",
+                  icon: "icon-weibo",
                   color: "bg-danger",
-                  id: "sinaweibo",
-                  sort: 2
+                  id: "sinaweibo"
                 });
                 break;
               case "qq":
-                data.push({
+                providers.push({
                   name: "QQ好友",
                   icon: "icon-qq",
                   color: "bg-primary",
-                  id: "qq",
-                  sort: 3
+                  id: "qq"
                 });
                 break;
             }
-          }
-          this.providerList = data.sort((x, y) => {
-            return x.sort - y.sort;
           });
-        },
-        fail: (e) => {
-          uni.showModal({
-            content: "获取分享通道失败",
-            showCancel: false
+          this.providerList = providers;
+        } catch (e) {
+          formatAppLog("error", "at components/common/share-to.vue:129", "获取分享服务失败", e);
+          uni.showToast({
+            title: "分享功能初始化失败",
+            icon: "none"
           });
         }
-      });
-    },
-    methods: {
-      open() {
+      },
+      open(options) {
+        this.title = options.title;
+        this.shareText = options.shareText;
+        this.href = options.href;
+        this.image = options.image;
+        formatAppLog("log", "at components/common/share-to.vue:141", options);
         this.$refs.popup.open();
       },
       close() {
         this.$refs.popup.close();
       },
       async share(e) {
-        formatAppLog("log", "at components/common/share-to.vue:144", "分享通道:" + e.id + "； 分享类型:" + this.shareType);
+        if (!e.id) {
+          uni.showToast({
+            title: "分享服务未就绪",
+            icon: "none"
+          });
+          return;
+        }
+        formatAppLog("log", "at components/common/share-to.vue:156", "分享通道:" + e.id + "； 分享类型:" + this.shareType);
         if (!this.shareText && (this.shareType === 1 || this.shareType === 0)) {
           uni.showModal({
             content: "分享内容不能为空",
@@ -4420,21 +5548,21 @@ if (uni.restoreGlobal) {
           //WXSceneSession”分享到聊天界面，“WXSenceTimeline”分享到朋友圈，“WXSceneFavorite”分享到微信收藏     
           type: this.shareType,
           success: (e2) => {
-            formatAppLog("log", "at components/common/share-to.vue:167", "success", e2);
+            formatAppLog("log", "at components/common/share-to.vue:179", "success", e2);
             uni.showModal({
               content: "已分享",
               showCancel: false
             });
           },
           fail: (e2) => {
-            formatAppLog("log", "at components/common/share-to.vue:174", "fail", e2);
+            formatAppLog("log", "at components/common/share-to.vue:186", "fail", e2);
             uni.showModal({
               content: e2.errMsg,
               showCancel: false
             });
           },
           complete: function() {
-            formatAppLog("log", "at components/common/share-to.vue:181", "分享操作结束!");
+            formatAppLog("log", "at components/common/share-to.vue:193", "分享操作结束!");
           }
         };
         switch (this.shareType) {
@@ -4471,14 +5599,14 @@ if (uni.restoreGlobal) {
         uni.share(shareOPtions);
       },
       compress() {
-        formatAppLog("log", "at components/common/share-to.vue:222", "开始压缩");
+        formatAppLog("log", "at components/common/share-to.vue:234", "开始压缩");
         let img = this.image;
         return new Promise((res) => {
           var localPath = plus.io.convertAbsoluteFileSystem(img.replace("file://", ""));
-          formatAppLog("log", "at components/common/share-to.vue:226", "after" + localPath);
+          formatAppLog("log", "at components/common/share-to.vue:238", "after" + localPath);
           plus.io.resolveLocalFileSystemURL(localPath, (entry) => {
             entry.file((file) => {
-              formatAppLog("log", "at components/common/share-to.vue:230", "getFile:" + JSON.stringify(file));
+              formatAppLog("log", "at components/common/share-to.vue:242", "getFile:" + JSON.stringify(file));
               if (file.size > 20480) {
                 plus.zip.compressImage({
                   src: img,
@@ -4488,7 +5616,7 @@ if (uni.restoreGlobal) {
                   quality: 1,
                   overwrite: true
                 }, (event) => {
-                  formatAppLog("log", "at components/common/share-to.vue:240", "success zip****" + event.size);
+                  formatAppLog("log", "at components/common/share-to.vue:252", "success zip****" + event.size);
                   let newImg = img.replace(".jpg", "2222.jpg").replace(".JPG", "2222.JPG");
                   res(newImg);
                 }, function(error) {
@@ -4500,7 +5628,7 @@ if (uni.restoreGlobal) {
               }
             });
           }, (e) => {
-            formatAppLog("log", "at components/common/share-to.vue:252", "Resolve file URL failed: " + e.message);
+            formatAppLog("log", "at components/common/share-to.vue:264", "Resolve file URL failed: " + e.message);
             uni.showModal({
               content: "分享图片太大,需要请重新选择图片!",
               showCancel: false
@@ -4510,7 +5638,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$d(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$c(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_popup = vue.resolveComponent("uni-popup");
     return vue.openBlock(), vue.createBlock(
       _component_uni_popup,
@@ -4558,7 +5686,8 @@ if (uni.restoreGlobal) {
             ]),
             vue.createElementVNode("view", {
               class: "text-center py-2 font-md border-top border-light-secondary",
-              "hover-class": "bg-light"
+              "hover-class": "bg-light",
+              onClick: _cache[0] || (_cache[0] = ($event) => $options.close())
             }, "取消")
           ])
         ]),
@@ -4569,9 +5698,9 @@ if (uni.restoreGlobal) {
       /* NEED_PATCH */
     );
   }
-  const shareTo = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["render", _sfc_render$d], ["__file", "F:/project/社区交友/components/common/share-to.vue"]]);
+  const shareTo = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["render", _sfc_render$c], ["__file", "F:/project/社区交友/components/common/share-to.vue"]]);
   const _imports_0 = "/static/common/demo5.jpg";
-  const _sfc_main$d = {
+  const _sfc_main$c = {
     components: {
       commonList,
       bottomInput,
@@ -4581,6 +5710,8 @@ if (uni.restoreGlobal) {
       return {
         // 当前帖子信息
         info: {
+          id: 0,
+          user_id: 0,
           username: "昵称",
           userpic: "/static/common/demo5.jpg",
           nowstime: "2019-10-20 下午04:30",
@@ -4594,15 +5725,9 @@ if (uni.restoreGlobal) {
           },
           comment_count: 2,
           share_count: 2,
-          content: "地煞编程学院:多热烈的白羊,热烈得好抽象,抽象掩盖欲望,却又欲盖弥彰",
-          images: [{
-            url: "https://i1.hdslb.com/bfs/banner/f653594eac6197889adc5feab9370c60bf8583e7.png"
-          }, {
-            url: "https://i1.hdslb.com/bfs/banner/31269866f3c0a2660d3875722a1597fb19084ae1.png"
-          }, {
-            url: "https://i1.hdslb.com/bfs/banner/0ed9b007e33ced3c32a1acc718e365cbaca1d372.png"
-          }]
-        }
+          content: "地煞编程学院:多热烈的白羊,热烈得好抽象,抽象掩盖欲望,却又欲盖弥彰"
+        },
+        images: []
       };
     },
     onLoad(e) {
@@ -4612,11 +5737,16 @@ if (uni.restoreGlobal) {
     },
     computed: {
       imagesList() {
-        return this.info.images.map((item) => item.url);
+        return this.images.map((item) => item.url);
       }
     },
     onNavigationBarButtonTap() {
-      this.$refs.share.open();
+      this.$refs.share.open({
+        title: this.info.title,
+        shareText: this.info.title,
+        href: "https://www.dishaxy.com",
+        image: this.info.titlepic
+      });
     },
     onBackPress() {
       this.$refs.share.close();
@@ -4625,6 +5755,12 @@ if (uni.restoreGlobal) {
       __init(data) {
         uni.setNavigationBarTitle({
           title: data.title
+        });
+        this.info = data;
+        this.info.content = "";
+        this.$H.get("/post/" + this.info.id).then((res) => {
+          this.info.content = res.data.data.detail.content;
+          this.images = res.data.data.detail.images;
         });
       },
       // 点击评论
@@ -4675,7 +5811,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$c(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$b(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_common_list = vue.resolveComponent("common-list");
     const _component_share_to = vue.resolveComponent("share-to");
     const _component_bottom_input = vue.resolveComponent("bottom-input");
@@ -4701,7 +5837,7 @@ if (uni.restoreGlobal) {
             (vue.openBlock(true), vue.createElementBlock(
               vue.Fragment,
               null,
-              vue.renderList($data.info.images, (item, index) => {
+              vue.renderList($data.images, (item, index) => {
                 return vue.openBlock(), vue.createElementBlock("image", {
                   src: item.url,
                   class: "w-100",
@@ -4718,7 +5854,13 @@ if (uni.restoreGlobal) {
         /* STABLE */
       }, 8, ["item", "onDoComment", "onShared", "onFollow", "onLiked"]),
       vue.createElementVNode("view", { class: "divider" }),
-      vue.createElementVNode("view", { class: "p-2 font-md font-weight-bold" }, " 最新评论 "),
+      vue.createElementVNode(
+        "view",
+        { class: "p-2 font-md font-weight-bold" },
+        " 最新评论 " + vue.toDisplayString($data.info.comment_count),
+        1
+        /* TEXT */
+      ),
       vue.createElementVNode("view", { class: "px-2" }, [
         vue.createElementVNode("view", { class: "uni-comment-list" }, [
           vue.createElementVNode("view", { class: "uni-comment-face" }, [
@@ -4752,8 +5894,8 @@ if (uni.restoreGlobal) {
       vue.createVNode(_component_bottom_input, { onSubmit: $options.submit }, null, 8, ["onSubmit"])
     ]);
   }
-  const PagesPostDetailPostDetail = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["render", _sfc_render$c], ["__file", "F:/project/社区交友/pages/post-detail/post-detail.vue"]]);
-  const _sfc_main$c = {
+  const PagesPostDetailPostDetail = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__file", "F:/project/社区交友/pages/post-detail/post-detail.vue"]]);
+  const _sfc_main$b = {
     components: {
       uniList,
       uniListItem
@@ -4796,7 +5938,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$b(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$a(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_list_item = vue.resolveComponent("uni-list-item");
     const _component_uni_list = vue.resolveComponent("uni-list");
     return vue.openBlock(), vue.createElementBlock("view", null, [
@@ -4851,8 +5993,8 @@ if (uni.restoreGlobal) {
       })
     ]);
   }
-  const PagesUserSettingUserSetting = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__file", "F:/project/社区交友/pages/user-setting/user-setting.vue"]]);
-  const _sfc_main$b = {
+  const PagesUserSettingUserSetting = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__file", "F:/project/社区交友/pages/user-setting/user-setting.vue"]]);
+  const _sfc_main$a = {
     data() {
       return {
         oldpassword: "",
@@ -4885,7 +6027,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$a(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", null, [
       vue.withDirectives(vue.createElementVNode(
         "input",
@@ -4940,8 +6082,8 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesUserPasswordUserPassword = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__file", "F:/project/社区交友/pages/user-password/user-password.vue"]]);
-  const _sfc_main$a = {
+  const PagesUserPasswordUserPassword = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__file", "F:/project/社区交友/pages/user-password/user-password.vue"]]);
+  const _sfc_main$9 = {
     data() {
       return {
         email: "",
@@ -4974,7 +6116,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", null, [
       vue.withDirectives(vue.createElementVNode(
         "input",
@@ -5015,7 +6157,7 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesUserEmailUserEmail = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__file", "F:/project/社区交友/pages/user-email/user-email.vue"]]);
+  const PagesUserEmailUserEmail = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__file", "F:/project/社区交友/pages/user-email/user-email.vue"]]);
   var provinceData = [
     {
       "label": "北京市",
@@ -19564,7 +20706,7 @@ if (uni.restoreGlobal) {
       }]
     ]
   ];
-  const _sfc_main$9 = {
+  const _sfc_main$8 = {
     data() {
       return {
         pickerValue: [0, 0, 0],
@@ -19669,7 +20811,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$7(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("div", { class: "mpvue-picker" }, [
       vue.createElementVNode(
         "div",
@@ -19783,10 +20925,10 @@ if (uni.restoreGlobal) {
       )
     ]);
   }
-  const mpvueCityPicker = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-a822e6e6"], ["__file", "F:/project/社区交友/components/uni-uni/mpvue-citypicker/mpvueCityPicker.vue"]]);
+  const mpvueCityPicker = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-a822e6e6"], ["__file", "F:/project/社区交友/components/uni-uni/mpvue-citypicker/mpvueCityPicker.vue"]]);
   const genderArray = ["男", "女", "保密"];
   const relationArray = ["保密", "未婚", "已婚"];
-  const _sfc_main$8 = {
+  const _sfc_main$7 = {
     components: {
       uniList,
       uniListItem,
@@ -19866,7 +21008,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$7(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$6(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_list_item = vue.resolveComponent("uni-list-item");
     const _component_uni_list = vue.resolveComponent("uni-list");
     const _component_mpvue_city_picker = vue.resolveComponent("mpvue-city-picker");
@@ -20014,8 +21156,8 @@ if (uni.restoreGlobal) {
       }, null, 8, ["themeColor", "pickerValueDefault", "onOnConfirm"])
     ]);
   }
-  const PagesUserOwnerinfoUserOwnerinfo = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__file", "F:/project/社区交友/pages/user-ownerinfo/user-ownerinfo.vue"]]);
-  const _sfc_main$7 = {
+  const PagesUserOwnerinfoUserOwnerinfo = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__file", "F:/project/社区交友/pages/user-ownerinfo/user-ownerinfo.vue"]]);
+  const _sfc_main$6 = {
     name: "UniCollapse",
     props: {
       accordion: {
@@ -20047,13 +21189,13 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$6(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$5(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "uni-collapse" }, [
       vue.renderSlot(_ctx.$slots, "default", {}, void 0, true)
     ]);
   }
-  const uniCollapse = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-83aa08f3"], ["__file", "F:/project/社区交友/components/uni-uni/uni-collapse/uni-collapse.vue"]]);
-  const _sfc_main$6 = {
+  const uniCollapse = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-83aa08f3"], ["__file", "F:/project/社区交友/components/uni-uni/uni-collapse/uni-collapse.vue"]]);
+  const _sfc_main$5 = {
     name: "UniCollapseItem",
     components: {
       uniIcons
@@ -20133,7 +21275,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$5(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_icons = vue.resolveComponent("uni-icons");
     return vue.openBlock(), vue.createElementBlock(
       "view",
@@ -20191,8 +21333,8 @@ if (uni.restoreGlobal) {
       /* CLASS */
     );
   }
-  const uniCollapseItem = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-5e56371b"], ["__file", "F:/project/社区交友/components/uni-uni/uni-collapse-item/uni-collapse-item.vue"]]);
-  const _sfc_main$5 = {
+  const uniCollapseItem = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__scopeId", "data-v-5e56371b"], ["__file", "F:/project/社区交友/components/uni-uni/uni-collapse-item/uni-collapse-item.vue"]]);
+  const _sfc_main$4 = {
     components: {
       uniCollapse,
       uniCollapseItem
@@ -20202,7 +21344,7 @@ if (uni.restoreGlobal) {
     },
     methods: {}
   };
-  function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$3(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_collapse_item = vue.resolveComponent("uni-collapse-item");
     const _component_uni_collapse = vue.resolveComponent("uni-collapse");
     return vue.openBlock(), vue.createElementBlock("view", null, [
@@ -20241,8 +21383,8 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesUserFeedbackUserFeedback = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__file", "F:/project/社区交友/pages/user-feedback/user-feedback.vue"]]);
-  const _sfc_main$4 = {
+  const PagesUserFeedbackUserFeedback = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__file", "F:/project/社区交友/pages/user-feedback/user-feedback.vue"]]);
+  const _sfc_main$3 = {
     components: {
       uniList,
       uniListItem
@@ -20252,7 +21394,7 @@ if (uni.restoreGlobal) {
     },
     methods: {}
   };
-  function _sfc_render$3(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$2(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_list_item = vue.resolveComponent("uni-list-item");
     const _component_uni_list = vue.resolveComponent("uni-list");
     return vue.openBlock(), vue.createElementBlock("view", null, [
@@ -20274,80 +21416,7 @@ if (uni.restoreGlobal) {
       })
     ]);
   }
-  const PagesAboutAbout = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__file", "F:/project/社区交友/pages/about/about.vue"]]);
-  const _sfc_main$3 = {
-    data() {
-      return {
-        providerList: []
-      };
-    },
-    mounted() {
-      uni.getProvider({
-        service: "oauth",
-        success: (result) => {
-          this.providerList = result.provider.map((value) => {
-            let providerName = "";
-            let icon = "";
-            let bgColor = "";
-            switch (value) {
-              case "weixin":
-                providerName = "微信登录";
-                icon = "icon-weixin";
-                bgColor = "bg-success";
-                break;
-              case "qq":
-                providerName = "QQ登录";
-                icon = "icon-qq";
-                bgColor = "bg-primary";
-                break;
-              case "sinaweibo":
-                providerName = "新浪微博登录";
-                icon = "icon-weibo";
-                bgColor = "bg-warning";
-                break;
-            }
-            return {
-              name: providerName,
-              icon,
-              bgColor,
-              id: value
-            };
-          }).filter((item) => item.name);
-        },
-        fail: (error) => {
-          formatAppLog("log", "at components/common/other-login.vue:55", "获取登录通道失败", error);
-        }
-      });
-    }
-  };
-  function _sfc_render$2(_ctx, _cache, $props, $setup, $data, $options) {
-    return vue.openBlock(), vue.createElementBlock("view", { class: "flex align-center justify-center px-2 py-3" }, [
-      (vue.openBlock(true), vue.createElementBlock(
-        vue.Fragment,
-        null,
-        vue.renderList($data.providerList, (item, index) => {
-          return vue.openBlock(), vue.createElementBlock("view", {
-            class: "flex-1 flex align-center justify-center",
-            key: index
-          }, [
-            vue.createElementVNode(
-              "view",
-              {
-                class: vue.normalizeClass([item.icon + " " + item.bgColor, "iconfont font-lg text-white flex align-center justify-center rounded-circle"]),
-                style: { "width": "100rpx", "height": "100rpx" }
-              },
-              null,
-              2
-              /* CLASS */
-            )
-          ]);
-        }),
-        128
-        /* KEYED_FRAGMENT */
-      ))
-    ]);
-  }
-  const otherLogin = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__file", "F:/project/社区交友/components/common/other-login.vue"]]);
+  const PagesAboutAbout = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__file", "F:/project/社区交友/pages/about/about.vue"]]);
   const _sfc_main$2 = {
     components: {
       uniStatusBar,
@@ -20423,8 +21492,23 @@ if (uni.restoreGlobal) {
       },
       // 提交
       submit() {
-        if (!this.validata())
-          return;
+        if (this.staus) {
+          if (!this.validata())
+            return;
+        }
+        this.$H.post("/user/login", {
+          username: this.username,
+          password: this.password
+        }).then((res) => {
+          this.$store.commit("login", res);
+          uni.navigateBack({
+            delta: 1
+          });
+          uni.showToast({
+            title: "登录成功",
+            icon: "none"
+          });
+        });
       }
     }
   };
@@ -20870,9 +21954,9 @@ if (uni.restoreGlobal) {
   const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__file", "F:/project/社区交友/App.vue"]]);
   const $C = {
     // api请求前缀
-    webUrl: "http://ceshi2.dishait.cn/api/v1",
+    webUrl: "https://ceshi.virtualfri.asia/",
     // websocket地址
-    websocketUrl: "wss:ceshi2.dishait.cn/wss"
+    websocketUrl: "wss://ceshi.virtualfri.asia/wss"
   };
   const $U = {
     // 监听网络
@@ -20891,1067 +21975,87 @@ if (uni.restoreGlobal) {
     },
     // 热更新
     update() {
-    }
-  };
-  function getDevtoolsGlobalHook() {
-    return getTarget().__VUE_DEVTOOLS_GLOBAL_HOOK__;
-  }
-  function getTarget() {
-    return typeof navigator !== "undefined" && typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : {};
-  }
-  const isProxyAvailable = typeof Proxy === "function";
-  const HOOK_SETUP = "devtools-plugin:setup";
-  const HOOK_PLUGIN_SETTINGS_SET = "plugin:settings:set";
-  class ApiProxy {
-    constructor(plugin, hook) {
-      this.target = null;
-      this.targetQueue = [];
-      this.onQueue = [];
-      this.plugin = plugin;
-      this.hook = hook;
-      const defaultSettings = {};
-      if (plugin.settings) {
-        for (const id in plugin.settings) {
-          const item = plugin.settings[id];
-          defaultSettings[id] = item.defaultValue;
-        }
-      }
-      const localSettingsSaveId = `__vue-devtools-plugin-settings__${plugin.id}`;
-      let currentSettings = { ...defaultSettings };
-      try {
-        const raw = localStorage.getItem(localSettingsSaveId);
-        const data = JSON.parse(raw);
-        Object.assign(currentSettings, data);
-      } catch (e) {
-      }
-      this.fallbacks = {
-        getSettings() {
-          return currentSettings;
+    },
+    // 转换公共列表数据
+    formatCommonList(v) {
+      return {
+        id: v.id,
+        user_id: v.user_id,
+        username: v.user.username,
+        userpic: v.user.userpic,
+        nowstime: v.create_time,
+        isFollow: false,
+        title: v.title,
+        titlepic: v.titlepic,
+        liked: {
+          type: "liked",
+          liked_count: 1,
+          disliked_count: 2
         },
-        setSettings(value) {
-          try {
-            localStorage.setItem(localSettingsSaveId, JSON.stringify(value));
-          } catch (e) {
-          }
-          currentSettings = value;
-        }
+        comment_count: v.comment_count,
+        share_count: v.share_count
       };
-      hook.on(HOOK_PLUGIN_SETTINGS_SET, (pluginId, value) => {
-        if (pluginId === this.plugin.id) {
-          this.fallbacks.setSettings(value);
-        }
-      });
-      this.proxiedOn = new Proxy({}, {
-        get: (_target, prop) => {
-          if (this.target) {
-            return this.target.on[prop];
-          } else {
-            return (...args) => {
-              this.onQueue.push({
-                method: prop,
-                args
-              });
-            };
-          }
-        }
-      });
-      this.proxiedTarget = new Proxy({}, {
-        get: (_target, prop) => {
-          if (this.target) {
-            return this.target[prop];
-          } else if (prop === "on") {
-            return this.proxiedOn;
-          } else if (Object.keys(this.fallbacks).includes(prop)) {
-            return (...args) => {
-              this.targetQueue.push({
-                method: prop,
-                args,
-                resolve: () => {
-                }
-              });
-              return this.fallbacks[prop](...args);
-            };
-          } else {
-            return (...args) => {
-              return new Promise((resolve) => {
-                this.targetQueue.push({
-                  method: prop,
-                  args,
-                  resolve
-                });
-              });
-            };
-          }
-        }
-      });
-    }
-    async setRealTarget(target) {
-      this.target = target;
-      for (const item of this.onQueue) {
-        this.target.on[item.method](...item.args);
-      }
-      for (const item of this.targetQueue) {
-        item.resolve(await this.target[item.method](...item.args));
-      }
-    }
-  }
-  function setupDevtoolsPlugin(pluginDescriptor, setupFn) {
-    const target = getTarget();
-    const hook = getDevtoolsGlobalHook();
-    const enableProxy = isProxyAvailable && pluginDescriptor.enableEarlyProxy;
-    if (hook && (target.__VUE_DEVTOOLS_PLUGIN_API_AVAILABLE__ || !enableProxy)) {
-      hook.emit(HOOK_SETUP, pluginDescriptor, setupFn);
-    } else {
-      const proxy = enableProxy ? new ApiProxy(pluginDescriptor, hook) : null;
-      const list = target.__VUE_DEVTOOLS_PLUGINS__ = target.__VUE_DEVTOOLS_PLUGINS__ || [];
-      list.push({
-        pluginDescriptor,
-        setupFn,
-        proxy
-      });
-      if (proxy)
-        setupFn(proxy.proxiedTarget);
-    }
-  }
-  /*!
-   * vuex v4.1.0
-   * (c) 2022 Evan You
-   * @license MIT
-   */
-  var storeKey = "store";
-  function forEachValue(obj, fn) {
-    Object.keys(obj).forEach(function(key) {
-      return fn(obj[key], key);
-    });
-  }
-  function isObject(obj) {
-    return obj !== null && typeof obj === "object";
-  }
-  function isPromise(val) {
-    return val && typeof val.then === "function";
-  }
-  function assert(condition, msg) {
-    if (!condition) {
-      throw new Error("[vuex] " + msg);
-    }
-  }
-  function partial(fn, arg) {
-    return function() {
-      return fn(arg);
-    };
-  }
-  function genericSubscribe(fn, subs, options) {
-    if (subs.indexOf(fn) < 0) {
-      options && options.prepend ? subs.unshift(fn) : subs.push(fn);
-    }
-    return function() {
-      var i = subs.indexOf(fn);
-      if (i > -1) {
-        subs.splice(i, 1);
-      }
-    };
-  }
-  function resetStore(store2, hot) {
-    store2._actions = /* @__PURE__ */ Object.create(null);
-    store2._mutations = /* @__PURE__ */ Object.create(null);
-    store2._wrappedGetters = /* @__PURE__ */ Object.create(null);
-    store2._modulesNamespaceMap = /* @__PURE__ */ Object.create(null);
-    var state = store2.state;
-    installModule(store2, state, [], store2._modules.root, true);
-    resetStoreState(store2, state, hot);
-  }
-  function resetStoreState(store2, state, hot) {
-    var oldState = store2._state;
-    var oldScope = store2._scope;
-    store2.getters = {};
-    store2._makeLocalGettersCache = /* @__PURE__ */ Object.create(null);
-    var wrappedGetters = store2._wrappedGetters;
-    var computedObj = {};
-    var computedCache = {};
-    var scope = vue.effectScope(true);
-    scope.run(function() {
-      forEachValue(wrappedGetters, function(fn, key) {
-        computedObj[key] = partial(fn, store2);
-        computedCache[key] = vue.computed(function() {
-          return computedObj[key]();
-        });
-        Object.defineProperty(store2.getters, key, {
-          get: function() {
-            return computedCache[key].value;
-          },
-          enumerable: true
-          // for local getters
-        });
-      });
-    });
-    store2._state = vue.reactive({
-      data: state
-    });
-    store2._scope = scope;
-    if (store2.strict) {
-      enableStrictMode(store2);
-    }
-    if (oldState) {
-      if (hot) {
-        store2._withCommit(function() {
-          oldState.data = null;
-        });
-      }
-    }
-    if (oldScope) {
-      oldScope.stop();
-    }
-  }
-  function installModule(store2, rootState, path, module, hot) {
-    var isRoot = !path.length;
-    var namespace = store2._modules.getNamespace(path);
-    if (module.namespaced) {
-      if (store2._modulesNamespaceMap[namespace] && true) {
-        console.error("[vuex] duplicate namespace " + namespace + " for the namespaced module " + path.join("/"));
-      }
-      store2._modulesNamespaceMap[namespace] = module;
-    }
-    if (!isRoot && !hot) {
-      var parentState = getNestedState(rootState, path.slice(0, -1));
-      var moduleName = path[path.length - 1];
-      store2._withCommit(function() {
-        {
-          if (moduleName in parentState) {
-            console.warn(
-              '[vuex] state field "' + moduleName + '" was overridden by a module with the same name at "' + path.join(".") + '"'
-            );
-          }
-        }
-        parentState[moduleName] = module.state;
-      });
-    }
-    var local = module.context = makeLocalContext(store2, namespace, path);
-    module.forEachMutation(function(mutation, key) {
-      var namespacedType = namespace + key;
-      registerMutation(store2, namespacedType, mutation, local);
-    });
-    module.forEachAction(function(action, key) {
-      var type = action.root ? key : namespace + key;
-      var handler = action.handler || action;
-      registerAction(store2, type, handler, local);
-    });
-    module.forEachGetter(function(getter, key) {
-      var namespacedType = namespace + key;
-      registerGetter(store2, namespacedType, getter, local);
-    });
-    module.forEachChild(function(child, key) {
-      installModule(store2, rootState, path.concat(key), child, hot);
-    });
-  }
-  function makeLocalContext(store2, namespace, path) {
-    var noNamespace = namespace === "";
-    var local = {
-      dispatch: noNamespace ? store2.dispatch : function(_type, _payload, _options) {
-        var args = unifyObjectStyle(_type, _payload, _options);
-        var payload = args.payload;
-        var options = args.options;
-        var type = args.type;
-        if (!options || !options.root) {
-          type = namespace + type;
-          if (!store2._actions[type]) {
-            console.error("[vuex] unknown local action type: " + args.type + ", global type: " + type);
-            return;
-          }
-        }
-        return store2.dispatch(type, payload);
-      },
-      commit: noNamespace ? store2.commit : function(_type, _payload, _options) {
-        var args = unifyObjectStyle(_type, _payload, _options);
-        var payload = args.payload;
-        var options = args.options;
-        var type = args.type;
-        if (!options || !options.root) {
-          type = namespace + type;
-          if (!store2._mutations[type]) {
-            console.error("[vuex] unknown local mutation type: " + args.type + ", global type: " + type);
-            return;
-          }
-        }
-        store2.commit(type, payload, options);
-      }
-    };
-    Object.defineProperties(local, {
-      getters: {
-        get: noNamespace ? function() {
-          return store2.getters;
-        } : function() {
-          return makeLocalGetters(store2, namespace);
-        }
-      },
-      state: {
-        get: function() {
-          return getNestedState(store2.state, path);
-        }
-      }
-    });
-    return local;
-  }
-  function makeLocalGetters(store2, namespace) {
-    if (!store2._makeLocalGettersCache[namespace]) {
-      var gettersProxy = {};
-      var splitPos = namespace.length;
-      Object.keys(store2.getters).forEach(function(type) {
-        if (type.slice(0, splitPos) !== namespace) {
-          return;
-        }
-        var localType = type.slice(splitPos);
-        Object.defineProperty(gettersProxy, localType, {
-          get: function() {
-            return store2.getters[type];
-          },
-          enumerable: true
-        });
-      });
-      store2._makeLocalGettersCache[namespace] = gettersProxy;
-    }
-    return store2._makeLocalGettersCache[namespace];
-  }
-  function registerMutation(store2, type, handler, local) {
-    var entry = store2._mutations[type] || (store2._mutations[type] = []);
-    entry.push(function wrappedMutationHandler(payload) {
-      handler.call(store2, local.state, payload);
-    });
-  }
-  function registerAction(store2, type, handler, local) {
-    var entry = store2._actions[type] || (store2._actions[type] = []);
-    entry.push(function wrappedActionHandler(payload) {
-      var res = handler.call(store2, {
-        dispatch: local.dispatch,
-        commit: local.commit,
-        getters: local.getters,
-        state: local.state,
-        rootGetters: store2.getters,
-        rootState: store2.state
-      }, payload);
-      if (!isPromise(res)) {
-        res = Promise.resolve(res);
-      }
-      if (store2._devtoolHook) {
-        return res.catch(function(err) {
-          store2._devtoolHook.emit("vuex:error", err);
-          throw err;
-        });
-      } else {
-        return res;
-      }
-    });
-  }
-  function registerGetter(store2, type, rawGetter, local) {
-    if (store2._wrappedGetters[type]) {
-      {
-        console.error("[vuex] duplicate getter key: " + type);
-      }
-      return;
-    }
-    store2._wrappedGetters[type] = function wrappedGetter(store22) {
-      return rawGetter(
-        local.state,
-        // local state
-        local.getters,
-        // local getters
-        store22.state,
-        // root state
-        store22.getters
-        // root getters
-      );
-    };
-  }
-  function enableStrictMode(store2) {
-    vue.watch(function() {
-      return store2._state.data;
-    }, function() {
-      {
-        assert(store2._committing, "do not mutate vuex store state outside mutation handlers.");
-      }
-    }, { deep: true, flush: "sync" });
-  }
-  function getNestedState(state, path) {
-    return path.reduce(function(state2, key) {
-      return state2[key];
-    }, state);
-  }
-  function unifyObjectStyle(type, payload, options) {
-    if (isObject(type) && type.type) {
-      options = payload;
-      payload = type;
-      type = type.type;
-    }
-    {
-      assert(typeof type === "string", "expects string as the type, but found " + typeof type + ".");
-    }
-    return { type, payload, options };
-  }
-  var LABEL_VUEX_BINDINGS = "vuex bindings";
-  var MUTATIONS_LAYER_ID = "vuex:mutations";
-  var ACTIONS_LAYER_ID = "vuex:actions";
-  var INSPECTOR_ID = "vuex";
-  var actionId = 0;
-  function addDevtools(app, store2) {
-    setupDevtoolsPlugin(
-      {
-        id: "org.vuejs.vuex",
-        app,
-        label: "Vuex",
-        homepage: "https://next.vuex.vuejs.org/",
-        logo: "https://vuejs.org/images/icons/favicon-96x96.png",
-        packageName: "vuex",
-        componentStateTypes: [LABEL_VUEX_BINDINGS]
-      },
-      function(api) {
-        api.addTimelineLayer({
-          id: MUTATIONS_LAYER_ID,
-          label: "Vuex Mutations",
-          color: COLOR_LIME_500
-        });
-        api.addTimelineLayer({
-          id: ACTIONS_LAYER_ID,
-          label: "Vuex Actions",
-          color: COLOR_LIME_500
-        });
-        api.addInspector({
-          id: INSPECTOR_ID,
-          label: "Vuex",
-          icon: "storage",
-          treeFilterPlaceholder: "Filter stores..."
-        });
-        api.on.getInspectorTree(function(payload) {
-          if (payload.app === app && payload.inspectorId === INSPECTOR_ID) {
-            if (payload.filter) {
-              var nodes = [];
-              flattenStoreForInspectorTree(nodes, store2._modules.root, payload.filter, "");
-              payload.rootNodes = nodes;
-            } else {
-              payload.rootNodes = [
-                formatStoreForInspectorTree(store2._modules.root, "")
-              ];
-            }
-          }
-        });
-        api.on.getInspectorState(function(payload) {
-          if (payload.app === app && payload.inspectorId === INSPECTOR_ID) {
-            var modulePath = payload.nodeId;
-            makeLocalGetters(store2, modulePath);
-            payload.state = formatStoreForInspectorState(
-              getStoreModule(store2._modules, modulePath),
-              modulePath === "root" ? store2.getters : store2._makeLocalGettersCache,
-              modulePath
-            );
-          }
-        });
-        api.on.editInspectorState(function(payload) {
-          if (payload.app === app && payload.inspectorId === INSPECTOR_ID) {
-            var modulePath = payload.nodeId;
-            var path = payload.path;
-            if (modulePath !== "root") {
-              path = modulePath.split("/").filter(Boolean).concat(path);
-            }
-            store2._withCommit(function() {
-              payload.set(store2._state.data, path, payload.state.value);
-            });
-          }
-        });
-        store2.subscribe(function(mutation, state) {
-          var data = {};
-          if (mutation.payload) {
-            data.payload = mutation.payload;
-          }
-          data.state = state;
-          api.notifyComponentUpdate();
-          api.sendInspectorTree(INSPECTOR_ID);
-          api.sendInspectorState(INSPECTOR_ID);
-          api.addTimelineEvent({
-            layerId: MUTATIONS_LAYER_ID,
-            event: {
-              time: Date.now(),
-              title: mutation.type,
-              data
-            }
-          });
-        });
-        store2.subscribeAction({
-          before: function(action, state) {
-            var data = {};
-            if (action.payload) {
-              data.payload = action.payload;
-            }
-            action._id = actionId++;
-            action._time = Date.now();
-            data.state = state;
-            api.addTimelineEvent({
-              layerId: ACTIONS_LAYER_ID,
-              event: {
-                time: action._time,
-                title: action.type,
-                groupId: action._id,
-                subtitle: "start",
-                data
-              }
-            });
-          },
-          after: function(action, state) {
-            var data = {};
-            var duration = Date.now() - action._time;
-            data.duration = {
-              _custom: {
-                type: "duration",
-                display: duration + "ms",
-                tooltip: "Action duration",
-                value: duration
-              }
-            };
-            if (action.payload) {
-              data.payload = action.payload;
-            }
-            data.state = state;
-            api.addTimelineEvent({
-              layerId: ACTIONS_LAYER_ID,
-              event: {
-                time: Date.now(),
-                title: action.type,
-                groupId: action._id,
-                subtitle: "end",
-                data
-              }
-            });
-          }
-        });
-      }
-    );
-  }
-  var COLOR_LIME_500 = 8702998;
-  var COLOR_DARK = 6710886;
-  var COLOR_WHITE = 16777215;
-  var TAG_NAMESPACED = {
-    label: "namespaced",
-    textColor: COLOR_WHITE,
-    backgroundColor: COLOR_DARK
-  };
-  function extractNameFromPath(path) {
-    return path && path !== "root" ? path.split("/").slice(-2, -1)[0] : "Root";
-  }
-  function formatStoreForInspectorTree(module, path) {
-    return {
-      id: path || "root",
-      // all modules end with a `/`, we want the last segment only
-      // cart/ -> cart
-      // nested/cart/ -> cart
-      label: extractNameFromPath(path),
-      tags: module.namespaced ? [TAG_NAMESPACED] : [],
-      children: Object.keys(module._children).map(
-        function(moduleName) {
-          return formatStoreForInspectorTree(
-            module._children[moduleName],
-            path + moduleName + "/"
-          );
-        }
-      )
-    };
-  }
-  function flattenStoreForInspectorTree(result, module, filter, path) {
-    if (path.includes(filter)) {
-      result.push({
-        id: path || "root",
-        label: path.endsWith("/") ? path.slice(0, path.length - 1) : path || "Root",
-        tags: module.namespaced ? [TAG_NAMESPACED] : []
-      });
-    }
-    Object.keys(module._children).forEach(function(moduleName) {
-      flattenStoreForInspectorTree(result, module._children[moduleName], filter, path + moduleName + "/");
-    });
-  }
-  function formatStoreForInspectorState(module, getters, path) {
-    getters = path === "root" ? getters : getters[path];
-    var gettersKeys = Object.keys(getters);
-    var storeState = {
-      state: Object.keys(module.state).map(function(key) {
-        return {
-          key,
-          editable: true,
-          value: module.state[key]
-        };
-      })
-    };
-    if (gettersKeys.length) {
-      var tree = transformPathsToObjectTree(getters);
-      storeState.getters = Object.keys(tree).map(function(key) {
-        return {
-          key: key.endsWith("/") ? extractNameFromPath(key) : key,
-          editable: false,
-          value: canThrow(function() {
-            return tree[key];
-          })
-        };
-      });
-    }
-    return storeState;
-  }
-  function transformPathsToObjectTree(getters) {
-    var result = {};
-    Object.keys(getters).forEach(function(key) {
-      var path = key.split("/");
-      if (path.length > 1) {
-        var target = result;
-        var leafKey = path.pop();
-        path.forEach(function(p) {
-          if (!target[p]) {
-            target[p] = {
-              _custom: {
-                value: {},
-                display: p,
-                tooltip: "Module",
-                abstract: true
-              }
-            };
-          }
-          target = target[p]._custom.value;
-        });
-        target[leafKey] = canThrow(function() {
-          return getters[key];
-        });
-      } else {
-        result[key] = canThrow(function() {
-          return getters[key];
-        });
-      }
-    });
-    return result;
-  }
-  function getStoreModule(moduleMap, path) {
-    var names = path.split("/").filter(function(n) {
-      return n;
-    });
-    return names.reduce(
-      function(module, moduleName, i) {
-        var child = module[moduleName];
-        if (!child) {
-          throw new Error('Missing module "' + moduleName + '" for path "' + path + '".');
-        }
-        return i === names.length - 1 ? child : child._children;
-      },
-      path === "root" ? moduleMap : moduleMap.root._children
-    );
-  }
-  function canThrow(cb) {
-    try {
-      return cb();
-    } catch (e) {
-      return e;
-    }
-  }
-  var Module = function Module2(rawModule, runtime) {
-    this.runtime = runtime;
-    this._children = /* @__PURE__ */ Object.create(null);
-    this._rawModule = rawModule;
-    var rawState = rawModule.state;
-    this.state = (typeof rawState === "function" ? rawState() : rawState) || {};
-  };
-  var prototypeAccessors$1 = { namespaced: { configurable: true } };
-  prototypeAccessors$1.namespaced.get = function() {
-    return !!this._rawModule.namespaced;
-  };
-  Module.prototype.addChild = function addChild(key, module) {
-    this._children[key] = module;
-  };
-  Module.prototype.removeChild = function removeChild(key) {
-    delete this._children[key];
-  };
-  Module.prototype.getChild = function getChild(key) {
-    return this._children[key];
-  };
-  Module.prototype.hasChild = function hasChild(key) {
-    return key in this._children;
-  };
-  Module.prototype.update = function update(rawModule) {
-    this._rawModule.namespaced = rawModule.namespaced;
-    if (rawModule.actions) {
-      this._rawModule.actions = rawModule.actions;
-    }
-    if (rawModule.mutations) {
-      this._rawModule.mutations = rawModule.mutations;
-    }
-    if (rawModule.getters) {
-      this._rawModule.getters = rawModule.getters;
-    }
-  };
-  Module.prototype.forEachChild = function forEachChild(fn) {
-    forEachValue(this._children, fn);
-  };
-  Module.prototype.forEachGetter = function forEachGetter(fn) {
-    if (this._rawModule.getters) {
-      forEachValue(this._rawModule.getters, fn);
-    }
-  };
-  Module.prototype.forEachAction = function forEachAction(fn) {
-    if (this._rawModule.actions) {
-      forEachValue(this._rawModule.actions, fn);
-    }
-  };
-  Module.prototype.forEachMutation = function forEachMutation(fn) {
-    if (this._rawModule.mutations) {
-      forEachValue(this._rawModule.mutations, fn);
-    }
-  };
-  Object.defineProperties(Module.prototype, prototypeAccessors$1);
-  var ModuleCollection = function ModuleCollection2(rawRootModule) {
-    this.register([], rawRootModule, false);
-  };
-  ModuleCollection.prototype.get = function get(path) {
-    return path.reduce(function(module, key) {
-      return module.getChild(key);
-    }, this.root);
-  };
-  ModuleCollection.prototype.getNamespace = function getNamespace(path) {
-    var module = this.root;
-    return path.reduce(function(namespace, key) {
-      module = module.getChild(key);
-      return namespace + (module.namespaced ? key + "/" : "");
-    }, "");
-  };
-  ModuleCollection.prototype.update = function update$1(rawRootModule) {
-    update2([], this.root, rawRootModule);
-  };
-  ModuleCollection.prototype.register = function register(path, rawModule, runtime) {
-    var this$1$1 = this;
-    if (runtime === void 0)
-      runtime = true;
-    {
-      assertRawModule(path, rawModule);
-    }
-    var newModule = new Module(rawModule, runtime);
-    if (path.length === 0) {
-      this.root = newModule;
-    } else {
-      var parent = this.get(path.slice(0, -1));
-      parent.addChild(path[path.length - 1], newModule);
-    }
-    if (rawModule.modules) {
-      forEachValue(rawModule.modules, function(rawChildModule, key) {
-        this$1$1.register(path.concat(key), rawChildModule, runtime);
-      });
-    }
-  };
-  ModuleCollection.prototype.unregister = function unregister(path) {
-    var parent = this.get(path.slice(0, -1));
-    var key = path[path.length - 1];
-    var child = parent.getChild(key);
-    if (!child) {
-      {
-        console.warn(
-          "[vuex] trying to unregister module '" + key + "', which is not registered"
-        );
-      }
-      return;
-    }
-    if (!child.runtime) {
-      return;
-    }
-    parent.removeChild(key);
-  };
-  ModuleCollection.prototype.isRegistered = function isRegistered(path) {
-    var parent = this.get(path.slice(0, -1));
-    var key = path[path.length - 1];
-    if (parent) {
-      return parent.hasChild(key);
-    }
-    return false;
-  };
-  function update2(path, targetModule, newModule) {
-    {
-      assertRawModule(path, newModule);
-    }
-    targetModule.update(newModule);
-    if (newModule.modules) {
-      for (var key in newModule.modules) {
-        if (!targetModule.getChild(key)) {
-          {
-            console.warn(
-              "[vuex] trying to add a new module '" + key + "' on hot reloading, manual reload is needed"
-            );
-          }
-          return;
-        }
-        update2(
-          path.concat(key),
-          targetModule.getChild(key),
-          newModule.modules[key]
-        );
-      }
-    }
-  }
-  var functionAssert = {
-    assert: function(value) {
-      return typeof value === "function";
     },
-    expected: "function"
+    // 数组置顶
+    __toFirst(arr, index) {
+      if (index != 0) {
+        arr.unshift(arr.splice(index, 1)[0]);
+      }
+      return arr;
+    }
   };
-  var objectAssert = {
-    assert: function(value) {
-      return typeof value === "function" || typeof value === "object" && typeof value.handler === "function";
+  const $H = {
+    common: {
+      method: "GET",
+      header: {
+        "content-type": "application/json"
+      },
+      data: {}
     },
-    expected: 'function or object with "handler" function'
-  };
-  var assertTypes = {
-    getters: functionAssert,
-    mutations: functionAssert,
-    actions: objectAssert
-  };
-  function assertRawModule(path, rawModule) {
-    Object.keys(assertTypes).forEach(function(key) {
-      if (!rawModule[key]) {
-        return;
-      }
-      var assertOptions = assertTypes[key];
-      forEachValue(rawModule[key], function(value, type) {
-        assert(
-          assertOptions.assert(value),
-          makeAssertionMessage(path, key, type, value, assertOptions.expected)
-        );
-      });
-    });
-  }
-  function makeAssertionMessage(path, key, type, value, expected) {
-    var buf = key + " should be " + expected + ' but "' + key + "." + type + '"';
-    if (path.length > 0) {
-      buf += ' in module "' + path.join(".") + '"';
-    }
-    buf += " is " + JSON.stringify(value) + ".";
-    return buf;
-  }
-  function createStore(options) {
-    return new Store(options);
-  }
-  var Store = function Store2(options) {
-    var this$1$1 = this;
-    if (options === void 0)
-      options = {};
-    {
-      assert(typeof Promise !== "undefined", "vuex requires a Promise polyfill in this browser.");
-      assert(this instanceof Store2, "store must be called with the new operator.");
-    }
-    var plugins = options.plugins;
-    if (plugins === void 0)
-      plugins = [];
-    var strict = options.strict;
-    if (strict === void 0)
-      strict = false;
-    var devtools = options.devtools;
-    this._committing = false;
-    this._actions = /* @__PURE__ */ Object.create(null);
-    this._actionSubscribers = [];
-    this._mutations = /* @__PURE__ */ Object.create(null);
-    this._wrappedGetters = /* @__PURE__ */ Object.create(null);
-    this._modules = new ModuleCollection(options);
-    this._modulesNamespaceMap = /* @__PURE__ */ Object.create(null);
-    this._subscribers = [];
-    this._makeLocalGettersCache = /* @__PURE__ */ Object.create(null);
-    this._scope = null;
-    this._devtools = devtools;
-    var store2 = this;
-    var ref = this;
-    var dispatch2 = ref.dispatch;
-    var commit2 = ref.commit;
-    this.dispatch = function boundDispatch(type, payload) {
-      return dispatch2.call(store2, type, payload);
-    };
-    this.commit = function boundCommit(type, payload, options2) {
-      return commit2.call(store2, type, payload, options2);
-    };
-    this.strict = strict;
-    var state = this._modules.root.state;
-    installModule(this, state, [], this._modules.root);
-    resetStoreState(this, state);
-    plugins.forEach(function(plugin) {
-      return plugin(this$1$1);
-    });
-  };
-  var prototypeAccessors = { state: { configurable: true } };
-  Store.prototype.install = function install(app, injectKey) {
-    app.provide(injectKey || storeKey, this);
-    app.config.globalProperties.$store = this;
-    var useDevtools = this._devtools !== void 0 ? this._devtools : true;
-    if (useDevtools) {
-      addDevtools(app, this);
-    }
-  };
-  prototypeAccessors.state.get = function() {
-    return this._state.data;
-  };
-  prototypeAccessors.state.set = function(v) {
-    {
-      assert(false, "use store.replaceState() to explicit replace store state.");
-    }
-  };
-  Store.prototype.commit = function commit(_type, _payload, _options) {
-    var this$1$1 = this;
-    var ref = unifyObjectStyle(_type, _payload, _options);
-    var type = ref.type;
-    var payload = ref.payload;
-    var options = ref.options;
-    var mutation = { type, payload };
-    var entry = this._mutations[type];
-    if (!entry) {
-      {
-        console.error("[vuex] unknown mutation type: " + type);
-      }
-      return;
-    }
-    this._withCommit(function() {
-      entry.forEach(function commitIterator(handler) {
-        handler(payload);
-      });
-    });
-    this._subscribers.slice().forEach(function(sub) {
-      return sub(mutation, this$1$1.state);
-    });
-    if (options && options.silent) {
-      console.warn(
-        "[vuex] mutation type: " + type + ". Silent option has been removed. Use the filter functionality in the vue-devtools"
-      );
-    }
-  };
-  Store.prototype.dispatch = function dispatch(_type, _payload) {
-    var this$1$1 = this;
-    var ref = unifyObjectStyle(_type, _payload);
-    var type = ref.type;
-    var payload = ref.payload;
-    var action = { type, payload };
-    var entry = this._actions[type];
-    if (!entry) {
-      {
-        console.error("[vuex] unknown action type: " + type);
-      }
-      return;
-    }
-    try {
-      this._actionSubscribers.slice().filter(function(sub) {
-        return sub.before;
-      }).forEach(function(sub) {
-        return sub.before(action, this$1$1.state);
-      });
-    } catch (e) {
-      {
-        console.warn("[vuex] error in before action subscribers: ");
-        console.error(e);
-      }
-    }
-    var result = entry.length > 1 ? Promise.all(entry.map(function(handler) {
-      return handler(payload);
-    })) : entry[0](payload);
-    return new Promise(function(resolve, reject) {
-      result.then(function(res) {
-        try {
-          this$1$1._actionSubscribers.filter(function(sub) {
-            return sub.after;
-          }).forEach(function(sub) {
-            return sub.after(action, this$1$1.state);
+    request(options = {}) {
+      return new Promise((resolve, reject) => {
+        options.url = $C.webUrl + options.url;
+        options.method = options.method || this.common.method;
+        options.header = options.header || this.common.header;
+        options.success = (res) => resolve(res);
+        options.fail = (err) => {
+          uni.showToast({
+            title: "网络连接失败",
+            icon: "none"
           });
-        } catch (e) {
-          {
-            console.warn("[vuex] error in after action subscribers: ");
-            console.error(e);
-          }
-        }
-        resolve(res);
-      }, function(error) {
-        try {
-          this$1$1._actionSubscribers.filter(function(sub) {
-            return sub.error;
-          }).forEach(function(sub) {
-            return sub.error(action, this$1$1.state, error);
+          reject({
+            code: -1,
+            msg: "网络异常",
+            raw: err
           });
-        } catch (e) {
-          {
-            console.warn("[vuex] error in error action subscribers: ");
-            console.error(e);
-          }
-        }
-        reject(error);
+        };
+        uni.request(options);
       });
-    });
-  };
-  Store.prototype.subscribe = function subscribe(fn, options) {
-    return genericSubscribe(fn, this._subscribers, options);
-  };
-  Store.prototype.subscribeAction = function subscribeAction(fn, options) {
-    var subs = typeof fn === "function" ? { before: fn } : fn;
-    return genericSubscribe(subs, this._actionSubscribers, options);
-  };
-  Store.prototype.watch = function watch$1(getter, cb, options) {
-    var this$1$1 = this;
-    {
-      assert(typeof getter === "function", "store.watch only accepts a function.");
+    },
+    get(url, data = {}, options = {}) {
+      options.url = url;
+      options.data = data;
+      options.method = "GET";
+      return this.request(options);
+    },
+    post(url, data = {}, options = {}) {
+      options.url = url;
+      options.data = data;
+      options.method = "POST";
+      return this.request(options);
     }
-    return vue.watch(function() {
-      return getter(this$1$1.state, this$1$1.getters);
-    }, cb, Object.assign({}, options));
   };
-  Store.prototype.replaceState = function replaceState(state) {
-    var this$1$1 = this;
-    this._withCommit(function() {
-      this$1$1._state.data = state;
-    });
-  };
-  Store.prototype.registerModule = function registerModule(path, rawModule, options) {
-    if (options === void 0)
-      options = {};
-    if (typeof path === "string") {
-      path = [path];
-    }
-    {
-      assert(Array.isArray(path), "module path must be a string or an Array.");
-      assert(path.length > 0, "cannot register the root module by using registerModule.");
-    }
-    this._modules.register(path, rawModule);
-    installModule(this, this.state, path, this._modules.get(path), options.preserveState);
-    resetStoreState(this, this.state);
-  };
-  Store.prototype.unregisterModule = function unregisterModule(path) {
-    var this$1$1 = this;
-    if (typeof path === "string") {
-      path = [path];
-    }
-    {
-      assert(Array.isArray(path), "module path must be a string or an Array.");
-    }
-    this._modules.unregister(path);
-    this._withCommit(function() {
-      var parentState = getNestedState(this$1$1.state, path.slice(0, -1));
-      delete parentState[path[path.length - 1]];
-    });
-    resetStore(this);
-  };
-  Store.prototype.hasModule = function hasModule(path) {
-    if (typeof path === "string") {
-      path = [path];
-    }
-    {
-      assert(Array.isArray(path), "module path must be a string or an Array.");
-    }
-    return this._modules.isRegistered(path);
-  };
-  Store.prototype.hotUpdate = function hotUpdate(newOptions) {
-    this._modules.update(newOptions);
-    resetStore(this, true);
-  };
-  Store.prototype._withCommit = function _withCommit(fn) {
-    var committing = this._committing;
-    this._committing = true;
-    fn();
-    this._committing = committing;
-  };
-  Object.defineProperties(Store.prototype, prototypeAccessors);
   const store = createStore({
     state: {
-      loginStatus: false
+      loginStatus: false,
+      user: {}
     },
     mutations: {
-      changeLoginStatus(state, { num }) {
-        state.loginStatus = num;
+      // 登录
+      login(state, user) {
+        state.loginStatus = true;
+        state.user = user;
+        uni.setStorageSync("user", JSON.stringify(user));
       }
     },
     actions: {},
@@ -21986,6 +22090,7 @@ if (uni.restoreGlobal) {
     app.component("no-thing", noThing);
     app.config.globalProperties.$C = $C;
     app.config.globalProperties.$U = $U;
+    app.config.globalProperties.$H = $H;
     app.config.globalProperties.$store = store;
     app.config.globalProperties.checkAuth = checkAuth;
     app.config.globalProperties.navigateTo = navigateTo;

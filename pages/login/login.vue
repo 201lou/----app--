@@ -146,9 +146,25 @@
 			// 提交
 			submit() {
 				// 表单验证
-				if(!this.validata()) return
+				if(this.staus) {
+					if(!this.validata()) return
+				}
 				// 提交后端
-				// 登录处理
+				this.$H.post('/user/login',{
+					username:this.username,
+					password:this.password
+				}).then(res=>{
+					// 修改vuex的state,持久化存储
+					this.$store.commit('login',res)
+					// 提示和跳转
+					uni.navigateBack({
+						delta:1
+					})
+					uni.showToast({
+						title:'登录成功',
+						icon:'none'
+					})
+				})
 			}
 		}
 	}

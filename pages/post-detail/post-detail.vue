@@ -5,14 +5,14 @@
 		@follow="follow" @liked="liked">
 			<view>{{info.content}}</view>
 			<view>
-				<image v-for="(item,index) in info.images" :src="item.url" 
+				<image v-for="(item,index) in images" :src="item.url" 
 				class="w-100" mode="widthFix" @click="preview(index)"></image>
 			</view>
 		</common-list>
 		
 		<view class="divider"></view>
 		<view class="p-2 font-md font-weight-bold">
-			最新评论
+			最新评论 {{info.comment_count}}
 		</view>
 		<view class="px-2">
 			<view class="uni-comment-list">
@@ -52,6 +52,8 @@
 			return {				
 				// 当前帖子信息
 				info:{
+					id:0,
+					user_id:0,
 					username:"昵称",
 					userpic:"/static/common/demo5.jpg",
 					nowstime:"2019-10-20 下午04:30",
@@ -66,14 +68,8 @@
 					comment_count:2,
 					share_count:2,
 					content:"地煞编程学院:多热烈的白羊,热烈得好抽象,抽象掩盖欲望,却又欲盖弥彰",
-					images:[{
-						url:"https://i1.hdslb.com/bfs/banner/f653594eac6197889adc5feab9370c60bf8583e7.png"
-					},{
-						url:"https://i1.hdslb.com/bfs/banner/31269866f3c0a2660d3875722a1597fb19084ae1.png"
-					},{
-						url:"https://i1.hdslb.com/bfs/banner/0ed9b007e33ced3c32a1acc718e365cbaca1d372.png"
-					},]
-				}
+				},
+				images:[]
 			}
 		},
 		onLoad(e) {
@@ -84,11 +80,16 @@
 		},
 		computed: {
 			imagesList() {
-				return this.info.images.map(item=>item.url) 
+				return this.images.map(item=>item.url) 
 			}
 		},
 		onNavigationBarButtonTap() {
-			this.$refs.share.open()
+			this.$refs.share.open({
+				title: this.info.title,
+				shareText: this.info.title,
+				href:"https://www.dishaxy.com",
+				image: this.info.titlepic,
+			})
 		},
 		onBackPress() {
 			this.$refs.share.close()
@@ -99,7 +100,13 @@
 				uni.setNavigationBarTitle({
 					title:data.title
 				})
+				this.info = data
+				this.info.content = ''
 				//请求api
+				this.$H.get('/post/'+this.info.id).then(res=>{
+					this.info.content = res.data.data.detail.content
+					this.images = res.data.data.detail.images
+				})
 			},
 			// 点击评论
 			doComment() {

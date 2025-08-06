@@ -6,7 +6,7 @@
 			<view v-for="(item,index) in tabBars" :key="index" 
 			class="scroll-row-item px-3 py-2" :id="'tab'+index"
 			:class="tabIndex === index?'color-global font-lg font-weight-bold':''"
-			@click="changeTab(index)">{{item.name}}</view>
+			@click="changeTab(index)">{{item.classname}}</view>
 		</scroll-view>
 		
 		<!-- 滑动列表 -->
@@ -24,6 +24,11 @@
 					<!-- 上拉加载 -->
 					<load-more :loadmore="item.loadmore"></load-more>
 					</template>
+					<!-- 加载中 -->
+					<template v-else-if="!item.firstload">
+						<view class="text-light-muted flex align-center justify-center font-md"
+						style="height: 200rpx;">加载中</view>
+					</template>
 					<!-- 没有数据 -->
 					<template v-else>
 						<no-thing></no-thing>
@@ -36,53 +41,6 @@
 </template>
 
 <script>
-	
-	const demo = [{
-		username:"昵称",
-		userpic:"/static/common/demo5.jpg",
-		nowstime:"2019-10-20 下午04:30",
-		isFollow:false,
-		title:"我是标题",
-		titlepic:"/static/common/demo2.jpg",
-		liked:{
-			type:"liked",
-			liked_count:1,
-			disliked_count:2
-		},
-		comment_count:2,
-		share_count:2
-	},
-	{
-		username:"昵称",
-		userpic:"/static/common/demo5.jpg",
-		nowstime:"2019-10-20 下午04:30",
-		isFollow:false,
-		title:"我是标题",
-		titlepic:"",
-		liked:{
-			type:"disliked",
-			liked_count:1,
-			disliked_count:2
-		},
-		comment_count:0,
-		share_count:2
-	},
-	{
-		username:"昵称",
-		userpic:"/static/common/demo5.jpg",
-		nowstime:"2019-10-20 下午04:30",
-		isFollow:false,
-		title:"我是标题",
-		titlepic:"/static/common/demo2.jpg",
-		liked:{
-			type:"",
-			liked_count:1,
-			disliked_count:2
-		},
-		comment_count:2,
-		share_count:2
-	}
-	];
 	
 	import commonList from '@/components/common/common-list.vue';
 	import loadMore from '@/components/common/load-more.vue';
@@ -98,38 +56,13 @@
 				// 顶部选项卡
 				scrollInto : "",
 				tabIndex : 0,
-				tabBars: [
-					{
-						name: '关注',
-					},
-					{
-						name: '推荐',
-					},
-					{
-						name: '热点',
-					},
-					{
-						name: '新闻',
-					},
-					{
-						name: '财经',
-					},
-					{
-						name: '娱乐',
-					},
-					{
-						name: '军事',
-					},
-					{
-						name: '体育',
-					},
-				],
+				tabBars: [],
 				newList:[]
 			}
 		},
 		//监听点击导航栏搜索框
 		onNavigationBarSearchInputClicked() {
-			this.navigateTo({
+			uni.navigateTo({
 				url:"/pages/search/search?type=post",
 			})
 		},
@@ -153,20 +86,50 @@
 		methods: {
 			//获取数据
 			getData() {
-				var arr = []
-				for (let i = 0; i < this.tabBars.length; i++) {
-					//生成列表模板
-					let obj = {
-						//1.上拉加载更多 2.加载中 3...没有更多了
-						loadmore:"上拉加载更多",
-						list:[]
+				// 获取分类
+				this.$H.get('/postclass').then(res=>{
+					this.tabBars = res.data.data.list
+					// 根据分类生成列表
+					var arr = []
+					for (let i = 0; i < this.tabBars.length; i++) {
+						//生成列表模板
+						arr.push({
+							//1.上拉加载更多 2.加载中 3...没有更多了
+							loadmore:"上拉加载更多",
+							list:[],
+							page:1,
+							firstLoad:false
+						})
 					}
-					if (i < 3) {
-						obj.list = demo
+					this.newList = arr
+					// 获取第一个分类的数据
+					if (this.tabBars.length) {
+						this.getList()
 					}
-					arr.push(obj)
-				}
-				this.newList = arr
+				})			
+				
+			},
+			// 获取指定分类下的列表数据
+			getList(){
+				let index = this.tabIndex
+				let id = this.tabBars[index].id
+				let page = this.newList[index].page
+				let isrefresh = page === 1
+				this.$H.get('/postclass/'+id+'/post/'+page).then(res2=>{
+					let list = res2.data.data.list.map(v=>{
+						return this.$U.formatCommonList(v)
+					})
+					this.newList[index].list = isrefresh ? list : [...this.newList[index].list,
+					...list],
+					this.newList[index].loadmore = list.length < 10 ?'没有更多了' : '上拉加载更多'
+					if (isrefresh) {
+						this.newList[index].firstLoad = true
+					}
+				}).catch(err=>{
+					if (!isrefresh) {
+						this.newList[index].page--
+					}
+				})
 			},
 			//监听滑动
 			onChangeTab(e) {
@@ -178,7 +141,12 @@
 					return;
 				}
 				this.tabIndex = index
+				// 滚动到指定元素
 				this.scrollInto = 'tab'+index
+				// 获取当前分类下的列表数据
+				if (!this.newList[this.tabIndex].firstLoad) {
+					this.getList()
+				}
 			},
 			//关注
 			follow(e){
@@ -217,13 +185,9 @@
 				if(item.loadmore !== '上拉加载更多') return;
 				//修改当前列表加载状态
 				item.loadmore = '加载中...'
-				//模拟数据请求
-				setTimeout(()=>{
-					// 加载数据
-					item.list = [...item.list,...item.list]
-					// 恢复加载状态
-					item.loadmore = '上拉加载更多'
-				},2000)
+				// 请求数据
+				item.page++;
+				this.getList()
 			}
 		}
 	}

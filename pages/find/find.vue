@@ -40,9 +40,10 @@
 						</view>
 					</view>
 					<!-- 轮播图 -->
-					<swiper class="px-2 pb-2" :indicator-dots="true" :autoplay="true" :interval="3000" :duration="1000">
-						<swiper-item>
-							<image src="/static/common/demo2.jpg"
+					<swiper class="px-2 pb-2" :indicator-dots="true" :autoplay="true" 
+					:interval="3000" :duration="1000">
+						<swiper-item v-for="(item,index) in swiperList" :key="index">
+							<image :src="item.src"
 							style="height: 300rpx;" class="w-100 rounded"></image>
 						</swiper-item>						
 					</swiper>
@@ -135,44 +136,9 @@
 				],
 				list : [],
 				loadmore : "上拉加载更多",
-				hotClick:[{
-					name:"关注"
-				},{
-					name:"推荐"
-				},{
-					name:"体育"
-				},{
-					name:"热点"
-				},{
-					name:"财经"
-				},{
-					name:"娱乐"
-				}],
-				topicList:[{
-					cover:"/static/common/demo10.jpg",
-					title:"话题名称",
-					desc:"话题描述",
-					today_count:0,
-					news_count:10
-				},{
-					cover:"/static/common/demo10.jpg",
-					title:"话题名称",
-					desc:"话题描述",
-					today_count:0,
-					news_count:10
-				},{
-					cover:"/static/common/demo10.jpg",
-					title:"话题名称",
-					desc:"话题描述",
-					today_count:0,
-					news_count:10
-				},{
-					cover:"/static/common/demo10.jpg",
-					title:"话题名称",
-					desc:"话题描述",
-					today_count:0,
-					news_count:10
-				}]
+				hotClick:[],
+				topicList:[],
+				swiperList:[]
 			}
 		},
 		onLoad() {
@@ -183,8 +149,44 @@
 			})
 			// 加载数据
 			this.list = demo
+			// 获取数据
+			this.getTopicNav()
+			this.getHotTopic()
+			this.getSwipers()
 		},
 		methods: {
+			// 获取热门分类
+			getTopicNav(){
+				this.$H.get('/topicclass').then(res=>{
+					this.hotClick = res.data.data.list.map(item=>{
+						return {
+							id:item.id,
+							name:item.classname
+						}
+					})
+				})
+			},
+			// 获取热门话题
+			getHotTopic(){
+				this.$H.get('/hottopic').then(res=>{
+					this.topicList = res.data.data.list.map(item=>{
+						return {
+							id:item.id,
+							cover:item.titlepic,
+							title:item.title,
+							desc:item.desc,
+							today_count:item.today_count,
+							news_count:item.post_count
+						}
+					})
+				})
+			},
+			// 获取轮播图
+			getSwipers(){
+				this.$H.get('/adsense/0').then(res=>{
+					this.swiperList = res.data.data.list
+				})
+			},
 			// 打开发布页
 			openInput(){
 				uni.navigateTo({

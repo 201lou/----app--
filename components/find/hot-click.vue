@@ -9,7 +9,7 @@
 		</view>
 		<view class="flex align-center py-3 px-2 border-bottom">
 			<view class="border rounded bg-light mx-1 px-2 animated" hover-class="rubberBand"
-			v-for="(item,index) in hotClick" :key="index" @click="openDetail(item)">
+			v-for="(item,index) in hotClick" :key="index" @click="openMore">
 				{{item.name}}
 			</view>
 		</view>
@@ -24,9 +24,6 @@
 				uni.navigateTo({
 					url:'/pages/topic-nav/topic-nav'
 				})
-			},
-			openDetail() {
-				console.log('打开话题详情页')
 			}
 		}
 	}

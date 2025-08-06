@@ -10,7 +10,8 @@
 					<text class="font mt-1 text-muted">{{item.name}}</text>
 				</view>
 			</view>
-			<view class="text-center py-2 font-md border-top border-light-secondary" hover-class="bg-light">取消</view>
+			<view class="text-center py-2 font-md border-top border-light-secondary" 
+			hover-class="bg-light" @click="close()">取消</view>
 		</view>			
 	</uni-popup>
 </template>
@@ -23,28 +24,34 @@
 		},
 		data() {
 			return {
-				title: 'share',
-				shareText: 'uni-app可以同时发布成原生App、小程序、H5，邀请你一起体验！',
-				href:"https://uniapp.dcloud.io",
+				title: '',
+				shareText: '',
+				href:"",
 				image: '',
-				shareType:1,
-				providerList:[{
+				shareType:0,
+				providerList:[
+					{
 					name: '微信好友',
 					icon:"icon-weixin",
-					color:"bg-success"
+					color:"bg-success",
+					id:'weixin'
 				},{
 					name: '新浪微博',
 					icon:"icon-qq",
-					color:"bg-danger"
+					color:"bg-danger",
+					id:'weixin'
 				},{
 					name: '新浪微博',
 					icon:"icon-qq",
-					color:"bg-danger"
+					color:"bg-danger",
+					id:'weixin'
 				},{
 					name: '新浪微博',
 					icon:"icon-qq",
-					color:"bg-danger"
-				}]
+					color:"bg-danger",
+					id:'weixin'
+				},
+				]
 			}
 		},
 		computed:{
@@ -74,73 +81,78 @@
 			this.image='';
 		},
 		onReady() {
-			uni.getProvider({
-				service: 'share',
-				success: (e) => {
-					console.log('success', e);
-					console.log('分享渠道数据:', this.providerList)
-					let data = []
-					for (let i = 0; i < e.provider.length; i++) {
-						switch (e.provider[i]) {
-							case 'weixin':
-								data.push({
-									name: '微信好友',
-									icon:"icon-weixin",
-									color:"bg-success",
-									id: 'weixin',
-									sort:0
-								})
-								data.push({
-									name: '朋友圈',
-									icon:"icon-qq",
-									color:"bg-dark",
-									id: 'weixin',
-									type:'WXSenceTimeline',
-									sort:1
-								})
-								break;
-							case 'sinaweibo':
-								data.push({
-									name: '新浪微博',
-									icon:"icon-qq",
-									color:"bg-danger",
-									id: 'sinaweibo',
-									sort:2
-								})
-								break;
-							case 'qq':
-								data.push({
-									name: 'QQ好友',
-									icon:"icon-qq",
-									color:"bg-primary",
-									id: 'qq',
-									sort:3
-								})
-								break;
-							default:
-								break;
-						}
-					}
-					this.providerList = data.sort((x,y) => {
-						return x.sort - y.sort
-					});
-				},
-				fail: (e) => {					
-					uni.showModal({
-						content:'获取分享通道失败',
-						showCancel:false
-					})
-				}
-			});
+			this.loadShareProviders()
 		},
 		methods:{
-			open() {
+			async loadShareProviders() {
+				try {
+					const res = await uni.getProvider({ service: 'share' })
+					const providers = []
+					
+					res.provider.forEach(service => {
+					  switch(service) {
+						case 'weixin':
+						  providers.push({
+							name: '微信好友',
+							icon: 'icon-weixin',
+							color: 'bg-success',
+							id: 'weixin'
+						  }, {
+							name: '朋友圈',
+							icon: 'icon-weixincircle',
+							color: 'bg-dark',
+							id: 'weixin',
+							type: 'WXSenceTimeline'
+						  })
+						  break
+						case 'sinaweibo':
+						  providers.push({
+							name: '新浪微博',
+							icon: 'icon-weibo',
+							color: 'bg-danger',
+							id: 'sinaweibo'
+						  })
+						  break
+						case 'qq':
+						  providers.push({
+							name: 'QQ好友',
+							icon: 'icon-qq',
+							color: 'bg-primary',
+							id: 'qq'
+						  })
+						  break
+					  }
+					})
+					
+				this.providerList = providers
+				  } catch (e) {
+					console.error('获取分享服务失败', e)
+					uni.showToast({
+					  title: '分享功能初始化失败',
+					  icon: 'none'
+					})
+				  }
+				},
+			open(options) {
+				this.title = options.title
+				this.shareText = options.shareText
+				this.href = options.href
+				this.image = options.image
+				console.log(options)
 				this.$refs.popup.open()
 			},
 			close(){
 				this.$refs.popup.close()
 			},
 			async share(e) {
+				if (!e.id) {
+				    uni.showToast({
+				      title: '分享服务未就绪',
+				      icon: 'none'
+				    })
+				    return
+				  }
+				
 				console.log('分享通道:'+ e.id +'； 分享类型:' + this.shareType);
 				
 				if(!this.shareText && (this.shareType === 1 || this.shareType === 0)){

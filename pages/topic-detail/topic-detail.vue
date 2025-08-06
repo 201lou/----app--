@@ -34,53 +34,6 @@
 </template>
 
 <script>
-	const demo = [{
-		username:"昵称",
-		userpic:"/static/tabber/msg2.png",
-		nowstime:"2019-10-20 下午04:30",
-		isFollow:false,
-		title:"我是标题",
-		titlepic:"/static/common/banner2.jpg",
-		liked:{
-			type:"liked",
-			liked_count:1,
-			disliked_count:2
-		},
-		comment_count:2,
-		share_count:2
-	},
-	{
-		username:"昵称",
-		userpic:"/static/tabber/msg2.png",
-		nowstime:"2019-10-20 下午04:30",
-		isFollow:false,
-		title:"我是标题",
-		titlepic:"",
-		liked:{
-			type:"disliked",
-			liked_count:1,
-			disliked_count:2
-		},
-		comment_count:2,
-		share_count:2
-	},
-	{
-		username:"昵称",
-		userpic:"/static/tabber/msg2.png",
-		nowstime:"2019-10-20 下午04:30",
-		isFollow:false,
-		title:"我是标题",
-		titlepic:"/static/common/banner2.jpg",
-		liked:{
-			type:"",
-			liked_count:1,
-			disliked_count:2
-		},
-		comment_count:2,
-		share_count:2
-	}
-	];
-	
 	import topicInfo from '@/components/topic-detail/topic-info.vue';
 	import commonList from '@/components/common/common-list.vue';
 	import noThing from '@/components/common/no-thing.vue';
@@ -115,9 +68,13 @@
 				// 热门
 				list1:[],
 				loadtext1:"上拉加载更多",
+				page1:1,
+				firstLoad1:false,
 				// 最新
 				list2:[],
 				loadtext2:"上拉加载更多",
+				page2:1,
+				firstLoad2:false,
 			}
 		},
 		computed:{
@@ -139,10 +96,13 @@
 		},
 		onLoad(e) {
 			if (e.detail) {
-				let res = JSON.parse(e.detail)
-				// console.log(res)
+				this.info = JSON.parse(e.detail)
+				uni.setNavigationBarTitle({
+					title:this.info.title
+				})
 			}
-			this.list1 = demo
+			// 加载数据
+			this.getData()
 		},
 		// 触底事件
 		onReachBottom() {
@@ -152,6 +112,29 @@
 			// tab切换
 			changeTab(index){
 				this.tabIndex = index
+				if(!this['firstLoad'+(index+1)]) {
+					this.getData()
+				}
+			},
+			// 加载数据
+			getData() {
+				let no = this.tabIndex + 1
+				let page = this['page'+no]
+				let isrefresh = page === 1
+				this.$H.get('/topic/'+this.info.id+"/post/"+page).then(res=>{
+					let list = res.data.data.list.map(v=>{
+						return this.$U.formatCommonList(v)
+					})
+					this['list'+no] = isrefresh ? list : [...this['list'+no],...list],
+					this['loadtext'+no] = list.length < 10 ?'没有更多了' : '上拉加载更多'
+					if (isrefresh) {
+						this['firstLoad'+no] = true
+					}
+				}).catch(err=>{
+					if (!isrefresh) {
+						page--
+					}
+				})
 			},
 			// 上拉加载更多
 			loadmore() {
@@ -162,10 +145,8 @@
 				// 设置上拉加载状态处于加载中
 				this['loadtext'+(index+1)] = '加载中...'
 				// 请求数据
-				setTimeout(()=>{
-					this['list'+(index+1)] = [...this['list'+(index+1)],...this['list'+(index+1)]]
-					this['loadtext'+index+1] = '上拉加载更多'
-				},2000)
+				this['page'+(index+1)]++;
+				this.getData()
 			}			
 		}
 	}

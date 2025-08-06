@@ -32,6 +32,9 @@ import $C from './common/config.js';
 // 挂载助手函数库
 import $U from './common/utill.js';
 
+// 引入请求库
+import $H from './common/request.js';
+
 import store from './store/index.js'
 
 const checkAuth = (callback)=>{
@@ -68,6 +71,7 @@ export function createApp() {
   app.component('no-thing', noThing) // Vue3 全局注册
   app.config.globalProperties.$C = $C
   app.config.globalProperties.$U = $U
+  app.config.globalProperties.$H = $H
   app.config.globalProperties.$store = store
   app.config.globalProperties.checkAuth = checkAuth
   app.config.globalProperties.navigateTo = navigateTo
