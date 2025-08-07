@@ -1,6 +1,7 @@
 <template>
 	<view class="flex align-center justify-center px-2 py-3">
-			<view class="flex-1 flex align-center justify-center" v-for="(item,index) in providerList" :key="index">
+			<view class="flex-1 flex align-center justify-center" 
+			v-for="(item,index) in providerList" :key="index" @click="login(item)">
 				<view :class="item.icon + ' '+item.bgColor" 
 				class="iconfont font-lg text-white flex align-center justify-center rounded-circle"
 				style="width: 100rpx;height: 100rpx;"></view>
@@ -11,6 +12,12 @@
 
 <script>
 	export default {
+		props: {
+			back: {
+				type: Boolean,
+				default: false
+			}
+		},
 		data() {
 			return {
 				providerList: []
@@ -55,6 +62,51 @@
 					console.log('获取登录通道失败', error);
 				}
 			});
+		},
+		methods: {
+			// 登录
+			login(item) {
+				uni.login({
+					provider:item.id,
+					success: res => {
+						uni.getUserInfo({
+							provider:item.id,
+							success: (infoRes) => {
+								let obj = {
+									provider:item.id,
+									openid:infoRes.userInfo.openId,
+									expires_in:0,
+									nickName:infoRes.userInfo.nickName,
+									avatarUrl:infoRes.userInfo.avatarUrl
+								}
+								this.loginEvent(obj)
+							}
+						})
+					},
+					fail: () => {
+						uni.showToast({
+							title:'登录失败',
+							icon:'none'
+						})
+					}
+				})
+			},
+			// 登录事件
+			loginEvent(data) {
+				this.$H.post('/user/otherlogin',data).then(res=>{
+					// 修改vuex的state,持久化存储
+					this.$store.commit('login',this.$U.formatUserinfo(res.data.data))
+					if(this.back) {
+						uni.navigateBack({
+							delta:1
+						})
+					}
+					uni.showToast({
+						title:'登录成功',
+						icon:'none'
+					})
+				})
+			}
 		}
 	}
 </script>

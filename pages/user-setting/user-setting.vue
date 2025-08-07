@@ -1,18 +1,19 @@
 <template>
 	<view>
 		<uni-list>
-			<uni-list-item title="账号与安全" @click="open('user-password')"></uni-list-item>
-			<uni-list-item title="绑定邮箱" @click="open('user-email')"></uni-list-item>
-			<uni-list-item title="资料编辑"  @click="open('user-ownerinfo')"></uni-list-item>
+			<template v-if="loginStatus">
+				<uni-list-item title="账号与安全" @click="open('user-safe')"></uni-list-item>
+				<uni-list-item title="资料编辑"  @click="open('user-ownerinfo')"></uni-list-item>
+			</template>
 			<uni-list-item title="清除缓存" @click="clear">
 				<text slot="right">{{currentSize}}</text>
 			</uni-list-item>
-			<uni-list-item title="意见反馈" @click="open('user-feedback')"></uni-list-item>
+			<uni-list-item v-if="loginStatus" title="意见反馈" @click="open('user-feedback')"></uni-list-item>
 			<uni-list-item title="关于社区" @click="open('about')"></uni-list-item>
 			
-			<view class="py-2 px-3">
+			<view class="py-2 px-3" v-if="loginStatus">
 				<button class="bg-color text-white" style="border-radius: 50rpx;border: 0;"
-				type="primary">退出登录</button>
+				type="primary" @click="logout">退出登录</button>
 			</view>
 			
 		</uni-list>
@@ -21,7 +22,8 @@
 
 <script>
 	import uniListItem from '@/components/uni-uni/uni-list-item/uni-list-item.vue';
-	import uniList from '@/components/uni-uni/uni-list/uni-list.vue';	
+	import uniList from '@/components/uni-uni/uni-list/uni-list.vue';
+	import {mapState} from 'vuex'
 	export default {
 		components: {
 			uniList,
@@ -34,6 +36,11 @@
 		},
 		onLoad() {
 			this.getStorageInfo()
+		},
+		computed:{
+			...mapState({
+				loginStatus:state=>state.loginStatus
+			})
 		},
 		methods: {
 			getStorageInfo(){
@@ -58,6 +65,24 @@
 							this.getStorageInfo()
 							uni.showToast({
 								title:'清除成功',								
+							})
+						}
+					}
+				})
+			},
+			// 退出登录
+			logout() {
+				uni.showModal({
+					content:'是否要退出登录',
+					success: (res) => {
+						if(res.confirm) {
+							this.$store.commit('logout')
+							uni.navigateBack({
+								delta:1
+							})
+							uni.showToast({
+								title:'退出登录成功',
+								icon:'none'
 							})
 						}
 					}

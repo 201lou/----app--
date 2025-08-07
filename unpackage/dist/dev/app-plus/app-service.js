@@ -38,7 +38,7 @@ if (uni.restoreGlobal) {
     }
     return target;
   };
-  const _sfc_main$H = {
+  const _sfc_main$J = {
     props: {
       item: Object,
       index: {
@@ -98,7 +98,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$G(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$I(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "p-2" }, [
       vue.createCommentVNode(" 头像 昵称 | 关注按钮 "),
       vue.createElementVNode("view", { class: "flex align-center justify-between" }, [
@@ -245,11 +245,11 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const commonList = /* @__PURE__ */ _export_sfc(_sfc_main$H, [["render", _sfc_render$G], ["__scopeId", "data-v-047d201c"], ["__file", "F:/project/社区交友/components/common/common-list.vue"]]);
-  const _sfc_main$G = {
+  const commonList = /* @__PURE__ */ _export_sfc(_sfc_main$J, [["render", _sfc_render$I], ["__scopeId", "data-v-047d201c"], ["__file", "F:/project/社区交友/components/common/common-list.vue"]]);
+  const _sfc_main$I = {
     props: ["loadmore"]
   };
-  function _sfc_render$F(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$H(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "flex align-center justify-center py-3" }, [
       vue.createElementVNode(
         "text",
@@ -260,8 +260,8 @@ if (uni.restoreGlobal) {
       )
     ]);
   }
-  const loadMore = /* @__PURE__ */ _export_sfc(_sfc_main$G, [["render", _sfc_render$F], ["__file", "F:/project/社区交友/components/common/load-more.vue"]]);
-  const _sfc_main$F = {
+  const loadMore = /* @__PURE__ */ _export_sfc(_sfc_main$I, [["render", _sfc_render$H], ["__file", "F:/project/社区交友/components/common/load-more.vue"]]);
+  const _sfc_main$H = {
     components: {
       commonList,
       loadMore
@@ -394,7 +394,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$E(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$G(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_common_list = vue.resolveComponent("common-list");
     const _component_load_more = vue.resolveComponent("load-more");
     const _component_no_thing = vue.resolveComponent("no-thing");
@@ -507,7 +507,7 @@ if (uni.restoreGlobal) {
       ], 44, ["current"])
     ]);
   }
-  const PagesIndexIndex = /* @__PURE__ */ _export_sfc(_sfc_main$F, [["render", _sfc_render$E], ["__file", "F:/project/社区交友/pages/index/index.vue"]]);
+  const PagesIndexIndex = /* @__PURE__ */ _export_sfc(_sfc_main$H, [["render", _sfc_render$G], ["__file", "F:/project/社区交友/pages/index/index.vue"]]);
   function formatAppLog(type, filename, ...args) {
     if (uni.__log__) {
       uni.__log__(type, filename, ...args);
@@ -591,7 +591,7 @@ if (uni.restoreGlobal) {
       return d.getFullYear() - birthday.getFullYear() - (d.getMonth() < birthday.getMonth() || d.getMonth() == birthday.getMonth() && d.getDate() < birthday.getDate() ? 1 : 0);
     }
   };
-  const _sfc_main$E = {
+  const _sfc_main$G = {
     name: "UniBadge",
     props: {
       type: {
@@ -632,7 +632,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$D(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$F(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       vue.Fragment,
       null,
@@ -663,8 +663,8 @@ if (uni.restoreGlobal) {
       /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */
     );
   }
-  const uniBadge = /* @__PURE__ */ _export_sfc(_sfc_main$E, [["render", _sfc_render$D], ["__scopeId", "data-v-e50d0de7"], ["__file", "F:/project/社区交友/components/uni-uni/uni-badge/uni-badge.vue"]]);
-  const _sfc_main$D = {
+  const uniBadge = /* @__PURE__ */ _export_sfc(_sfc_main$G, [["render", _sfc_render$F], ["__scopeId", "data-v-e50d0de7"], ["__file", "F:/project/社区交友/components/uni-uni/uni-badge/uni-badge.vue"]]);
+  const _sfc_main$F = {
     components: {
       uniBadge
     },
@@ -683,7 +683,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$C(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$E(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_badge = vue.resolveComponent("uni-badge");
     return vue.openBlock(), vue.createElementBlock("view", {
       class: "flex align-center p-2 border-bottom border-light-secondary",
@@ -731,10 +731,10 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const msgList = /* @__PURE__ */ _export_sfc(_sfc_main$D, [["render", _sfc_render$C], ["__file", "F:/project/社区交友/components/msg/msg-list.vue"]]);
+  const msgList = /* @__PURE__ */ _export_sfc(_sfc_main$F, [["render", _sfc_render$E], ["__file", "F:/project/社区交友/components/msg/msg-list.vue"]]);
   const _imports_0$2 = "/static/common/nothing.png";
-  const _sfc_main$C = {};
-  function _sfc_render$B(_ctx, _cache) {
+  const _sfc_main$E = {};
+  function _sfc_render$D(_ctx, _cache) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "flex flex-column align-center justify-center pt-5" }, [
       vue.createElementVNode("image", {
         src: _imports_0$2,
@@ -743,8 +743,8 @@ if (uni.restoreGlobal) {
       vue.createElementVNode("text", { class: "font-md" }, "什么都没有")
     ]);
   }
-  const noThing = /* @__PURE__ */ _export_sfc(_sfc_main$C, [["render", _sfc_render$B], ["__file", "F:/project/社区交友/components/common/no-thing.vue"]]);
-  const _sfc_main$B = {
+  const noThing = /* @__PURE__ */ _export_sfc(_sfc_main$E, [["render", _sfc_render$D], ["__file", "F:/project/社区交友/components/common/no-thing.vue"]]);
+  const _sfc_main$D = {
     name: "uniTransition",
     props: {
       show: {
@@ -904,7 +904,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$A(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$C(_ctx, _cache, $props, $setup, $data, $options) {
     return $data.isShow ? (vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -921,8 +921,8 @@ if (uni.restoreGlobal) {
       /* CLASS, STYLE */
     )) : vue.createCommentVNode("v-if", true);
   }
-  const uniTransition = /* @__PURE__ */ _export_sfc(_sfc_main$B, [["render", _sfc_render$A], ["__scopeId", "data-v-fbf5fe9e"], ["__file", "F:/project/社区交友/components/uni-uni/uni-transition/uni-transition.vue"]]);
-  const _sfc_main$A = {
+  const uniTransition = /* @__PURE__ */ _export_sfc(_sfc_main$D, [["render", _sfc_render$C], ["__scopeId", "data-v-fbf5fe9e"], ["__file", "F:/project/社区交友/components/uni-uni/uni-transition/uni-transition.vue"]]);
+  const _sfc_main$C = {
     name: "UniPopup",
     components: {
       uniTransition
@@ -1040,7 +1040,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$z(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$B(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_transition = vue.resolveComponent("uni-transition");
     return $data.showPopup ? (vue.openBlock(), vue.createElementBlock(
       "view",
@@ -1078,7 +1078,7 @@ if (uni.restoreGlobal) {
       /* NEED_HYDRATION */
     )) : vue.createCommentVNode("v-if", true);
   }
-  const uniPopup = /* @__PURE__ */ _export_sfc(_sfc_main$A, [["render", _sfc_render$z], ["__scopeId", "data-v-fda68b36"], ["__file", "F:/project/社区交友/components/uni-uni/uni-popup/uni-popup.vue"]]);
+  const uniPopup = /* @__PURE__ */ _export_sfc(_sfc_main$C, [["render", _sfc_render$B], ["__scopeId", "data-v-fda68b36"], ["__file", "F:/project/社区交友/components/uni-uni/uni-popup/uni-popup.vue"]]);
   const demo$3 = [{
     headshot: "/static/common/demo6.jpg",
     username: "星期四的微信",
@@ -1104,7 +1104,7 @@ if (uni.restoreGlobal) {
     data: "nrnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn内容 ",
     notread: 2
   }];
-  const _sfc_main$z = {
+  const _sfc_main$B = {
     components: {
       msgList,
       noThing,
@@ -1167,7 +1167,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$y(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$A(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_msg_list = vue.resolveComponent("msg-list");
     const _component_no_thing = vue.resolveComponent("no-thing");
     const _component_uni_popup = vue.resolveComponent("uni-popup");
@@ -1230,7 +1230,7 @@ if (uni.restoreGlobal) {
       )
     ]);
   }
-  const PagesMsgMsg = /* @__PURE__ */ _export_sfc(_sfc_main$z, [["render", _sfc_render$y], ["__file", "F:/project/社区交友/pages/msg/msg.vue"]]);
+  const PagesMsgMsg = /* @__PURE__ */ _export_sfc(_sfc_main$B, [["render", _sfc_render$A], ["__file", "F:/project/社区交友/pages/msg/msg.vue"]]);
   const icons = {
     "contact": "",
     "person": "",
@@ -1327,7 +1327,7 @@ if (uni.restoreGlobal) {
     "sound": "",
     "scan": ""
   };
-  const _sfc_main$y = {
+  const _sfc_main$A = {
     name: "UniIcons",
     props: {
       type: {
@@ -1354,7 +1354,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$x(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$z(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "text",
       {
@@ -1367,8 +1367,8 @@ if (uni.restoreGlobal) {
       /* TEXT, STYLE */
     );
   }
-  const uniIcons = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["render", _sfc_render$x], ["__scopeId", "data-v-d3aa67ff"], ["__file", "F:/project/社区交友/components/uni-uni/uni-icons/uni-icons.vue"]]);
-  const _sfc_main$x = {
+  const uniIcons = /* @__PURE__ */ _export_sfc(_sfc_main$A, [["render", _sfc_render$z], ["__scopeId", "data-v-d3aa67ff"], ["__file", "F:/project/社区交友/components/uni-uni/uni-icons/uni-icons.vue"]]);
+  const _sfc_main$z = {
     name: "UniListItem",
     components: {
       uniIcons,
@@ -1462,7 +1462,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$w(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$y(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_icons = vue.resolveComponent("uni-icons");
     const _component_uni_badge = vue.resolveComponent("uni-badge");
     return vue.openBlock(), vue.createElementBlock("view", {
@@ -1548,8 +1548,8 @@ if (uni.restoreGlobal) {
       )
     ], 10, ["hover-class"]);
   }
-  const uniListItem = /* @__PURE__ */ _export_sfc(_sfc_main$x, [["render", _sfc_render$w], ["__scopeId", "data-v-83bcf706"], ["__file", "F:/project/社区交友/components/uni-uni/uni-list-item/uni-list-item.vue"]]);
-  const _sfc_main$w = {
+  const uniListItem = /* @__PURE__ */ _export_sfc(_sfc_main$z, [["render", _sfc_render$y], ["__scopeId", "data-v-83bcf706"], ["__file", "F:/project/社区交友/components/uni-uni/uni-list-item/uni-list-item.vue"]]);
+  const _sfc_main$y = {
     name: "UniList",
     "mp-weixin": {
       options: {
@@ -1580,13 +1580,19 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$v(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$x(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "uni-list" }, [
       vue.renderSlot(_ctx.$slots, "default", {}, void 0, true)
     ]);
   }
-  const uniList = /* @__PURE__ */ _export_sfc(_sfc_main$w, [["render", _sfc_render$v], ["__scopeId", "data-v-3751c120"], ["__file", "F:/project/社区交友/components/uni-uni/uni-list/uni-list.vue"]]);
-  const _sfc_main$v = {
+  const uniList = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["render", _sfc_render$x], ["__scopeId", "data-v-3751c120"], ["__file", "F:/project/社区交友/components/uni-uni/uni-list/uni-list.vue"]]);
+  const _sfc_main$x = {
+    props: {
+      back: {
+        type: Boolean,
+        default: false
+      }
+    },
     data() {
       return {
         providerList: []
@@ -1626,12 +1632,56 @@ if (uni.restoreGlobal) {
           }).filter((item) => item.name);
         },
         fail: (error) => {
-          formatAppLog("log", "at components/common/other-login.vue:55", "获取登录通道失败", error);
+          formatAppLog("log", "at components/common/other-login.vue:62", "获取登录通道失败", error);
         }
       });
+    },
+    methods: {
+      // 登录
+      login(item) {
+        uni.login({
+          provider: item.id,
+          success: (res) => {
+            uni.getUserInfo({
+              provider: item.id,
+              success: (infoRes) => {
+                let obj = {
+                  provider: item.id,
+                  openid: infoRes.userInfo.openId,
+                  expires_in: 0,
+                  nickName: infoRes.userInfo.nickName,
+                  avatarUrl: infoRes.userInfo.avatarUrl
+                };
+                this.loginEvent(obj);
+              }
+            });
+          },
+          fail: () => {
+            uni.showToast({
+              title: "登录失败",
+              icon: "none"
+            });
+          }
+        });
+      },
+      // 登录事件
+      loginEvent(data) {
+        this.$H.post("/user/otherlogin", data).then((res) => {
+          this.$store.commit("login", this.$U.formatUserinfo(res.data.data));
+          if (this.back) {
+            uni.navigateBack({
+              delta: 1
+            });
+          }
+          uni.showToast({
+            title: "登录成功",
+            icon: "none"
+          });
+        });
+      }
     }
   };
-  function _sfc_render$u(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$w(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "flex align-center justify-center px-2 py-3" }, [
       (vue.openBlock(true), vue.createElementBlock(
         vue.Fragment,
@@ -1639,7 +1689,8 @@ if (uni.restoreGlobal) {
         vue.renderList($data.providerList, (item, index) => {
           return vue.openBlock(), vue.createElementBlock("view", {
             class: "flex-1 flex align-center justify-center",
-            key: index
+            key: index,
+            onClick: ($event) => $options.login(item)
           }, [
             vue.createElementVNode(
               "view",
@@ -1651,14 +1702,14 @@ if (uni.restoreGlobal) {
               2
               /* CLASS */
             )
-          ]);
+          ], 8, ["onClick"]);
         }),
         128
         /* KEYED_FRAGMENT */
       ))
     ]);
   }
-  const otherLogin = /* @__PURE__ */ _export_sfc(_sfc_main$v, [["render", _sfc_render$u], ["__file", "F:/project/社区交友/components/common/other-login.vue"]]);
+  const otherLogin = /* @__PURE__ */ _export_sfc(_sfc_main$x, [["render", _sfc_render$w], ["__file", "F:/project/社区交友/components/common/other-login.vue"]]);
   function getDevtoolsGlobalHook() {
     return getTarget().__VUE_DEVTOOLS_GLOBAL_HOOK__;
   }
@@ -2767,9 +2818,8 @@ if (uni.restoreGlobal) {
     }
     return module;
   }
-  const _imports_0$1 = "/static/common/demo6.jpg";
-  const _imports_1 = "/static/common/banner2.jpg";
-  const _sfc_main$u = {
+  const _imports_0$1 = "/static/common/banner2.jpg";
+  const _sfc_main$w = {
     components: {
       uniListItem,
       uniList,
@@ -2799,8 +2849,15 @@ if (uni.restoreGlobal) {
     },
     computed: {
       ...mapState({
-        loginStatus: (state) => state.loginStatus
-      })
+        loginStatus: (state) => state.loginStatus,
+        user: (state) => state.user
+      }),
+      // 用户头像
+      avatar() {
+        return this.user.userpic ? this.user.userpic : "/static/common/demo6.jpg";
+      }
+    },
+    mounted() {
     },
     methods: {
       // 打开登录页
@@ -2811,7 +2868,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$t(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$v(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_other_login = vue.resolveComponent("other-login");
     const _component_uni_list_item = vue.resolveComponent("uni-list-item");
     const _component_uni_list = vue.resolveComponent("uni-list");
@@ -2843,12 +2900,18 @@ if (uni.restoreGlobal) {
             "hover-class": "bg-light"
           }, [
             vue.createElementVNode("image", {
-              src: _imports_0$1,
+              src: $options.avatar,
               style: { "width": "100rpx", "height": "100rpx" },
               class: "rounded-circle"
-            }),
+            }, null, 8, ["src"]),
             vue.createElementVNode("view", { class: "flex flex-column flex-1 px-2" }, [
-              vue.createElementVNode("text", { class: "font-lg font-weight-bold" }, "昵称"),
+              vue.createElementVNode(
+                "text",
+                { class: "font-lg font-weight-bold" },
+                vue.toDisplayString(_ctx.user.username),
+                1
+                /* TEXT */
+              ),
               vue.createElementVNode("text", { class: "font text-muted" }, "总帖子10 今日发帖0")
             ]),
             vue.createElementVNode("text", { class: "iconfont icon-xiangyou1" })
@@ -2888,7 +2951,7 @@ if (uni.restoreGlobal) {
       ]),
       vue.createElementVNode("view", { class: "px-3 py-2" }, [
         vue.createElementVNode("image", {
-          src: _imports_1,
+          src: _imports_0$1,
           mode: "aspectFill",
           style: { "height": "170rpx" },
           class: "rounded w-100"
@@ -2932,9 +2995,9 @@ if (uni.restoreGlobal) {
       })
     ]);
   }
-  const PagesOwnerOwner = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["render", _sfc_render$t], ["__file", "F:/project/社区交友/pages/owner/owner.vue"]]);
+  const PagesOwnerOwner = /* @__PURE__ */ _export_sfc(_sfc_main$w, [["render", _sfc_render$v], ["__file", "F:/project/社区交友/pages/owner/owner.vue"]]);
   var statusBarHeight = uni.getSystemInfoSync().statusBarHeight + "px";
-  const _sfc_main$t = {
+  const _sfc_main$v = {
     name: "UniStatusBar",
     data() {
       return {
@@ -2942,7 +3005,7 @@ if (uni.restoreGlobal) {
       };
     }
   };
-  function _sfc_render$s(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$u(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -2956,8 +3019,8 @@ if (uni.restoreGlobal) {
       /* STYLE */
     );
   }
-  const uniStatusBar = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["render", _sfc_render$s], ["__scopeId", "data-v-25810fe1"], ["__file", "F:/project/社区交友/components/uni-uni/uni-status-bar/uni-status-bar.vue"]]);
-  const _sfc_main$s = {
+  const uniStatusBar = /* @__PURE__ */ _export_sfc(_sfc_main$v, [["render", _sfc_render$u], ["__scopeId", "data-v-25810fe1"], ["__file", "F:/project/社区交友/components/uni-uni/uni-status-bar/uni-status-bar.vue"]]);
+  const _sfc_main$u = {
     name: "UniNavBar",
     components: {
       uniStatusBar,
@@ -3023,7 +3086,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$r(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$t(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_status_bar = vue.resolveComponent("uni-status-bar");
     const _component_uni_icons = vue.resolveComponent("uni-icons");
     return vue.openBlock(), vue.createElementBlock("view", { class: "uni-navbar" }, [
@@ -3149,8 +3212,8 @@ if (uni.restoreGlobal) {
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const uniNavBar = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["render", _sfc_render$r], ["__scopeId", "data-v-49ede2a5"], ["__file", "F:/project/社区交友/components/uni-uni/uni-nav-bar/uni-nav-bar.vue"]]);
-  const _sfc_main$r = {
+  const uniNavBar = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["render", _sfc_render$t], ["__scopeId", "data-v-49ede2a5"], ["__file", "F:/project/社区交友/components/uni-uni/uni-nav-bar/uni-nav-bar.vue"]]);
+  const _sfc_main$t = {
     props: ["hotClick"],
     methods: {
       openMore() {
@@ -3160,7 +3223,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$q(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$s(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", null, [
       vue.createElementVNode("view", { class: "flex align-center justify-between px-2" }, [
         vue.createElementVNode("text", { class: "font-md" }, "热门分类"),
@@ -3197,8 +3260,8 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const hotClick = /* @__PURE__ */ _export_sfc(_sfc_main$r, [["render", _sfc_render$q], ["__file", "F:/project/社区交友/components/find/hot-click.vue"]]);
-  const _sfc_main$q = {
+  const hotClick = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["render", _sfc_render$s], ["__file", "F:/project/社区交友/components/find/hot-click.vue"]]);
+  const _sfc_main$s = {
     props: {
       item: Object,
       index: Number
@@ -3211,7 +3274,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$p(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$r(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "flex align-center p-2" }, [
       vue.createElementVNode("image", {
         src: $props.item.cover,
@@ -3255,7 +3318,7 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const topicList = /* @__PURE__ */ _export_sfc(_sfc_main$q, [["render", _sfc_render$p], ["__file", "F:/project/社区交友/components/find/topic-list.vue"]]);
+  const topicList = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["render", _sfc_render$r], ["__file", "F:/project/社区交友/components/find/topic-list.vue"]]);
   const demo$2 = [
     {
       username: "昵称",
@@ -3303,7 +3366,7 @@ if (uni.restoreGlobal) {
       share_count: 2
     }
   ];
-  const _sfc_main$p = {
+  const _sfc_main$r = {
     components: {
       uniNavBar,
       commonList,
@@ -3424,7 +3487,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$o(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$q(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_nav_bar = vue.resolveComponent("uni-nav-bar");
     const _component_common_list = vue.resolveComponent("common-list");
     const _component_load_more = vue.resolveComponent("load-more");
@@ -3577,8 +3640,8 @@ if (uni.restoreGlobal) {
       ], 44, ["current"])
     ]);
   }
-  const PagesFindFind = /* @__PURE__ */ _export_sfc(_sfc_main$p, [["render", _sfc_render$o], ["__file", "F:/project/社区交友/pages/find/find.vue"]]);
-  const _sfc_main$o = {
+  const PagesFindFind = /* @__PURE__ */ _export_sfc(_sfc_main$r, [["render", _sfc_render$q], ["__file", "F:/project/社区交友/pages/find/find.vue"]]);
+  const _sfc_main$q = {
     components: {
       uniBadge
     },
@@ -3587,7 +3650,7 @@ if (uni.restoreGlobal) {
       indexe: Number
     }
   };
-  function _sfc_render$n(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$p(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_badge = vue.resolveComponent("uni-badge");
     return vue.openBlock(), vue.createElementBlock("view", {
       class: "flex align-center p-2 border-bottom border-light-secondary",
@@ -3639,8 +3702,8 @@ if (uni.restoreGlobal) {
       )
     ]);
   }
-  const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["render", _sfc_render$n], ["__file", "F:/project/社区交友/components/user-list/user-list.vue"]]);
-  const _sfc_main$n = {
+  const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main$q, [["render", _sfc_render$p], ["__file", "F:/project/社区交友/components/user-list/user-list.vue"]]);
+  const _sfc_main$p = {
     components: {
       commonList,
       topicList,
@@ -3788,7 +3851,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$m(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$o(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_common_list = vue.resolveComponent("common-list");
     const _component_topic_list = vue.resolveComponent("topic-list");
     const _component_user_list = resolveEasycom(vue.resolveDynamicComponent("user-list"), __easycom_0);
@@ -3885,7 +3948,7 @@ if (uni.restoreGlobal) {
       ))
     ]);
   }
-  const PagesSearchSearch = /* @__PURE__ */ _export_sfc(_sfc_main$n, [["render", _sfc_render$m], ["__file", "F:/project/社区交友/pages/search/search.vue"]]);
+  const PagesSearchSearch = /* @__PURE__ */ _export_sfc(_sfc_main$p, [["render", _sfc_render$o], ["__file", "F:/project/社区交友/pages/search/search.vue"]]);
   var isIOS;
   function album() {
     var result = 0;
@@ -4124,7 +4187,7 @@ if (uni.restoreGlobal) {
     ["original"],
     ["compressed", "original"]
   ];
-  const _sfc_main$m = {
+  const _sfc_main$o = {
     props: {
       list: Array,
       show: {
@@ -4246,7 +4309,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$l(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$n(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "px-2" }, [
       $props.show ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 0,
@@ -4302,8 +4365,8 @@ if (uni.restoreGlobal) {
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const uploadImage = /* @__PURE__ */ _export_sfc(_sfc_main$m, [["render", _sfc_render$l], ["__scopeId", "data-v-ac335ed3"], ["__file", "F:/project/社区交友/components/common/upload-image.vue"]]);
-  const _sfc_main$l = {
+  const uploadImage = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["render", _sfc_render$n], ["__scopeId", "data-v-ac335ed3"], ["__file", "F:/project/社区交友/components/common/upload-image.vue"]]);
+  const _sfc_main$n = {
     components: {
       uniNavBar,
       uploadImage
@@ -4384,7 +4447,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$k(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$m(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_nav_bar = vue.resolveComponent("uni-nav-bar");
     const _component_upload_image = vue.resolveComponent("upload-image");
     return vue.openBlock(), vue.createElementBlock("view", null, [
@@ -4451,8 +4514,8 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesAddInputAddInput = /* @__PURE__ */ _export_sfc(_sfc_main$l, [["render", _sfc_render$k], ["__file", "F:/project/社区交友/pages/add-input/add-input.vue"]]);
-  const _sfc_main$k = {
+  const PagesAddInputAddInput = /* @__PURE__ */ _export_sfc(_sfc_main$n, [["render", _sfc_render$m], ["__file", "F:/project/社区交友/pages/add-input/add-input.vue"]]);
+  const _sfc_main$m = {
     components: {
       topicList,
       loadMore
@@ -4566,7 +4629,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$j(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$l(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_topic_list = vue.resolveComponent("topic-list");
     const _component_load_more = vue.resolveComponent("load-more");
     const _component_no_thing = vue.resolveComponent("no-thing");
@@ -4677,11 +4740,11 @@ if (uni.restoreGlobal) {
       ], 44, ["current"])
     ]);
   }
-  const PagesTopicNavTopicNav = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["render", _sfc_render$j], ["__file", "F:/project/社区交友/pages/topic-nav/topic-nav.vue"]]);
-  const _sfc_main$j = {
+  const PagesTopicNavTopicNav = /* @__PURE__ */ _export_sfc(_sfc_main$m, [["render", _sfc_render$l], ["__file", "F:/project/社区交友/pages/topic-nav/topic-nav.vue"]]);
+  const _sfc_main$l = {
     props: ["info"]
   };
-  function _sfc_render$i(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$k(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", null, [
       vue.createElementVNode("view", { class: "position-relative" }, [
         vue.createElementVNode("image", {
@@ -4735,8 +4798,8 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const topicInfo = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["render", _sfc_render$i], ["__file", "F:/project/社区交友/components/topic-detail/topic-info.vue"]]);
-  const _sfc_main$i = {
+  const topicInfo = /* @__PURE__ */ _export_sfc(_sfc_main$l, [["render", _sfc_render$k], ["__file", "F:/project/社区交友/components/topic-detail/topic-info.vue"]]);
+  const _sfc_main$k = {
     components: {
       topicInfo,
       commonList,
@@ -4842,7 +4905,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$h(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$j(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_topic_info = vue.resolveComponent("topic-info");
     const _component_common_list = vue.resolveComponent("common-list");
     const _component_no_thing = vue.resolveComponent("no-thing");
@@ -4916,7 +4979,7 @@ if (uni.restoreGlobal) {
       vue.createVNode(_component_load_more, { loadmore: $options.loadtext }, null, 8, ["loadmore"])
     ]);
   }
-  const PagesTopicDetailTopicDetail = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$h], ["__file", "F:/project/社区交友/pages/topic-detail/topic-detail.vue"]]);
+  const PagesTopicDetailTopicDetail = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["render", _sfc_render$j], ["__file", "F:/project/社区交友/pages/topic-detail/topic-detail.vue"]]);
   const demo$1 = [{
     headshot: "/static/common/demo6.jpg",
     username: "烦躁杏鲍菇",
@@ -4946,7 +5009,7 @@ if (uni.restoreGlobal) {
     age: 24,
     isFollow: false
   }];
-  const _sfc_main$h = {
+  const _sfc_main$j = {
     components: {
       loadMore,
       noThing,
@@ -5027,7 +5090,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$g(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$i(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_user_list = resolveEasycom(vue.resolveDynamicComponent("user-list"), __easycom_0);
     const _component_load_more = vue.resolveComponent("load-more");
     const _component_no_thing = vue.resolveComponent("no-thing");
@@ -5137,9 +5200,9 @@ if (uni.restoreGlobal) {
       ], 44, ["current"])
     ]);
   }
-  const PagesFriendListFriendList = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["render", _sfc_render$g], ["__file", "F:/project/社区交友/pages/friend-list/friend-list.vue"]]);
+  const PagesFriendListFriendList = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["render", _sfc_render$i], ["__file", "F:/project/社区交友/pages/friend-list/friend-list.vue"]]);
   const uid = 1;
-  const _sfc_main$g = {
+  const _sfc_main$i = {
     props: {
       item: Object,
       index: Number,
@@ -5156,7 +5219,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$f(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$h(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", null, [
       vue.createCommentVNode(" 时间 "),
       $options.shortTime ? (vue.openBlock(), vue.createElementBlock(
@@ -5198,8 +5261,8 @@ if (uni.restoreGlobal) {
       )
     ]);
   }
-  const userChatPage = /* @__PURE__ */ _export_sfc(_sfc_main$g, [["render", _sfc_render$f], ["__file", "F:/project/社区交友/components/users-chat/user-chat-page.vue"]]);
-  const _sfc_main$f = {
+  const userChatPage = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$h], ["__file", "F:/project/社区交友/components/users-chat/user-chat-page.vue"]]);
+  const _sfc_main$h = {
     data() {
       return {
         content: ""
@@ -5218,7 +5281,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$e(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$g(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", {
       class: "fixed-bottom flex align-center border-top bg-white",
       style: { "height": "100rpx" }
@@ -5247,8 +5310,8 @@ if (uni.restoreGlobal) {
       })
     ]);
   }
-  const bottomInput = /* @__PURE__ */ _export_sfc(_sfc_main$f, [["render", _sfc_render$e], ["__file", "F:/project/社区交友/components/common/bottom-input.vue"]]);
-  const _sfc_main$e = {
+  const bottomInput = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["render", _sfc_render$g], ["__file", "F:/project/社区交友/components/common/bottom-input.vue"]]);
+  const _sfc_main$g = {
     components: {
       userChatPage,
       bottomInput
@@ -5358,7 +5421,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$d(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$f(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_user_chat_page = vue.resolveComponent("user-chat-page");
     const _component_bottom_input = vue.resolveComponent("bottom-input");
     return vue.openBlock(), vue.createElementBlock("view", null, [
@@ -5393,8 +5456,8 @@ if (uni.restoreGlobal) {
       vue.createCommentVNode(' <view class="fixed-bottom flex align-center border-top bg-white" \r\n		style="height: 100rpx;">\r\n			<input type="text" v-model="content2" class="flex-1 rounded bg-light ml-2" \r\n			 style="padding: 5rpx; "placeholder="文明发言" @confirm="submit" />\r\n			<view class="iconfont icon-fabu flex align-center justify-center font-md animated" \r\n			style="width: 100rpx;" hover-class="rubberBand color-global" @click="submit()"></view>\r\n		</view> ')
     ]);
   }
-  const PagesUsersChatUsersChat = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["render", _sfc_render$d], ["__file", "F:/project/社区交友/pages/users-chat/users-chat.vue"]]);
-  const _sfc_main$d = {
+  const PagesUsersChatUsersChat = /* @__PURE__ */ _export_sfc(_sfc_main$g, [["render", _sfc_render$f], ["__file", "F:/project/社区交友/pages/users-chat/users-chat.vue"]]);
+  const _sfc_main$f = {
     components: {
       uniPopup
     },
@@ -5638,7 +5701,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$c(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$e(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_popup = vue.resolveComponent("uni-popup");
     return vue.openBlock(), vue.createBlock(
       _component_uni_popup,
@@ -5698,9 +5761,9 @@ if (uni.restoreGlobal) {
       /* NEED_PATCH */
     );
   }
-  const shareTo = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["render", _sfc_render$c], ["__file", "F:/project/社区交友/components/common/share-to.vue"]]);
+  const shareTo = /* @__PURE__ */ _export_sfc(_sfc_main$f, [["render", _sfc_render$e], ["__file", "F:/project/社区交友/components/common/share-to.vue"]]);
   const _imports_0 = "/static/common/demo5.jpg";
-  const _sfc_main$c = {
+  const _sfc_main$e = {
     components: {
       commonList,
       bottomInput,
@@ -5811,7 +5874,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$b(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$d(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_common_list = vue.resolveComponent("common-list");
     const _component_share_to = vue.resolveComponent("share-to");
     const _component_bottom_input = vue.resolveComponent("bottom-input");
@@ -5894,8 +5957,8 @@ if (uni.restoreGlobal) {
       vue.createVNode(_component_bottom_input, { onSubmit: $options.submit }, null, 8, ["onSubmit"])
     ]);
   }
-  const PagesPostDetailPostDetail = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__file", "F:/project/社区交友/pages/post-detail/post-detail.vue"]]);
-  const _sfc_main$b = {
+  const PagesPostDetailPostDetail = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["render", _sfc_render$d], ["__file", "F:/project/社区交友/pages/post-detail/post-detail.vue"]]);
+  const _sfc_main$d = {
     components: {
       uniList,
       uniListItem
@@ -5907,6 +5970,11 @@ if (uni.restoreGlobal) {
     },
     onLoad() {
       this.getStorageInfo();
+    },
+    computed: {
+      ...mapState({
+        loginStatus: (state) => state.loginStatus
+      })
     },
     methods: {
       getStorageInfo() {
@@ -5935,27 +6003,49 @@ if (uni.restoreGlobal) {
             }
           }
         });
+      },
+      // 退出登录
+      logout() {
+        uni.showModal({
+          content: "是否要退出登录",
+          success: (res) => {
+            if (res.confirm) {
+              this.$store.commit("logout");
+              uni.navigateBack({
+                delta: 1
+              });
+              uni.showToast({
+                title: "退出登录成功",
+                icon: "none"
+              });
+            }
+          }
+        });
       }
     }
   };
-  function _sfc_render$a(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$c(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_list_item = vue.resolveComponent("uni-list-item");
     const _component_uni_list = vue.resolveComponent("uni-list");
     return vue.openBlock(), vue.createElementBlock("view", null, [
       vue.createVNode(_component_uni_list, null, {
         default: vue.withCtx(() => [
-          vue.createVNode(_component_uni_list_item, {
-            title: "账号与安全",
-            onClick: _cache[0] || (_cache[0] = ($event) => $options.open("user-password"))
-          }),
-          vue.createVNode(_component_uni_list_item, {
-            title: "绑定邮箱",
-            onClick: _cache[1] || (_cache[1] = ($event) => $options.open("user-email"))
-          }),
-          vue.createVNode(_component_uni_list_item, {
-            title: "资料编辑",
-            onClick: _cache[2] || (_cache[2] = ($event) => $options.open("user-ownerinfo"))
-          }),
+          _ctx.loginStatus ? (vue.openBlock(), vue.createElementBlock(
+            vue.Fragment,
+            { key: 0 },
+            [
+              vue.createVNode(_component_uni_list_item, {
+                title: "账号与安全",
+                onClick: _cache[0] || (_cache[0] = ($event) => $options.open("user-safe"))
+              }),
+              vue.createVNode(_component_uni_list_item, {
+                title: "资料编辑",
+                onClick: _cache[1] || (_cache[1] = ($event) => $options.open("user-ownerinfo"))
+              })
+            ],
+            64
+            /* STABLE_FRAGMENT */
+          )) : vue.createCommentVNode("v-if", true),
           vue.createVNode(_component_uni_list_item, {
             title: "清除缓存",
             onClick: $options.clear
@@ -5972,29 +6062,34 @@ if (uni.restoreGlobal) {
             _: 1
             /* STABLE */
           }, 8, ["onClick"]),
-          vue.createVNode(_component_uni_list_item, {
+          _ctx.loginStatus ? (vue.openBlock(), vue.createBlock(_component_uni_list_item, {
+            key: 1,
             title: "意见反馈",
-            onClick: _cache[3] || (_cache[3] = ($event) => $options.open("user-feedback"))
-          }),
+            onClick: _cache[2] || (_cache[2] = ($event) => $options.open("user-feedback"))
+          })) : vue.createCommentVNode("v-if", true),
           vue.createVNode(_component_uni_list_item, {
             title: "关于社区",
-            onClick: _cache[4] || (_cache[4] = ($event) => $options.open("about"))
+            onClick: _cache[3] || (_cache[3] = ($event) => $options.open("about"))
           }),
-          vue.createElementVNode("view", { class: "py-2 px-3" }, [
+          _ctx.loginStatus ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 2,
+            class: "py-2 px-3"
+          }, [
             vue.createElementVNode("button", {
               class: "bg-color text-white",
               style: { "border-radius": "50rpx", "border": "0" },
-              type: "primary"
+              type: "primary",
+              onClick: _cache[4] || (_cache[4] = (...args) => $options.logout && $options.logout(...args))
             }, "退出登录")
-          ])
+          ])) : vue.createCommentVNode("v-if", true)
         ]),
         _: 1
         /* STABLE */
       })
     ]);
   }
-  const PagesUserSettingUserSetting = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__file", "F:/project/社区交友/pages/user-setting/user-setting.vue"]]);
-  const _sfc_main$a = {
+  const PagesUserSettingUserSetting = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["render", _sfc_render$c], ["__file", "F:/project/社区交友/pages/user-setting/user-setting.vue"]]);
+  const _sfc_main$c = {
     data() {
       return {
         oldpassword: "",
@@ -6027,7 +6122,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$b(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", null, [
       vue.withDirectives(vue.createElementVNode(
         "input",
@@ -6082,8 +6177,8 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesUserPasswordUserPassword = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__file", "F:/project/社区交友/pages/user-password/user-password.vue"]]);
-  const _sfc_main$9 = {
+  const PagesUserPasswordUserPassword = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__file", "F:/project/社区交友/pages/user-password/user-password.vue"]]);
+  const _sfc_main$b = {
     data() {
       return {
         email: "",
@@ -6116,7 +6211,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$a(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", null, [
       vue.withDirectives(vue.createElementVNode(
         "input",
@@ -6157,7 +6252,7 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesUserEmailUserEmail = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__file", "F:/project/社区交友/pages/user-email/user-email.vue"]]);
+  const PagesUserEmailUserEmail = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__file", "F:/project/社区交友/pages/user-email/user-email.vue"]]);
   var provinceData = [
     {
       "label": "北京市",
@@ -20706,7 +20801,7 @@ if (uni.restoreGlobal) {
       }]
     ]
   ];
-  const _sfc_main$8 = {
+  const _sfc_main$a = {
     data() {
       return {
         pickerValue: [0, 0, 0],
@@ -20811,7 +20906,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$7(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("div", { class: "mpvue-picker" }, [
       vue.createElementVNode(
         "div",
@@ -20925,10 +21020,10 @@ if (uni.restoreGlobal) {
       )
     ]);
   }
-  const mpvueCityPicker = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-a822e6e6"], ["__file", "F:/project/社区交友/components/uni-uni/mpvue-citypicker/mpvueCityPicker.vue"]]);
+  const mpvueCityPicker = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-a822e6e6"], ["__file", "F:/project/社区交友/components/uni-uni/mpvue-citypicker/mpvueCityPicker.vue"]]);
   const genderArray = ["男", "女", "保密"];
   const relationArray = ["保密", "未婚", "已婚"];
-  const _sfc_main$7 = {
+  const _sfc_main$9 = {
     components: {
       uniList,
       uniListItem,
@@ -21008,7 +21103,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$6(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_list_item = vue.resolveComponent("uni-list-item");
     const _component_uni_list = vue.resolveComponent("uni-list");
     const _component_mpvue_city_picker = vue.resolveComponent("mpvue-city-picker");
@@ -21156,8 +21251,8 @@ if (uni.restoreGlobal) {
       }, null, 8, ["themeColor", "pickerValueDefault", "onOnConfirm"])
     ]);
   }
-  const PagesUserOwnerinfoUserOwnerinfo = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__file", "F:/project/社区交友/pages/user-ownerinfo/user-ownerinfo.vue"]]);
-  const _sfc_main$6 = {
+  const PagesUserOwnerinfoUserOwnerinfo = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__file", "F:/project/社区交友/pages/user-ownerinfo/user-ownerinfo.vue"]]);
+  const _sfc_main$8 = {
     name: "UniCollapse",
     props: {
       accordion: {
@@ -21189,13 +21284,13 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$5(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$7(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "uni-collapse" }, [
       vue.renderSlot(_ctx.$slots, "default", {}, void 0, true)
     ]);
   }
-  const uniCollapse = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-83aa08f3"], ["__file", "F:/project/社区交友/components/uni-uni/uni-collapse/uni-collapse.vue"]]);
-  const _sfc_main$5 = {
+  const uniCollapse = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-83aa08f3"], ["__file", "F:/project/社区交友/components/uni-uni/uni-collapse/uni-collapse.vue"]]);
+  const _sfc_main$7 = {
     name: "UniCollapseItem",
     components: {
       uniIcons
@@ -21275,7 +21370,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$6(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_icons = vue.resolveComponent("uni-icons");
     return vue.openBlock(), vue.createElementBlock(
       "view",
@@ -21333,8 +21428,8 @@ if (uni.restoreGlobal) {
       /* CLASS */
     );
   }
-  const uniCollapseItem = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__scopeId", "data-v-5e56371b"], ["__file", "F:/project/社区交友/components/uni-uni/uni-collapse-item/uni-collapse-item.vue"]]);
-  const _sfc_main$4 = {
+  const uniCollapseItem = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-5e56371b"], ["__file", "F:/project/社区交友/components/uni-uni/uni-collapse-item/uni-collapse-item.vue"]]);
+  const _sfc_main$6 = {
     components: {
       uniCollapse,
       uniCollapseItem
@@ -21344,7 +21439,7 @@ if (uni.restoreGlobal) {
     },
     methods: {}
   };
-  function _sfc_render$3(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$5(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_collapse_item = vue.resolveComponent("uni-collapse-item");
     const _component_uni_collapse = vue.resolveComponent("uni-collapse");
     return vue.openBlock(), vue.createElementBlock("view", null, [
@@ -21383,8 +21478,8 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesUserFeedbackUserFeedback = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__file", "F:/project/社区交友/pages/user-feedback/user-feedback.vue"]]);
-  const _sfc_main$3 = {
+  const PagesUserFeedbackUserFeedback = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__file", "F:/project/社区交友/pages/user-feedback/user-feedback.vue"]]);
+  const _sfc_main$5 = {
     components: {
       uniList,
       uniListItem
@@ -21394,7 +21489,7 @@ if (uni.restoreGlobal) {
     },
     methods: {}
   };
-  function _sfc_render$2(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_list_item = vue.resolveComponent("uni-list-item");
     const _component_uni_list = vue.resolveComponent("uni-list");
     return vue.openBlock(), vue.createElementBlock("view", null, [
@@ -21416,8 +21511,8 @@ if (uni.restoreGlobal) {
       })
     ]);
   }
-  const PagesAboutAbout = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__file", "F:/project/社区交友/pages/about/about.vue"]]);
-  const _sfc_main$2 = {
+  const PagesAboutAbout = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__file", "F:/project/社区交友/pages/about/about.vue"]]);
+  const _sfc_main$4 = {
     components: {
       uniStatusBar,
       otherLogin
@@ -21500,7 +21595,7 @@ if (uni.restoreGlobal) {
           username: this.username,
           password: this.password
         }).then((res) => {
-          this.$store.commit("login", res);
+          this.$store.commit("login", res.data.data);
           uni.navigateBack({
             delta: 1
           });
@@ -21512,7 +21607,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$1(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$3(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_status_bar = vue.resolveComponent("uni-status-bar");
     const _component_other_login = vue.resolveComponent("other-login");
     return vue.openBlock(), vue.createElementBlock("view", null, [
@@ -21659,14 +21754,14 @@ if (uni.restoreGlobal) {
         vue.createElementVNode("view", { style: { "height": "1rpx", "background-color": "#ddd", "width": "100rpx" } })
       ]),
       vue.createCommentVNode(" 第三方登录 "),
-      vue.createVNode(_component_other_login),
+      vue.createVNode(_component_other_login, { back: "" }),
       vue.createElementVNode("view", { class: "flex align-center justify-center text-muted" }, [
         vue.createTextVNode(" 注册即代表同意"),
         vue.createElementVNode("text", { class: "text-primary" }, "《xxx社区协议》")
       ])
     ]);
   }
-  const PagesLoginLogin = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render$1], ["__file", "F:/project/社区交友/pages/login/login.vue"]]);
+  const PagesLoginLogin = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__file", "F:/project/社区交友/pages/login/login.vue"]]);
   const demo = [
     {
       username: "昵称",
@@ -21714,7 +21809,7 @@ if (uni.restoreGlobal) {
       share_count: 2
     }
   ];
-  const _sfc_main$1 = {
+  const _sfc_main$3 = {
     components: {
       commonList,
       loadMore,
@@ -21782,7 +21877,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$2(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_common_list = vue.resolveComponent("common-list");
     const _component_load_more = vue.resolveComponent("load-more");
     const _component_uni_popup = vue.resolveComponent("uni-popup");
@@ -21918,7 +22013,223 @@ if (uni.restoreGlobal) {
       )
     ]);
   }
-  const PagesUserSpaceUserSpace = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__file", "F:/project/社区交友/pages/user-space/user-space.vue"]]);
+  const PagesUserSpaceUserSpace = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__file", "F:/project/社区交友/pages/user-space/user-space.vue"]]);
+  const _sfc_main$2 = {
+    components: {
+      uniList,
+      uniListItem
+    },
+    data() {
+      return {
+        list: [
+          // 	{
+          // 	name:"微信绑定",
+          // 	data:"未绑定"
+          // },{
+          // 	name:"qq绑定",
+          // 	data:"未绑定"
+          // },
+        ]
+      };
+    },
+    computed: {
+      ...mapState({
+        user: (state) => state.user
+      })
+    },
+    onLoad() {
+      let list = [{
+        name: "手机号",
+        data: this.user.phone ? this.user.phone : "未绑定",
+        type: "navigateTo",
+        url: "/pages/user-phone/user-phone"
+      }, {
+        name: "登录密码",
+        data: this.user.password ? "修改密码" : "未设置"
+      }, {
+        name: "绑定邮箱",
+        data: this.user.email ? this.user.email : "未绑定"
+      }];
+      this.list = [...list];
+    },
+    methods: {
+      handleEvent(item) {
+        if (item.type === "")
+          return;
+        switch (item.type) {
+          case "navigateTo":
+            uni.navigateTo({
+              url: item.url
+            });
+            break;
+        }
+      }
+    }
+  };
+  function _sfc_render$1(_ctx, _cache, $props, $setup, $data, $options) {
+    const _component_uni_list_item = vue.resolveComponent("uni-list-item");
+    const _component_uni_list = vue.resolveComponent("uni-list");
+    return vue.openBlock(), vue.createElementBlock("view", null, [
+      vue.createVNode(_component_uni_list, null, {
+        default: vue.withCtx(() => [
+          (vue.openBlock(true), vue.createElementBlock(
+            vue.Fragment,
+            null,
+            vue.renderList($data.list, (item, index) => {
+              return vue.openBlock(), vue.createBlock(_component_uni_list_item, {
+                title: item.name,
+                key: index,
+                onClick: ($event) => $options.handleEvent(item)
+              }, {
+                right: vue.withCtx(() => [
+                  vue.createElementVNode(
+                    "view",
+                    { class: "flex align-center text-right text-light-muted" },
+                    vue.toDisplayString(item.data),
+                    1
+                    /* TEXT */
+                  )
+                ]),
+                _: 2
+                /* DYNAMIC */
+              }, 1032, ["title", "onClick"]);
+            }),
+            128
+            /* KEYED_FRAGMENT */
+          ))
+        ]),
+        _: 1
+        /* STABLE */
+      })
+    ]);
+  }
+  const PagesUserSafeUserSafe = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render$1], ["__file", "F:/project/社区交友/pages/user-safe/user-safe.vue"]]);
+  const _sfc_main$1 = {
+    data() {
+      return {
+        phone: "",
+        code: "",
+        codeTime: 0
+      };
+    },
+    computed: {
+      disabled() {
+        return this.phone === "" || this.code === "";
+      }
+    },
+    methods: {
+      // 验证密码
+      check() {
+        var rule = /^1[3-9]\d{9}$/;
+        if (!rule.test(this.phone)) {
+          uni.showToast({
+            title: "手机号格式不正确",
+            icon: "none"
+          });
+          return false;
+        }
+        return true;
+      },
+      submit() {
+        if (!this.check()) {
+          return;
+        }
+        this.$H.post("/user/bindphone", {
+          phone: this.phone,
+          code: this.code
+        }, {
+          token: true
+        }).then((res) => {
+          this.$store.commit("ediUserInfo", {
+            key: "phone",
+            value: this.phone
+          });
+          uni.navigateBack({
+            delta: 1
+          });
+          uni.showToast({
+            title: "修改成功",
+            icon: "none"
+          });
+        });
+      },
+      // 获取验证码
+      getCode() {
+        if (this.codeTime > 0) {
+          return;
+        }
+        if (!this.check())
+          return;
+        this.codeTime = 60;
+        let timer = setInterval(() => {
+          if (this.codeTime >= 1) {
+            this.codeTime--;
+          } else {
+            this.codeTime = 0;
+            clearInterval(timer);
+          }
+        }, 1e3);
+      }
+    }
+  };
+  function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createElementBlock("view", null, [
+      vue.createElementVNode("view", { class: "mb-2 flex align-stretch" }, [
+        vue.createElementVNode("view", { class: "border-bottom flex align-center justify-center font px-2" }, "+86"),
+        vue.withDirectives(vue.createElementVNode(
+          "input",
+          {
+            type: "text",
+            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $data.phone = $event),
+            placeholder: "手机号",
+            class: "border-bottom p-2 flex-1"
+          },
+          null,
+          512
+          /* NEED_PATCH */
+        ), [
+          [vue.vModelText, $data.phone]
+        ])
+      ]),
+      vue.createElementVNode("view", { class: "mb-2 flex align-stretch" }, [
+        vue.withDirectives(vue.createElementVNode(
+          "input",
+          {
+            type: "text",
+            "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $data.code = $event),
+            placeholder: "请输入验证码",
+            class: "border-bottom p-2 flex-1"
+          },
+          null,
+          512
+          /* NEED_PATCH */
+        ), [
+          [vue.vModelText, $data.code]
+        ]),
+        vue.createElementVNode(
+          "view",
+          {
+            class: vue.normalizeClass(["border-bottom flex align-center justify-center font-sm text-white", $data.codeTime > 0 ? "bg-color-disabled" : "bg-color"]),
+            style: { "width": "180rpx" },
+            onClick: _cache[2] || (_cache[2] = (...args) => $options.getCode && $options.getCode(...args))
+          },
+          vue.toDisplayString($data.codeTime > 0 ? $data.codeTime + "s" : "获取验证码"),
+          3
+          /* TEXT, CLASS */
+        )
+      ]),
+      vue.createElementVNode("view", { class: "py-2 px-3" }, [
+        vue.createElementVNode("button", {
+          class: vue.normalizeClass(["bg-color text-white", $options.disabled ? "bg-color-disabled" : ""]),
+          style: { "border-radius": "50rpx", "border": "0" },
+          type: "primary",
+          disabled: $options.disabled,
+          onClick: _cache[3] || (_cache[3] = (...args) => $options.submit && $options.submit(...args))
+        }, "绑定", 10, ["disabled"])
+      ])
+    ]);
+  }
+  const PagesUserPhoneUserPhone = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__file", "F:/project/社区交友/pages/user-phone/user-phone.vue"]]);
   __definePage("pages/index/index", PagesIndexIndex);
   __definePage("pages/msg/msg", PagesMsgMsg);
   __definePage("pages/owner/owner", PagesOwnerOwner);
@@ -21938,17 +22249,20 @@ if (uni.restoreGlobal) {
   __definePage("pages/about/about", PagesAboutAbout);
   __definePage("pages/login/login", PagesLoginLogin);
   __definePage("pages/user-space/user-space", PagesUserSpaceUserSpace);
+  __definePage("pages/user-safe/user-safe", PagesUserSafeUserSafe);
+  __definePage("pages/user-phone/user-phone", PagesUserPhoneUserPhone);
   const _sfc_main = {
     onLaunch: function() {
       formatAppLog("log", "at App.vue:4", "App Launch");
       this.$U.update();
       this.$U.onNetwork();
+      this.$store.commit("initUser");
     },
     onShow: function() {
-      formatAppLog("log", "at App.vue:12", "App Show");
+      formatAppLog("log", "at App.vue:14", "App Show");
     },
     onHide: function() {
-      formatAppLog("log", "at App.vue:15", "App Hide");
+      formatAppLog("log", "at App.vue:17", "App Hide");
     }
   };
   const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__file", "F:/project/社区交友/App.vue"]]);
@@ -22002,8 +22316,85 @@ if (uni.restoreGlobal) {
         arr.unshift(arr.splice(index, 1)[0]);
       }
       return arr;
+    },
+    // userinfo格式转换
+    formatUserinfo(obj) {
+      if (obj.user && obj.user_id > 0) {
+        return {
+          id: obj.user.id,
+          username: obj.user.username || obj.nickname,
+          userpic: obj.user.userpic || obj.avatarurl,
+          phone: obj.user.phone,
+          email: obj.user.email,
+          status: obj.user.status,
+          create_time: obj.user.create_time,
+          logintype: obj.logintype,
+          password: obj.user.password,
+          token: obj.token,
+          userinfo: {
+            id: obj.user.userinfo.id,
+            user_id: obj.user.userinfo.user_id,
+            age: obj.user.userinfo.age,
+            sex: obj.user.userinfo.sex,
+            qg: obj.user.userinfo.qg,
+            job: obj.user.userinfo.job,
+            path: obj.user.userinfo.path,
+            birthday: obj.user.userinfo.birthday
+          }
+        };
+      }
+      return {
+        id: obj.user_id,
+        username: obj.nickname,
+        userpic: obj.avatarurl,
+        phone: false,
+        email: false,
+        status: 1,
+        create_time: false,
+        logintype: obj.logintype,
+        token: obj.token,
+        userinfo: false
+      };
     }
   };
+  const store = createStore({
+    state: {
+      loginStatus: false,
+      user: {},
+      token: false
+    },
+    mutations: {
+      // 登录
+      login(state, user) {
+        state.loginStatus = true;
+        state.user = user;
+        state.token = state.user.token;
+        uni.setStorageSync("user", JSON.stringify(user));
+      },
+      // 初始化登录状态
+      initUser(state) {
+        let user = uni.getStorageSync("user");
+        if (user) {
+          state.user = JSON.parse(user);
+          state.loginStatus = true;
+          state.token = state.user.token;
+        }
+      },
+      // 退出登录
+      logout(state) {
+        state.user = {};
+        state.loginStatus = false;
+        state.token = false;
+        uni.removeStorageSync("user");
+      },
+      // 修改用户信息（手机号，邮箱，密码）
+      editUserInfo(state, { key, value }) {
+        state.user[key] = value;
+      }
+    },
+    actions: {},
+    modules: {}
+  });
   const $H = {
     common: {
       method: "GET",
@@ -22017,6 +22408,15 @@ if (uni.restoreGlobal) {
         options.url = $C.webUrl + options.url;
         options.method = options.method || this.common.method;
         options.header = options.header || this.common.header;
+        if (options.token) {
+          options.header.token = store.state.token;
+          if (!options.header.token) {
+            return uni.showToast({
+              title: "非法token，请重新登录",
+              icon: "none"
+            });
+          }
+        }
         options.success = (res) => resolve(res);
         options.fail = (err) => {
           uni.showToast({
@@ -22045,22 +22445,6 @@ if (uni.restoreGlobal) {
       return this.request(options);
     }
   };
-  const store = createStore({
-    state: {
-      loginStatus: false,
-      user: {}
-    },
-    mutations: {
-      // 登录
-      login(state, user) {
-        state.loginStatus = true;
-        state.user = user;
-        uni.setStorageSync("user", JSON.stringify(user));
-      }
-    },
-    actions: {},
-    modules: {}
-  });
   const checkAuth = (callback) => {
     if (!store.state.loginStatus) {
       uni.showToast({

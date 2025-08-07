@@ -1,4 +1,5 @@
 import $C from '@/common/config.js'
+import $store from '@/store/index.js'
 
 export default {
 	common:{
@@ -14,6 +15,17 @@ export default {
 			options.url = $C.webUrl + options.url;
 			options.method = options.method || this.common.method;
 			options.header = options.header || this.common.header;
+			
+			// 验证权限token
+			if(options.token) {
+				options.header.token = $store.state.token
+				if(!options.header.token) {
+					return uni.showToast({
+						title:'非法token，请重新登录',
+						icon:'none'
+					})
+				}
+			}
 			
 			// 添加成功/失败回调
 			options.success = (res) => resolve(res);

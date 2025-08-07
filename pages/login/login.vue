@@ -52,7 +52,7 @@
 		</view>
 		
 		<!-- 第三方登录 -->
-		<other-login></other-login>
+		<other-login back></other-login>
 		
 		<view class="flex align-center justify-center text-muted">
 			注册即代表同意<text class="text-primary">《xxx社区协议》</text>
@@ -155,7 +155,7 @@
 					password:this.password
 				}).then(res=>{
 					// 修改vuex的state,持久化存储
-					this.$store.commit('login',res)
+					this.$store.commit('login',res.data.data)
 					// 提示和跳转
 					uni.navigateBack({
 						delta:1
