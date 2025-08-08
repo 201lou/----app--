@@ -88,8 +88,19 @@
 			//关注操作
 			follow(){
 				this.checkAuth(()=>{
-				//通知父组件
-				this.$emit('follow',this.index)
+					this.$H.post('/follow',{
+						follow_id:this.item.user_id
+					},{
+						token:true
+					}).then(res=>{
+						//通知父组件
+						this.$emit('follow',this.item.user_id)
+					}).catch(err=>{
+						uni.showToast({
+							title: '关注失败',
+							icon:'none'
+						});
+					})
 				})
 			},
 			//顶踩操作

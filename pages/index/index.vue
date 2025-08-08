@@ -149,11 +149,18 @@
 				}
 			},
 			//关注
-			follow(e){
-				let list = this.newList[this.tabIndex].list
-				list[e].isFollow = true
+			follow(user_id){
+				// 找到当前作者的所有列表
+				this.newList.forEach(tab=>{
+					tab.list.forEach((item)=>{
+						if(item.user_id === user_id){
+							item.isFollow = true
+						}
+					})
+				})
 				uni.showToast({
-					title:'关注成功'
+					title:'关注成功',
+					icon:'none'
 				})
 			},
 			//顶踩

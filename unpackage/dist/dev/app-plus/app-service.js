@@ -68,7 +68,18 @@ if (uni.restoreGlobal) {
       //关注操作
       follow() {
         this.checkAuth(() => {
-          this.$emit("follow", this.index);
+          this.$H.post("/follow", {
+            follow_id: this.item.user_id
+          }, {
+            token: true
+          }).then((res) => {
+            this.$emit("follow", this.item.user_id);
+          }).catch((err) => {
+            uni.showToast({
+              title: "关注失败",
+              icon: "none"
+            });
+          });
         });
       },
       //顶踩操作
@@ -357,11 +368,17 @@ if (uni.restoreGlobal) {
         }
       },
       //关注
-      follow(e) {
-        let list = this.newList[this.tabIndex].list;
-        list[e].isFollow = true;
+      follow(user_id) {
+        this.newList.forEach((tab) => {
+          tab.list.forEach((item) => {
+            if (item.user_id === user_id) {
+              item.isFollow = true;
+            }
+          });
+        });
         uni.showToast({
-          title: "关注成功"
+          title: "关注成功",
+          icon: "none"
         });
       },
       //顶踩
