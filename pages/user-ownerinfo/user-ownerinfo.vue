@@ -3,7 +3,8 @@
 		<uni-list>
 			<uni-list-item title="头像" @click="changeUserpic">
 				<template v-slot:right>
-					<image :src="userpic" style="width: 100rpx;height: 100rpx;"
+					<image :src="userpic" 
+					style="width: 100rpx;height: 100rpx;"
 					class="rounded-circle"></image>
 					<text class="iconfont icon-bianji1 ml-2"></text>
 				</template>
@@ -49,7 +50,7 @@
 		</uni-list>
 		<view class="py-2 px-3">
 			<button class="bg-color text-white" style="border-radius: 50rpx;border: 0;"
-			type="primary">完成</button>
+			type="primary" @click="submit">完成</button>
 		</view>
 		
 		<mpvue-city-picker :themeColor="themeColor" ref="mpvueCityPicker" 
@@ -64,6 +65,8 @@
 	import uniListItem from '@/components/uni-uni/uni-list-item/uni-list-item.vue';
 	import uniList from '@/components/uni-uni/uni-list/uni-list.vue';
 	import mpvueCityPicker from '@/components/uni-uni/mpvue-citypicker/mpvueCityPicker.vue';
+	import { mapState } from 'vuex'
+	
 	export default {
 		components: {
 			uniList,
@@ -78,12 +81,27 @@
 				relation:0,
 				job:"保密",
 				birthday:"",
+				pickerText:"",
 				themeColor:'#007AFF',
 				cityPickerValueDefault:[0,0,1],
-				pickerText:""
+				
 			}
 		},
-		computed: {			
+		onLoad() {
+			let userinfo = this.user.userinfo
+			if(userinfo){
+				this.pickerText = userinfo.path
+				this.username = this.user.username
+				this.gender =  userinfo.sex
+				this.relation = userinfo.qg
+				this.job  = userinfo.job
+				this.birthday  = userinfo.birthday
+			}
+		},
+		computed: {
+			...mapState({
+				user:state=>state.user
+			}),
 			genderText() {
 				return genderArray[this.gender] 
 			},
@@ -140,6 +158,33 @@
 					success: (res) => {
 						this.job = jobArray[res.tapIndex]
 					}
+				})
+			},
+			// 提交
+			submit() {
+				let obj = {
+					name:this.username,
+					sex:this.gender,
+					qg:this.relation,
+					job:this.job,
+					birthday:this.birthday,
+					path:this.pickerText
+				}
+				this.$H.post('/edituserinfo',obj,{
+					token:true
+				}).then(res=>{
+					this.$store.commit('editUserInfo',{
+						key:"username",
+						value:this.username
+					})
+					this.$store.commit('editUserUserInfo',obj)
+					uni.navigateBack({
+						delta:1
+					})
+					uni.showToast({
+						title:'修改资料成功',
+						icon:'none'
+					})
 				})
 			}
 		}

@@ -6098,8 +6098,14 @@ if (uni.restoreGlobal) {
       };
     },
     computed: {
+      ...mapState({
+        user: (state) => state.user
+      }),
       disabled() {
-        return this.oldpassword == "" || this.newpassword == "" || this.renewpassword == "";
+        if (this.user.password) {
+          return this.oldpassword == "" || this.newpassword == "" || this.renewpassword == "";
+        }
+        return this.newpassword == "" || this.renewpassword == "";
       }
     },
     methods: {
@@ -6118,15 +6124,34 @@ if (uni.restoreGlobal) {
         if (!this.check()) {
           return;
         }
-        formatAppLog("log", "at pages/user-password/user-password.vue:44", "提交成功");
+        this.$H.post("/repassword", {
+          oldpassword: this.oldpassword,
+          newpassword: this.newpassword,
+          renewpassword: this.renewpassword
+        }, {
+          token: true
+        }).then((res) => {
+          this.$store.commit("editUserInfo", {
+            key: "password",
+            value: true
+          });
+          uni.navigateBack({
+            delta: 1
+          });
+          uni.showToast({
+            title: "修改密码成功",
+            icon: "none"
+          });
+        });
       }
     }
   };
   function _sfc_render$b(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", null, [
-      vue.withDirectives(vue.createElementVNode(
+      _ctx.user.password ? vue.withDirectives((vue.openBlock(), vue.createElementBlock(
         "input",
         {
+          key: 0,
           class: "uni-input",
           type: "text",
           placeholder: "输入旧密码",
@@ -6135,9 +6160,9 @@ if (uni.restoreGlobal) {
         null,
         512
         /* NEED_PATCH */
-      ), [
+      )), [
         [vue.vModelText, $data.oldpassword]
-      ]),
+      ]) : vue.createCommentVNode("v-if", true),
       vue.withDirectives(vue.createElementVNode(
         "input",
         {
@@ -6181,13 +6206,20 @@ if (uni.restoreGlobal) {
   const _sfc_main$b = {
     data() {
       return {
-        email: "",
-        password: ""
+        email: ""
       };
     },
     computed: {
+      ...mapState({
+        user: (state) => state.user
+      }),
       disabled() {
-        return this.email === "" || this.password === "";
+        return this.email === "";
+      }
+    },
+    onLoad() {
+      if (this.user.email) {
+        this.email = this.user.email;
       }
     },
     methods: {
@@ -6207,47 +6239,44 @@ if (uni.restoreGlobal) {
         if (!this.check()) {
           return;
         }
-        formatAppLog("log", "at pages/user-email/user-email.vue:43", "提交成功");
+        this.$H.post("/user/bindemail", {
+          email: this.email
+        }, {
+          token: true
+        }).then((res) => {
+          this.$store.commit("editUserInfo", {
+            key: "email",
+            value: this.email
+          });
+          uni.navigateBack({
+            delta: 1
+          });
+          uni.showToast({
+            title: "修改邮箱成功",
+            icon: "none"
+          });
+        });
       }
     }
   };
   function _sfc_render$a(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", null, [
-      vue.withDirectives(vue.createElementVNode(
-        "input",
-        {
-          class: "uni-input",
-          type: "text",
-          placeholder: "请输入你想要绑定的邮箱",
-          "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $data.email = $event)
-        },
-        null,
-        512
-        /* NEED_PATCH */
-      ), [
+      vue.withDirectives(vue.createElementVNode("input", {
+        class: "uni-input",
+        type: "text",
+        placeholder: "请输入你想要绑定的邮箱",
+        "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $data.email = $event),
+        disabled: this.user.email
+      }, null, 8, ["disabled"]), [
         [vue.vModelText, $data.email]
-      ]),
-      vue.withDirectives(vue.createElementVNode(
-        "input",
-        {
-          class: "uni-input",
-          type: "text",
-          placeholder: "请输入密码",
-          "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $data.password = $event)
-        },
-        null,
-        512
-        /* NEED_PATCH */
-      ), [
-        [vue.vModelText, $data.password]
       ]),
       vue.createElementVNode("view", { class: "py-2 px-3" }, [
         vue.createElementVNode("button", {
           class: vue.normalizeClass(["bg-color text-white", $options.disabled ? "bg-color-disabled" : ""]),
           style: { "border-radius": "50rpx", "border": "0" },
           type: "primary",
-          disabled: $options.disabled,
-          onClick: _cache[2] || (_cache[2] = (...args) => $options.submit && $options.submit(...args))
+          disabled: $options.disabled || this.user.email,
+          onClick: _cache[1] || (_cache[1] = (...args) => $options.submit && $options.submit(...args))
         }, "绑定", 10, ["disabled"])
       ])
     ]);
@@ -21037,12 +21066,26 @@ if (uni.restoreGlobal) {
         relation: 0,
         job: "保密",
         birthday: "",
+        pickerText: "",
         themeColor: "#007AFF",
-        cityPickerValueDefault: [0, 0, 1],
-        pickerText: ""
+        cityPickerValueDefault: [0, 0, 1]
       };
     },
+    onLoad() {
+      let userinfo = this.user.userinfo;
+      if (userinfo) {
+        this.pickerText = userinfo.path;
+        this.username = this.user.username;
+        this.gender = userinfo.sex;
+        this.relation = userinfo.qg;
+        this.job = userinfo.job;
+        this.birthday = userinfo.birthday;
+      }
+    },
     computed: {
+      ...mapState({
+        user: (state) => state.user
+      }),
       genderText() {
         return genderArray[this.gender];
       },
@@ -21099,6 +21142,33 @@ if (uni.restoreGlobal) {
           success: (res) => {
             this.job = jobArray[res.tapIndex];
           }
+        });
+      },
+      // 提交
+      submit() {
+        let obj = {
+          name: this.username,
+          sex: this.gender,
+          qg: this.relation,
+          job: this.job,
+          birthday: this.birthday,
+          path: this.pickerText
+        };
+        this.$H.post("/edituserinfo", obj, {
+          token: true
+        }).then((res) => {
+          this.$store.commit("editUserInfo", {
+            key: "username",
+            value: this.username
+          });
+          this.$store.commit("editUserUserInfo", obj);
+          uni.navigateBack({
+            delta: 1
+          });
+          uni.showToast({
+            title: "修改资料成功",
+            icon: "none"
+          });
         });
       }
     }
@@ -21240,7 +21310,8 @@ if (uni.restoreGlobal) {
         vue.createElementVNode("button", {
           class: "bg-color text-white",
           style: { "border-radius": "50rpx", "border": "0" },
-          type: "primary"
+          type: "primary",
+          onClick: _cache[2] || (_cache[2] = (...args) => $options.submit && $options.submit(...args))
         }, "完成")
       ]),
       vue.createVNode(_component_mpvue_city_picker, {
@@ -22021,15 +22092,7 @@ if (uni.restoreGlobal) {
     },
     data() {
       return {
-        list: [
-          // 	{
-          // 	name:"微信绑定",
-          // 	data:"未绑定"
-          // },{
-          // 	name:"qq绑定",
-          // 	data:"未绑定"
-          // },
-        ]
+        list: []
       };
     },
     computed: {
@@ -22037,22 +22100,54 @@ if (uni.restoreGlobal) {
         user: (state) => state.user
       })
     },
-    onLoad() {
-      let list = [{
-        name: "手机号",
-        data: this.user.phone ? this.user.phone : "未绑定",
-        type: "navigateTo",
-        url: "/pages/user-phone/user-phone"
-      }, {
-        name: "登录密码",
-        data: this.user.password ? "修改密码" : "未设置"
-      }, {
-        name: "绑定邮箱",
-        data: this.user.email ? this.user.email : "未绑定"
-      }];
-      this.list = [...list];
+    onShow() {
+      this.__init();
     },
     methods: {
+      __init() {
+        let list = [{
+          name: "手机号",
+          data: this.user.phone ? this.user.phone : "未绑定",
+          type: "navigateTo",
+          url: "/pages/user-phone/user-phone"
+        }, {
+          name: "登录密码",
+          data: this.user.password ? "修改密码" : "未设置",
+          type: "navigateTo",
+          url: "/pages/user-password/user-password"
+        }, {
+          name: "绑定邮箱",
+          data: this.user.email ? this.user.email : "未绑定",
+          type: "navigateTo",
+          url: "/pages/user-email/user-email"
+        }];
+        this.list = [...list];
+        this.$H.get("/user/getuserbind", {}, {
+          token: true
+        }).then((res) => {
+          this.$store.commit("editUserInfo", {
+            key: "user_bind",
+            value: res
+          });
+          let other = [{
+            name: "微信绑定",
+            data: this.user.user_bind.data.data.weixin ? this.user.user_bind.data.data.weixin.nickname : "未绑定",
+            type: "bind",
+            provider: "weixin"
+          }, {
+            name: "微博绑定",
+            data: this.user.user_bind.data.data.sinaweibo ? this.user.user_bind.data.data.sinaweibo.nickname : "未绑定",
+            type: "bind",
+            provider: "sinaweibo"
+          }, {
+            name: "qq绑定",
+            data: this.user.user_bind.data.data.qq ? this.user.user_bind.data.data.qq.nickname : "未绑定",
+            type: "bind",
+            provider: "qq"
+          }];
+          this.list = [...this.list, ...other];
+        });
+      },
       handleEvent(item) {
         if (item.type === "")
           return;
@@ -22062,7 +22157,44 @@ if (uni.restoreGlobal) {
               url: item.url
             });
             break;
+          case "bind":
+            if (item.data !== "未绑定") {
+              return uni.showToast({
+                title: "你已经绑定过了",
+                icon: "none"
+              });
+            }
+            this.bind(item.provider);
+            break;
         }
+      },
+      // 绑定第三方登录
+      bind(provider) {
+        uni.login({
+          provider,
+          success: (r) => {
+            uni.getUserInfo({
+              provider,
+              success: (res) => {
+                let obj = {
+                  provider,
+                  openid: res.userInfo.openId,
+                  nickName: res.userInfo.nickName,
+                  avatarUrl: res.userInfo.avatarUrl
+                };
+                this.$H.post("user/bindother", obj, {
+                  token: true
+                }).then((res2) => {
+                  this.__init();
+                  uni.showToast({
+                    title: "绑定成功",
+                    icon: "none"
+                  });
+                });
+              }
+            });
+          }
+        });
       }
     }
   };
@@ -22390,6 +22522,18 @@ if (uni.restoreGlobal) {
       // 修改用户信息（手机号，邮箱，密码）
       editUserInfo(state, { key, value }) {
         state.user[key] = value;
+        uni.setStorageSync("user", JSON.stringify(state.user));
+      },
+      // 修改资料
+      editUserUserInfo(state, obj) {
+        if (state.user.userinfo) {
+          state.user.userinfo.sex = obj.sex;
+          state.user.userinfo.qg = obj.qg;
+          state.user.userinfo.qg = obj.qg;
+          state.user.userinfo.path = obj.path;
+          state.user.userinfo.birthday = obj.birthday;
+          uni.setStorageSync("user", JSON.stringify(state.user));
+        }
       }
     },
     actions: {},

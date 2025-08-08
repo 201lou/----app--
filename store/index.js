@@ -35,6 +35,18 @@ export default createStore({
 	// 修改用户信息（手机号，邮箱，密码）
 	editUserInfo(state,{ key,value }) {
 		state.user[key] = value
+		uni.setStorageSync('user',JSON.stringify(state.user));
+	},
+	// 修改资料
+	editUserUserInfo(state,obj) {
+		if(state.user.userinfo){
+			state.user.userinfo.sex = obj.sex
+			state.user.userinfo.qg = obj.qg
+			state.user.userinfo.qg = obj.qg
+			state.user.userinfo.path = obj.path
+			state.user.userinfo.birthday = obj.birthday
+			uni.setStorageSync('user',JSON.stringify(state.user));
+		}
 	}
   },
   actions: {},

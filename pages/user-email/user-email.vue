@@ -1,26 +1,34 @@
 <template>
 	<view>
-		<input class="uni-input" type="text" placeholder="请输入你想要绑定的邮箱" v-model="email"/>
-		<input class="uni-input" type="text" placeholder="请输入密码" v-model="password"/>
+		<input class="uni-input" type="text" placeholder="请输入你想要绑定的邮箱" 
+		v-model="email" :disabled="this.user.email" />
 		<view class="py-2 px-3">
 			<button class="bg-color text-white" style="border-radius: 50rpx;border: 0;"
-			type="primary" :disabled="disabled" :class="disabled ? 'bg-color-disabled' : ''"
+			type="primary" :disabled="disabled || this.user.email" :class="disabled ? 'bg-color-disabled' : ''"
 			@click="submit">绑定</button>
 		</view>
 	</view>
 </template>
 
 <script>
+	import { mapState } from 'vuex';
 	export default {
 		data() {
 			return {
-				email:"",
-				password:""
+				email:""
 			}
 		},
 		computed:{
+			...mapState({
+				user:state=>state.user
+			}),
 			disabled() {
-				return this.email === '' || this.password === ''
+				return this.email === ''
+			}
+		},
+		onLoad() {
+			if (this.user.email) {
+				this.email = this.user.email
 			}
 		},
 		methods: {
@@ -40,7 +48,23 @@
 				if(!this.check()) {
 					return;
 				}
-				console.log("提交成功");
+				this.$H.post('/user/bindemail',{
+					email:this.email
+				},{
+					token:true
+				}).then(res=>{
+					this.$store.commit('editUserInfo',{
+						key:'email',
+						value:this.email
+					})
+					uni.navigateBack({
+						delta:1
+					})
+					uni.showToast({
+						title:'修改邮箱成功',
+						icon:'none'
+					})
+				})
 			}
 		}
 	}

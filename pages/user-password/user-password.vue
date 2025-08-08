@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<input class="uni-input" type="text" placeholder="输入旧密码" v-model="oldpassword"/>
+		<input v-if="user.password" class="uni-input" type="text" placeholder="输入旧密码" v-model="oldpassword"/>
 		<input class="uni-input" ype="text" placeholder="输入新密码" v-model="newpassword"/>
 		<input class="uni-input" type="text" placeholder="确认新密码"v-model="renewpassword"/>
 		<view class="py-2 px-3">
@@ -12,6 +12,7 @@
 </template>
 
 <script>
+	import { mapState } from 'vuex';
 	export default {
 		data() {
 			return {
@@ -21,8 +22,14 @@
 			}
 		},
 		computed:{
+			...mapState({
+				user:state=>state.user
+			}),
 			disabled() {
-				return this.oldpassword == '' || this.newpassword == '' || this.renewpassword == ''
+				if (this.user.password) {
+					return this.oldpassword == '' || this.newpassword == '' || this.renewpassword == ''
+				}
+				return this.newpassword == '' || this.renewpassword == ''
 			}
 		},
 		methods: {
@@ -41,7 +48,25 @@
 				if(!this.check()) {
 					return;
 				}
-				console.log("提交成功");
+				this.$H.post('/repassword',{
+					oldpassword:this.oldpassword,
+					newpassword:this.newpassword,
+					renewpassword:this.renewpassword
+				},{
+					token:true
+				}).then(res=>{
+					this.$store.commit('editUserInfo',{
+						key:'password',
+						value:true
+					})
+					uni.navigateBack({
+						delta:1
+					})
+					uni.showToast({
+						title:'修改密码成功',
+						icon:'none'
+					})
+				})
 			}
 		}
 	}
