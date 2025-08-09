@@ -93,8 +93,13 @@
 					},{
 						token:true
 					}).then(res=>{
-						//通知父组件
-						this.$emit('follow',this.item.user_id)
+						// 通知更新
+						uni.$emit('updateFollowOrLiked',{
+							type:"follow",
+							data:{
+								user_id:this.item.user_id
+							}
+						})
 					}).catch(err=>{
 						uni.showToast({
 							title: '关注失败',
@@ -106,10 +111,27 @@
 			//顶踩操作
 			liked(type){
 				this.checkAuth(()=>{
-					this.$emit('liked',{
-						type,
-						index:this.index
-						})					
+					this.$H.post('/liked',{
+						post_id:this.item.id,
+						type:type === 'liked' ? 0 : 1
+					},{
+						token:true,
+					}).then(res=>{
+						if(res.data.errorCode) {
+							return uni.showToast({
+								title: res.data.msg,
+								icon:'none'
+							});
+						}
+					// 通知父组件
+					uni.$emit('updateFollowOrLiked',{
+						type:"liked",
+						data:{
+							type:type,
+							id:this.item.id
+						}
+						})
+					})
 				})
 			},
 			// 评论

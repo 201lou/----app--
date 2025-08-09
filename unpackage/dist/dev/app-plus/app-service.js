@@ -73,7 +73,12 @@ if (uni.restoreGlobal) {
           }, {
             token: true
           }).then((res) => {
-            this.$emit("follow", this.item.user_id);
+            uni.$emit("updateFollowOrLiked", {
+              type: "follow",
+              data: {
+                user_id: this.item.user_id
+              }
+            });
           }).catch((err) => {
             uni.showToast({
               title: "关注失败",
@@ -85,9 +90,25 @@ if (uni.restoreGlobal) {
       //顶踩操作
       liked(type) {
         this.checkAuth(() => {
-          this.$emit("liked", {
-            type,
-            index: this.index
+          this.$H.post("/liked", {
+            post_id: this.item.id,
+            type: type === "liked" ? 0 : 1
+          }, {
+            token: true
+          }).then((res) => {
+            if (res.data.errorCode) {
+              return uni.showToast({
+                title: res.data.msg,
+                icon: "none"
+              });
+            }
+            uni.$emit("updateFollowOrLiked", {
+              type: "liked",
+              data: {
+                type,
+                id: this.item.id
+              }
+            });
           });
         });
       },
@@ -306,7 +327,26 @@ if (uni.restoreGlobal) {
           this.scrollH = res.windowHeight - uni.upx2px(100);
         }
       });
+      uni.$on("updateIndex", () => {
+        this.getData();
+      });
       this.getData();
+      uni.$on("updateFollowOrLiked", (e) => {
+        switch (e.type) {
+          case "follow":
+            this.follow(e.data.user_id);
+            break;
+          case "liked":
+            this.liked(e.data);
+            break;
+        }
+      });
+    },
+    onUnload() {
+      uni.$off("updateFollowOrLiked", (e) => {
+      });
+      uni.$off("updateIndex", (e) => {
+      });
     },
     methods: {
       //获取数据
@@ -335,7 +375,10 @@ if (uni.restoreGlobal) {
         let id = this.tabBars[index].id;
         let page = this.newList[index].page;
         let isrefresh = page === 1;
-        this.$H.get("/postclass/" + id + "/post/" + page).then((res2) => {
+        this.$H.get("/postclass/" + id + "/post/" + page, {}, {
+          token: true,
+          noCheck: true
+        }).then((res2) => {
           let list = res2.data.data.list.map((v) => {
             return this.$U.formatCommonList(v);
           });
@@ -383,21 +426,24 @@ if (uni.restoreGlobal) {
       },
       //顶踩
       liked(e) {
-        let list = this.newList[this.tabIndex].list;
-        let item = list[e.index];
+        this.newList[this.tabIndex].list.forEach((item) => {
+          if (item.id === e.id) {
+            if (item.liked.type === "") {
+              item.liked[e.type + "_count"]++;
+            } else if (item.liked.type === "liked" && e.type === "disliked") {
+              item.liked.liked_count--;
+              item.liked.disliked_count++;
+            } else if (item.liked.type === "disliked" && e.type === "liked") {
+              item.liked.liked_count++;
+              item.liked.disliked_count--;
+            }
+            item.liked.type = e.type;
+          }
+        });
         let msg = e.type === "liked" ? "赞" : "踩";
-        if (item.liked.type === "") {
-          item.liked[e.type + "_count"]++;
-        } else if (item.liked.type === "liked" && e.type === "disliked") {
-          item.liked.liked_count--;
-          item.liked.disliked_count++;
-        } else if (item.liked.type === "disliked" && e.type === "liked") {
-          item.liked.liked_count++;
-          item.liked.disliked_count--;
-        }
-        item.liked.type = e.type;
         uni.showToast({
-          title: msg + "成功"
+          title: msg + "成功",
+          icon: "none"
         });
       },
       //上拉加载更多
@@ -2846,16 +2892,16 @@ if (uni.restoreGlobal) {
       return {
         myData: [{
           name: "帖子",
-          num: 1
+          num: 0
         }, {
           name: "动态",
-          num: 2
+          num: 0
         }, {
-          name: "评论",
+          name: "关注",
           num: 0
         }, {
           name: "粉丝",
-          num: 1
+          num: 0
         }]
       };
     },
@@ -2876,7 +2922,21 @@ if (uni.restoreGlobal) {
     },
     mounted() {
     },
+    onShow() {
+      this.getCounts();
+    },
     methods: {
+      // 获取用户相关统计数据
+      getCounts() {
+        this.$H.get("/user/getcounts/" + this.user.id, {}, {
+          token: true
+        }).then((res) => {
+          this.myData[0].num = res.data.data.post_count;
+          this.myData[1].num = res.data.data.today_posts_count;
+          this.myData[2].num = res.data.data.withfollow_count;
+          this.myData[3].num = res.data.data.fens_count;
+        });
+      },
       // 打开登录页
       openLogin() {
         uni.navigateTo({
@@ -2929,7 +2989,13 @@ if (uni.restoreGlobal) {
                 1
                 /* TEXT */
               ),
-              vue.createElementVNode("text", { class: "font text-muted" }, "总帖子10 今日发帖0")
+              vue.createElementVNode(
+                "text",
+                { class: "font text-muted" },
+                "总帖子" + vue.toDisplayString($data.myData[0].num) + " 今日发帖" + vue.toDisplayString($data.myData[1].num),
+                1
+                /* TEXT */
+              )
             ]),
             vue.createElementVNode("text", { class: "iconfont icon-xiangyou1" })
           ])
@@ -3281,10 +3347,23 @@ if (uni.restoreGlobal) {
   const _sfc_main$s = {
     props: {
       item: Object,
-      index: Number
+      index: Number,
+      choose: {
+        type: Boolean,
+        default: false
+      }
     },
     methods: {
       openDetail() {
+        if (this.choose) {
+          uni.$emit("chooseTopic", {
+            id: this.item.id,
+            title: this.item.title
+          });
+          return uni.navigateBack({
+            delta: 1
+          });
+        }
         uni.navigateTo({
           url: "/pages/topic-detail/topic-detail?detail=" + JSON.stringify(this.item)
         });
@@ -3754,10 +3833,29 @@ if (uni.restoreGlobal) {
         this.type = e.type;
       }
       this.updateSearchPlaceholder();
-      this.updateSearchPlaceholder();
+      switch (this.type) {
+        case "post":
+          uni.$on("updateFollowOrLiked", (e2) => {
+            switch (e2.type) {
+              case "follow":
+                this.follow(e2.data.user_id);
+                break;
+              case "liked":
+                this.liked(e2.data);
+                break;
+            }
+          });
+          break;
+      }
       let list = uni.getStorageSync("historySearchText");
       if (list) {
         this.list = JSON.parse(list);
+      }
+    },
+    onUnload() {
+      if (this.type === "post") {
+        uni.$off("updateFollowOrLiked", (e) => {
+        });
       }
     },
     // 监听下拉刷新
@@ -3778,6 +3876,40 @@ if (uni.restoreGlobal) {
       this.getData(false);
     },
     methods: {
+      //顶踩
+      liked(e) {
+        this.searchList.forEach((item) => {
+          if (item.id === e.id) {
+            if (item.liked.type === "") {
+              item.liked[e.type + "_count"]++;
+            } else if (item.liked.type === "liked" && e.type === "disliked") {
+              item.liked.liked_count--;
+              item.liked.disliked_count++;
+            } else if (item.liked.type === "disliked" && e.type === "liked") {
+              item.liked.liked_count++;
+              item.liked.disliked_count--;
+            }
+            item.liked.type = e.type;
+          }
+        });
+        let msg = e.type === "liked" ? "赞" : "踩";
+        uni.showToast({
+          title: msg + "成功",
+          icon: "none"
+        });
+      },
+      //关注
+      follow(user_id) {
+        this.searchList.forEach((item) => {
+          if (item.user_id === user_id) {
+            item.isFollow = true;
+          }
+        });
+        uni.showToast({
+          title: "关注成功",
+          icon: "none"
+        });
+      },
       // 点击搜索历史
       clickSearchHistory(text) {
         this.searchText = text;
@@ -4271,8 +4403,18 @@ if (uni.restoreGlobal) {
           sizeType: sizeType[this.sizeTypeIndex],
           count: this.imageList.length + this.count[this.countIndex] > 9 ? 9 - this.imageList.length : this.count[this.countIndex],
           success: (res) => {
-            this.imageList = this.imageList.concat(res.tempFilePaths);
-            this.$emit("change", this.imageList);
+            res.tempFilePaths.forEach((item) => {
+              this.$H.upload("/image/uploadmore", {
+                filePath: item,
+                name: "imaglist[]",
+                token: true
+              }).then((result) => {
+                this.imageList.push(result.data.list[0]);
+                this.$emit("change", this.imageList);
+              }).catch((err) => {
+                formatAppLog("log", "at components/common/upload-image.vue:126", err);
+              });
+            });
           },
           fail: (err) => {
             if (err["code"] && err.code !== 0 && this.sourceTypeIndex === 2) {
@@ -4354,8 +4496,8 @@ if (uni.restoreGlobal) {
                 }, [
                   vue.createElementVNode("image", {
                     class: "uni-uploader__img rounded",
-                    src: image,
-                    "data-src": image,
+                    src: image.url,
+                    "data-src": image.url,
                     onClick: _cache[0] || (_cache[0] = (...args) => $options.previewImage && $options.previewImage(...args)),
                     mode: "aspectFill"
                   }, null, 8, ["src", "data-src"]),
@@ -4383,6 +4525,7 @@ if (uni.restoreGlobal) {
     ]);
   }
   const uploadImage = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["render", _sfc_render$n], ["__scopeId", "data-v-ac335ed3"], ["__file", "F:/project/社区交友/components/common/upload-image.vue"]]);
+  const isOpenArray = ["仅自己可见", "所有人可见"];
   const _sfc_main$n = {
     components: {
       uniNavBar,
@@ -4392,12 +4535,45 @@ if (uni.restoreGlobal) {
       return {
         content: "",
         imageList: [],
-        showBack: false
+        showBack: false,
+        isOpen: 1,
+        topic: {
+          id: 0,
+          title: ""
+        },
+        post_class_list: [],
+        post_class_index: -1
       };
     },
     computed: {
       show() {
         return this.imageList.length > 0;
+      },
+      isOpenText() {
+        return isOpenArray[this.isOpen];
+      },
+      // 文章分类可选项
+      range() {
+        return this.post_class_list.map((item) => {
+          return item.classname;
+        });
+      },
+      post_class_id() {
+        if (this.post_class_index !== -1) {
+          return this.post_class_list[this.post_class_index].id;
+        }
+      },
+      post_class_name() {
+        if (this.post_class_index !== -1) {
+          return this.post_class_list[this.post_class_index].classname;
+        }
+      },
+      imageListIds() {
+        return this.imageList.map((item) => {
+          return {
+            id: item.id
+          };
+        });
       }
     },
     // 监听返回
@@ -4434,8 +4610,84 @@ if (uni.restoreGlobal) {
           }
         }
       });
+      uni.$on("chooseTopic", (e) => {
+        this.topic.id = e.id;
+        this.topic.title = e.title;
+      });
+      this.getPostClass();
+    },
+    beforeDestroy() {
+      uni.$off("chooseTopic", (e) => {
+      });
     },
     methods: {
+      // 发布文章
+      submit() {
+        if (this.topic.id == 0) {
+          return uni.showToast({
+            title: "请选择话题",
+            icon: "none"
+          });
+        }
+        if (this.post_class_id == -1) {
+          return uni.showToast({
+            title: "请选择分类",
+            icon: "none"
+          });
+        }
+        uni.showLoading({
+          title: "发布中。。。",
+          mask: false
+        });
+        this.$H.post("/post/create", {
+          imaglist: JSON.stringify(this.imageListIds),
+          text: this.content,
+          isopen: this.isOpen,
+          topic_id: this.topic.id,
+          post_class_id: this.post_class_id
+        }, {
+          token: true
+        }).then((res) => {
+          formatAppLog("log", "at pages/add-input/add-input.vue:176", res);
+          uni.hideLoading();
+          uni.$emit("updateIndex");
+          uni.showToast({
+            title: "发布成功",
+            icon: "none"
+          });
+          this.showBack = true;
+          uni.navigateBack({
+            delta: 1
+          });
+        }).catch((err) => {
+          uni.hideLoading();
+        });
+      },
+      // 获取所有文章分类
+      getPostClass() {
+        this.$H.get("/postclass").then((res) => {
+          this.post_class_list = res.data.data.list;
+        });
+      },
+      // 选择文章分类
+      choosePostClass(e) {
+        this.post_class_index = e.detail.value;
+      },
+      // 选择话题
+      chooseTopic() {
+        uni.navigateTo({
+          url: "../topic-nav/topic-nav?choose=true"
+        });
+      },
+      // 切换可见性
+      changeOpen() {
+        uni.showActionSheet({
+          itemList: isOpenArray,
+          success: (res) => {
+            this.isOpen = res.tapIndex;
+          }
+        });
+      },
       // 选中图片
       changeImage(e) {
         this.imageList = e;
@@ -4473,22 +4725,29 @@ if (uni.restoreGlobal) {
         "left-icon": "back",
         statusBar: "",
         border: false,
-        onClick: $options.back
+        onClickLeft: $options.back
       }, {
         default: vue.withCtx(() => [
-          vue.createElementVNode("view", { class: "flex align-center justify-center w-100" }, [
-            vue.createTextVNode(" 所有人可见"),
+          vue.createElementVNode("view", {
+            class: "flex align-center justify-center w-100",
+            onClick: _cache[0] || (_cache[0] = (...args) => $options.changeOpen && $options.changeOpen(...args))
+          }, [
+            vue.createTextVNode(
+              vue.toDisplayString($options.isOpenText),
+              1
+              /* TEXT */
+            ),
             vue.createElementVNode("text", { class: "iconfont icon-shezhi1" })
           ])
         ]),
         _: 1
         /* STABLE */
-      }, 8, ["onClick"]),
+      }, 8, ["onClickLeft"]),
       vue.createCommentVNode(" 文本域组件 "),
       vue.withDirectives(vue.createElementVNode(
         "textarea",
         {
-          "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $data.content = $event),
+          "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $data.content = $event),
           placeholder: "说一句话吧~",
           class: "w-100 px-2"
         },
@@ -4497,6 +4756,34 @@ if (uni.restoreGlobal) {
         /* NEED_PATCH */
       ), [
         [vue.vModelText, $data.content]
+      ]),
+      vue.createCommentVNode(" 选中的分类 "),
+      vue.createElementVNode("view", { class: "font-md px-2 py-1 flex" }, [
+        vue.createElementVNode("view", {
+          class: "border px-3 py text-dark flex align-center justify-center",
+          style: { "border-radius": "50rpx" }
+        }, [
+          vue.createElementVNode("text", { class: "iconfont icon-huatifuhao mr-1" }),
+          vue.createTextVNode(
+            " " + vue.toDisplayString($options.post_class_name ? "所属分类：" + $options.post_class_name : "请选择分类"),
+            1
+            /* TEXT */
+          )
+        ])
+      ]),
+      vue.createCommentVNode(" 选中的话题 "),
+      vue.createElementVNode("view", { class: "font-md px-2 py-1 flex" }, [
+        vue.createElementVNode("view", {
+          class: "border px-3 py text-dark flex align-center justify-center",
+          style: { "border-radius": "50rpx" }
+        }, [
+          vue.createElementVNode("text", { class: "iconfont icon-huatifuhao mr-1" }),
+          vue.createTextVNode(
+            " " + vue.toDisplayString($data.topic.title ? "所属话题：" + $data.topic.title : "请选择话题"),
+            1
+            /* TEXT */
+          )
+        ])
       ]),
       vue.createCommentVNode(" 上传多图 "),
       vue.createVNode(_component_upload_image, {
@@ -4510,23 +4797,32 @@ if (uni.restoreGlobal) {
         class: "fixed-bottom bg-white flex align-center justify-center",
         style: { "height": "85rpx" }
       }, [
-        vue.createElementVNode("view", {
-          class: "footer-btn iconfont icon-caidan animated faster",
-          "hover-calss": "jello"
-        }),
+        vue.createTextVNode(" <"),
+        vue.createElementVNode("picker", {
+          mode: "selector",
+          range: $options.range,
+          onChange: _cache[2] || (_cache[2] = (...args) => $options.choosePostClass && $options.choosePostClass(...args))
+        }, [
+          vue.createElementVNode("view", {
+            class: "footer-btn iconfont icon-caidan animated faster",
+            "hover-calss": "jello"
+          })
+        ], 40, ["range"]),
         vue.createElementVNode("view", {
           class: "footer-btn iconfont icon-huatifuhao animated faster",
-          "hover-calss": "jello"
+          "hover-calss": "jello",
+          onClick: _cache[3] || (_cache[3] = (...args) => $options.chooseTopic && $options.chooseTopic(...args))
         }),
         vue.createElementVNode("view", {
           class: "footer-btn iconfont icon-tupian animated faster",
           "hover-calss": "jello",
-          onClick: _cache[1] || (_cache[1] = ($event) => $options.iconclick("uploadImage"))
+          onClick: _cache[4] || (_cache[4] = ($event) => $options.iconclick("uploadImage"))
         }),
         vue.createElementVNode("view", {
           class: "bg-color text-white ml-auto flex justify-center align-center rounded mr-3 animated faster",
           style: { "width": "140rpx", "height": "60rpx" },
-          "hover-class": "bounce"
+          "hover-class": "bounce",
+          onClick: _cache[5] || (_cache[5] = (...args) => $options.submit && $options.submit(...args))
         }, "发送")
       ])
     ]);
@@ -4545,7 +4841,8 @@ if (uni.restoreGlobal) {
         scrollInto: "",
         tabIndex: 0,
         tabBars: [],
-        newList: []
+        newList: [],
+        choose: false
       };
     },
     //监听点击导航栏搜索框
@@ -4560,13 +4857,19 @@ if (uni.restoreGlobal) {
         url: "/pages/add-input/add-input"
       });
     },
-    onLoad() {
+    onLoad(e) {
       uni.getSystemInfo({
         success: (res) => {
           this.scrollH = res.windowHeight - uni.upx2px(100);
         }
       });
       this.getData();
+      if (e.choose) {
+        uni.setNavigationBarTitle({
+          title: "选择话题"
+        });
+        this.choose = true;
+      }
     },
     methods: {
       //获取数据
@@ -4706,9 +5009,10 @@ if (uni.restoreGlobal) {
                           [
                             vue.createCommentVNode(" 列表样式 "),
                             vue.createVNode(_component_topic_list, {
+                              choose: $data.choose,
                               item: item2,
                               index: index2
-                            }, null, 8, ["item", "index"]),
+                            }, null, 8, ["choose", "item", "index"]),
                             vue.createCommentVNode(" 全局分割线 "),
                             vue.createElementVNode("view", { class: "divider" })
                           ],
@@ -4879,12 +5183,66 @@ if (uni.restoreGlobal) {
         });
       }
       this.getData();
+      uni.$on("updateFollowOrLiked", (e2) => {
+        switch (e2.type) {
+          case "follow":
+            this.follow(e2.data.user_id);
+            break;
+          case "liked":
+            this.liked(e2.data);
+            break;
+        }
+      });
     },
     // 触底事件
     onReachBottom() {
       this.loadmore();
     },
+    onUnload() {
+      uni.$off("updateFollowOrLiked", (e) => {
+      });
+    },
     methods: {
+      //关注
+      follow(user_id) {
+        this.list1.forEach((item) => {
+          if (item.user_id === user_id) {
+            item.isFollow = true;
+          }
+        });
+        this.list2.forEach((item) => {
+          if (item.user_id === user_id) {
+            item.isFollow = true;
+          }
+        });
+        uni.showToast({
+          title: "关注成功",
+          icon: "none"
+        });
+      },
+      //顶踩
+      liked(e) {
+        let no = this.tabIndex + 1;
+        this["list" + no].forEach((item) => {
+          if (item.id === e.id) {
+            if (item.liked.type === "") {
+              item.liked[e.type + "_count"]++;
+            } else if (item.liked.type === "liked" && e.type === "disliked") {
+              item.liked.liked_count--;
+              item.liked.disliked_count++;
+            } else if (item.liked.type === "disliked" && e.type === "liked") {
+              item.liked.liked_count++;
+              item.liked.disliked_count--;
+            }
+            item.liked.type = e.type;
+          }
+        });
+        let msg = e.type === "liked" ? "赞" : "踩";
+        uni.showToast({
+          title: msg + "成功",
+          icon: "none"
+        });
+      },
       // tab切换
       changeTab(index) {
         this.tabIndex = index;
@@ -5814,6 +6172,20 @@ if (uni.restoreGlobal) {
       if (e.detail) {
         this.__init(JSON.parse(e.detail));
       }
+      uni.$on("updateFollowOrLiked", (e2) => {
+        switch (e2.type) {
+          case "follow":
+            this.follow(e2.data.user_id);
+            break;
+          case "liked":
+            this.liked(e2.data);
+            break;
+        }
+      });
+    },
+    onUnload() {
+      uni.$off("updateFollowOrLiked", (e) => {
+      });
     },
     computed: {
       imagesList() {
@@ -21129,7 +21501,22 @@ if (uni.restoreGlobal) {
           sizeType: ["compressed"],
           sourceType: ["album", "camera"],
           success: (res) => {
-            this.userpic = res.tempFilePaths[0];
+            this.$H.upload("/edituserpic", {
+              filePath: res.tempFilePaths[0],
+              name: "userpic",
+              token: true
+            }).then((result) => {
+              this.$store.commit("editUserInfo", {
+                key: "userpic",
+                value: result.data
+              });
+              uni.showToast({
+                title: "修改头像成功",
+                icon: "none"
+              });
+            }).catch((err) => {
+              formatAppLog("log", "at pages/user-ownerinfo/user-ownerinfo.vue:146", err);
+            });
           }
         });
       },
@@ -22441,19 +22828,24 @@ if (uni.restoreGlobal) {
     },
     // 转换公共列表数据
     formatCommonList(v) {
+      let isFollow = v.user.fens.length > 0;
+      let liked = "";
+      if (v.liked.length > 0) {
+        liked = v.liked[0].type === 0 ? "liked" : "disliked";
+      }
       return {
         id: v.id,
         user_id: v.user_id,
         username: v.user.username,
         userpic: v.user.userpic,
         nowstime: v.create_time,
-        isFollow: false,
+        isFollow,
         title: v.title,
         titlepic: v.titlepic,
         liked: {
-          type: "liked",
-          liked_count: 1,
-          disliked_count: 2
+          type: liked,
+          liked_count: v.ding_count,
+          disliked_count: v.cai_count
         },
         comment_count: v.comment_count,
         share_count: v.share_count
@@ -22571,7 +22963,7 @@ if (uni.restoreGlobal) {
         options.header = options.header || this.common.header;
         if (options.token) {
           options.header.token = store.state.token;
-          if (!options.header.token) {
+          if (!options.noCheck && !options.header.token) {
             return uni.showToast({
               title: "非法token，请重新登录",
               icon: "none"
@@ -22604,6 +22996,37 @@ if (uni.restoreGlobal) {
       options.data = data;
       options.method = "POST";
       return this.request(options);
+    },
+    upload(url, options = {}) {
+      options.url = $C.webUrl + url;
+      options.header = options.header || {};
+      if (options.token) {
+        options.header.token = store.state.token;
+        if (!options.header.token) {
+          return uni.showToast({
+            title: "非法token,请重新登录",
+            icon: "none"
+          });
+        }
+      }
+      return new Promise((res, rej) => {
+        uni.uploadFile({
+          ...options,
+          success: (uploadFileRes) => {
+            if (uploadFileRes.statusCode !== 200) {
+              return uni.showToast({
+                title: "上传图片失败",
+                icon: "none"
+              });
+            }
+            let data = JSON.parse(uploadFileRes.data);
+            res(data);
+          },
+          fail: (err) => {
+            rej(err);
+          }
+        });
+      });
     }
   };
   const checkAuth = (callback) => {

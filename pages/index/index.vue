@@ -80,8 +80,27 @@
 					this.scrollH = res.windowHeight - uni.upx2px(100)
 				}
 			})
+			// 监听首页刷新
+			uni.$on('updateIndex',()=>{
+				this.getData()
+			})
 			// 根据选项生成列表
 			this.getData()
+			// 监听关注和顶踩操作
+			uni.$on('updateFollowOrLiked',(e)=>{
+				switch (e.type){
+					case 'follow'://关注
+					this.follow(e.data.user_id)
+						break;
+					case 'liked':
+					this.liked(e.data)
+						break;
+				}
+			})
+		},
+		onUnload() {
+			uni.$off('updateFollowOrLiked',(e)=>{})
+			uni.$off('updateIndex',(e)=>{})
 		},
 		methods: {
 			//获取数据
@@ -115,7 +134,10 @@
 				let id = this.tabBars[index].id
 				let page = this.newList[index].page
 				let isrefresh = page === 1
-				this.$H.get('/postclass/'+id+'/post/'+page).then(res2=>{
+				this.$H.get('/postclass/'+id+'/post/'+page,{},{
+					token:true,
+					noCheck:true
+				}).then(res2=>{
 					let list = res2.data.data.list.map(v=>{
 						return this.$U.formatCommonList(v)
 					})
@@ -165,23 +187,26 @@
 			},
 			//顶踩
 			liked(e){
-				let list = this.newList[this.tabIndex].list
-				let item = list[e.index];
-				let msg = e.type === 'liked' ? '赞':'踩'
-				if (item.liked.type === ''){
-					item.liked[e.type+'_count']++
+				this.newList[this.tabIndex].list.forEach(item=>{
+					if(item.id === e.id){
+						if (item.liked.type === ''){
+							item.liked[e.type+'_count']++
+							}
+						else if (item.liked.type === 'liked' && e.type === 'disliked'){
+							item.liked.liked_count--;
+							item.liked.disliked_count++;
+						}
+						else if(item.liked.type === 'disliked' && e.type === 'liked'){
+							item.liked.liked_count++;
+							item.liked.disliked_count--;
+						}
+						item.liked.type = e.type
 					}
-				else if (item.liked.type === 'liked' && e.type === 'disliked'){
-					item.liked.liked_count--;
-					item.liked.disliked_count++;
-				}
-				else if(item.liked.type === 'disliked' && e.type === 'liked'){
-					item.liked.liked_count++;
-					item.liked.disliked_count--;
-				}
-				item.liked.type = e.type
+				})
+				let msg = e.type === 'liked' ? '赞':'踩'
 				uni.showToast({
-					title:msg+'成功'
+					title:msg+'成功',
+					icon:'none'
 				});
 			},
 			//上拉加载更多

@@ -19,19 +19,24 @@ export default {
 	},
 	// 转换公共列表数据
 	formatCommonList(v){
+		let isFollow = (v.user.fens.length > 0)
+		let liked = ''
+		if(v.liked.length > 0){
+			liked = v.liked[0].type === 0 ? 'liked' : 'disliked'
+		}
 		return {
 			id:v.id,
 			user_id:v.user_id,
 			username:v.user.username,
 			userpic:v.user.userpic,
 			nowstime:v.create_time,
-			isFollow:false,
+			isFollow:isFollow,
 			title:v.title,
 			titlepic:v.titlepic,
 			liked:{
-				type:"liked",
-				liked_count:1,
-				disliked_count:2
+				type:liked,
+				liked_count:v.ding_count,
+				disliked_count:v.cai_count
 			},
 			comment_count:v.comment_count,
 			share_count:v.share_count

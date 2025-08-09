@@ -17,7 +17,7 @@
 					<!-- 列表 -->
 					<block v-for="(item2,index2) in item.list" :key="index2">
 						<!-- 列表样式 -->						
-						<topic-list :item="item2" :index="index2"></topic-list>
+						<topic-list :choose="choose" :item="item2" :index="index2"></topic-list>
 						<!-- 全局分割线 -->
 						<view class="divider"></view>
 					</block>
@@ -57,7 +57,8 @@
 				scrollInto : "",
 				tabIndex : 0,
 				tabBars: [],
-				newList:[]
+				newList:[],
+				choose:false
 			}
 		},
 		//监听点击导航栏搜索框
@@ -72,13 +73,20 @@
 				url:'/pages/add-input/add-input',
 			})
 		},
-		onLoad() {
+		onLoad(e) {
 			uni.getSystemInfo({
 				success:res=>{
 					this.scrollH = res.windowHeight - uni.upx2px(100)
 				}
 			})
 			this.getData()
+			
+			if(e.choose){
+				uni.setNavigationBarTitle({
+					title:'选择话题'
+				})
+				this.choose = true
+			}
 		},
 		methods: {
 			//获取数据

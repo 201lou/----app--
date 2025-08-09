@@ -128,7 +128,23 @@
 					sizeType:["compressed"],
 					sourceType:["album","camera"],
 					success: (res) => {
-						this.userpic = res.tempFilePaths[0]
+						this.$H.upload('/edituserpic',{
+							filePath: res.tempFilePaths[0],
+							name: 'userpic',
+							token:true
+						}).then(result=>{
+							// console.log(result);
+							this.$store.commit('editUserInfo',{
+								key:"userpic",
+								value:result.data
+							})
+							uni.showToast({
+								title: '修改头像成功',
+								icon: 'none'
+							});
+						}).catch(err=>{
+							console.log(err);
+						})
 					}
 				})
 			},

@@ -31,80 +31,7 @@
 </template>
 
 <script>
-	const demo_post = [{
-		username:"昵称",
-		userpic:"/static/tabber/msg2.png",
-		nowstime:"2019-10-20 下午04:30",
-		isFollow:false,
-		title:"我是标题",
-		titlepic:"/static/demo/屏幕截图 2025-07-14 081555.png",
-		liked:{
-			type:"liked",
-			liked_count:1,
-			disliked_count:2
-		},
-		comment_count:2,
-		share_count:2
-	},
-	{
-		username:"昵称",
-		userpic:"/static/tabber/msg2.png",
-		nowstime:"2019-10-20 下午04:30",
-		isFollow:false,
-		title:"我是标题",
-		titlepic:"",
-		liked:{
-			type:"disliked",
-			liked_count:1,
-			disliked_count:2
-		},
-		comment_count:2,
-		share_count:2
-	},
-	{
-		username:"昵称",
-		userpic:"/static/tabber/msg2.png",
-		nowstime:"2019-10-20 下午04:30",
-		isFollow:false,
-		title:"我是标题",
-		titlepic:"/static/demo/屏幕截图 2025-07-14 081555.png",
-		liked:{
-			type:"",
-			liked_count:1,
-			disliked_count:2
-		},
-		comment_count:2,
-		share_count:2
-	}
-	];
-	
-	const demo_topic = [{
-		cover:"/static/common/banner2.jpg",
-		title:"话题名称",
-		desc:"话题描述",
-		today_count:0,
-		news_count:10
-	},{
-		cover:"/static/common/banner2.jpg",
-		title:"话题名称",
-		desc:"话题描述",
-		today_count:0,
-		news_count:10
-	},{
-		cover:"/static/common/banner2.jpg",
-		title:"话题名称",
-		desc:"话题描述",
-		today_count:0,
-		news_count:10
-	},{
-		cover:"/static/common/banner2.jpg",
-		title:"话题名称",
-		desc:"话题描述",
-		today_count:0,
-		news_count:10
-				}]
-				
-		const demo_user = [{
+	const demo_user = [{
 		headshot:"/static/common/demo6.jpg",
 		username:"烦躁杏鲍菇",
 		gender:1,//0未知 1女性 2男性
@@ -168,18 +95,29 @@
 				this.type = e.type
 			}
 			this.updateSearchPlaceholder();
-			// let pageTitle = '帖子'
-			// switch (this.type) {
-			// 	case 'post':
-			// 	pageTitle = '帖子'
-			// 		break;
-			// 	case 'topic':
-			// 	pageTitle = '话题'
-			// 		break;
-			// 	case 'user':
-			// 	pageTitle = '用户'
-			// 		break;
-			// }
+			let pageTitle = '帖子'
+			switch (this.type) {
+				case 'post':
+				pageTitle = '帖子'
+				// 监听关注和顶踩操作
+				uni.$on('updateFollowOrLiked',(e)=>{
+					switch (e.type){
+						case 'follow'://关注
+						this.follow(e.data.user_id)
+							break;
+						case 'liked':
+						this.liked(e.data)
+							break;
+					}
+				})
+					break;
+				case 'topic':
+				pageTitle = '话题'
+					break;
+				case 'user':
+				pageTitle = '用户'
+					break;
+			}
 			// // 修改搜索占位
 			// // #ifdef APP-PLUS
 			// this.$nextTick(() => {
@@ -196,11 +134,16 @@
 			//     }
 			// })
 			// // #endif
-			this.updateSearchPlaceholder()
+			// this.updateSearchPlaceholder()
 			// 取出搜索历史
 			let list = uni.getStorageSync('historySearchText')
 			if (list) {
 				this.list = JSON.parse(list)
+			}
+		},
+		onUnload() {
+			if(this.type === 'post'){
+				uni.$off('updateFollowOrLiked',(e)=>{})
 			}
 		},
 		// 监听下拉刷新
@@ -222,6 +165,43 @@
 			this.getData(false)
 		},
 		methods: {
+			//顶踩
+			liked(e){
+				this.searchList.forEach(item=>{
+					if(item.id === e.id){
+						if (item.liked.type === ''){
+							item.liked[e.type+'_count']++
+							}
+						else if (item.liked.type === 'liked' && e.type === 'disliked'){
+							item.liked.liked_count--;
+							item.liked.disliked_count++;
+						}
+						else if(item.liked.type === 'disliked' && e.type === 'liked'){
+							item.liked.liked_count++;
+							item.liked.disliked_count--;
+						}
+						item.liked.type = e.type
+					}
+				})
+				let msg = e.type === 'liked' ? '赞':'踩'
+				uni.showToast({
+					title:msg+'成功',
+					icon:'none'
+				});
+			},
+			//关注
+			follow(user_id){
+				// 找到当前作者的所有列表
+				this.searchList.forEach((item)=>{
+					if(item.user_id === user_id){
+						item.isFollow = true
+					}
+				})
+				uni.showToast({
+					title:'关注成功',
+					icon:'none'
+				})
+			},
 			// 点击搜索历史
 			clickSearchHistory(text) {
 				this.searchText = text

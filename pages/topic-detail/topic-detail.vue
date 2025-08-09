@@ -103,12 +103,70 @@
 			}
 			// 加载数据
 			this.getData()
+			// 监听关注和顶踩操作
+			uni.$on('updateFollowOrLiked',(e)=>{
+				switch (e.type){
+					case 'follow'://关注
+					this.follow(e.data.user_id)
+						break;
+					case 'liked':
+					this.liked(e.data)
+						break;
+				}
+			})
 		},
 		// 触底事件
 		onReachBottom() {
 			this.loadmore()
 		},
+		onUnload() {
+			uni.$off('updateFollowOrLiked',(e)=>{})
+		},
 		methods: {
+			//关注
+			follow(user_id){
+				// 找到当前作者的所有列表
+				this.list1.forEach((item)=>{
+					if(item.user_id === user_id){
+						item.isFollow = true
+					}
+				})
+				this.list2.forEach((item)=>{
+					if(item.user_id === user_id){
+						item.isFollow = true
+					}
+				})
+				uni.showToast({
+					title:'关注成功',
+					icon:'none'
+				})
+			},
+			//顶踩
+			liked(e){
+				// 拿到当前的选项卡对应的list
+				let no = this.tabIndex + 1
+				this['list'+no].forEach(item=>{
+					if(item.id === e.id){
+						if (item.liked.type === ''){
+							item.liked[e.type+'_count']++
+							}
+						else if (item.liked.type === 'liked' && e.type === 'disliked'){
+							item.liked.liked_count--;
+							item.liked.disliked_count++;
+						}
+						else if(item.liked.type === 'disliked' && e.type === 'liked'){
+							item.liked.liked_count++;
+							item.liked.disliked_count--;
+						}
+						item.liked.type = e.type
+					}
+				})
+				let msg = e.type === 'liked' ? '赞':'踩'
+				uni.showToast({
+					title:msg+'成功',
+					icon:'none'
+				});
+			},
 			// tab切换
 			changeTab(index){
 				this.tabIndex = index

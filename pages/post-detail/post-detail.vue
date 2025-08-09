@@ -77,6 +77,20 @@
 			if (e.detail) {
 				this.__init(JSON.parse(e.detail))
 			}
+			// 监听关注和顶踩操作
+			uni.$on('updateFollowOrLiked',(e)=>{
+				switch (e.type){
+					case 'follow'://关注
+					this.follow(e.data.user_id)
+						break;
+					case 'liked':
+					this.liked(e.data)
+						break;
+				}
+			})
+		},
+		onUnload() {
+			uni.$off('updateFollowOrLiked',(e)=>{})
 		},
 		computed: {
 			imagesList() {

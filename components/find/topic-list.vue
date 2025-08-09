@@ -17,10 +17,23 @@
 	export default {
 		props: {
 			item: Object,
-			index: Number
+			index: Number,
+			choose:{
+				type:Boolean,
+				default:false
+			}
 		},
 		methods: {
 			openDetail() {
+				if(this.choose) {
+					uni.$emit('chooseTopic',{
+						id:this.item.id,
+						title:this.item.title
+					})
+					return uni.navigateBack({
+						delta:1
+					})
+				}
 				uni.navigateTo({
 					url: '/pages/topic-detail/topic-detail?detail='+JSON.stringify(this.item)
 				});

@@ -17,7 +17,7 @@
 			class="rounded-circle"></image>
 			<view class="flex flex-column flex-1 px-2">
 				<text class="font-lg font-weight-bold">{{user.username}}</text>
-				<text class="font text-muted">总帖子10 今日发帖0</text>
+				<text class="font text-muted">总帖子{{myData[0].num}} 今日发帖{{myData[1].num}}</text>
 			</view>
 			<text class="iconfont icon-xiangyou1"></text>
 		</view>		
@@ -73,16 +73,16 @@
 			return {
 				myData:[{
 					name:"帖子",
-					num:1
+					num:0
 				},{
 					name:"动态",
-					num:2
+					num:0
 				},{
-					name:"评论",
+					name:"关注",
 					num:0
 				},{
 					name:"粉丝",
-					num:1
+					num:0
 				}]
 			}
 		},
@@ -104,7 +104,21 @@
 		mounted() {
 		  // console.log(this.user)
 		},
+		onShow() {
+			this.getCounts()
+		},
 		methods: {
+			// 获取用户相关统计数据
+			getCounts(){
+				this.$H.get('/user/getcounts/'+this.user.id,{},{
+					token:true
+				}).then(res=>{
+					this.myData[0].num = res.data.data.post_count
+					this.myData[1].num = res.data.data.today_posts_count
+					this.myData[2].num = res.data.data.withfollow_count
+					this.myData[3].num = res.data.data.fens_count
+				})
+			},
 			// 打开登录页
 			openLogin(){
 				uni.navigateTo({

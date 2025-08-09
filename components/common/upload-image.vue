@@ -9,7 +9,7 @@
 				<view class="uni-uploader__files">
 					<block v-for="(image,index) in imageList" :key="index">
 						<view class="uni-uploader__file position-relative">
-							<image class="uni-uploader__img rounded" :src="image" :data-src="image" 
+							<image class="uni-uploader__img rounded" :src="image.url" :data-src="image.url" 
 							@tap="previewImage" mode="aspectFill"></image>
 							<view class="position-absolute top-0 right-0 px-1 rounded" 
 							style="background-color: rgba(0, 0, 0, 0.3);" @click.stop="deleteImage(index)">
@@ -113,8 +113,19 @@
 					sizeType: sizeType[this.sizeTypeIndex],
 					count: this.imageList.length + this.count[this.countIndex] > 9 ? 9 - this.imageList.length : this.count[this.countIndex],
 					success: (res) => {
-						this.imageList = this.imageList.concat(res.tempFilePaths);
-						this.$emit('change',this.imageList)
+						// 上传图片
+						res.tempFilePaths.forEach(item=>{
+							this.$H.upload('/image/uploadmore',{
+								filePath: item,
+								name: 'imaglist[]',
+								token:true
+							}).then(result=>{
+								this.imageList.push(result.data.list[0])
+								this.$emit('change',this.imageList)
+							}).catch(err=>{
+								console.log(err);
+							})
+						})
 					},
 					fail: (err) => {
 						// #ifdef APP-PLUS

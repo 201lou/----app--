@@ -19,7 +19,7 @@ export default {
 			// 验证权限token
 			if(options.token) {
 				options.header.token = $store.state.token
-				if(!options.header.token) {
+				if(!options.noCheck && !options.header.token) {
 					return uni.showToast({
 						title:'非法token，请重新登录',
 						icon:'none'
@@ -56,5 +56,40 @@ export default {
 		options.data = data
 		options.method = 'POST'
 		return this.request(options)
-	}
+	},
+	
+	upload(url,options = {}){
+			options.url = $C.webUrl + url
+			options.header = options.header || {}
+			// 验证权限token
+			if(options.token){
+				options.header.token = $store.state.token
+				if(!options.header.token){
+					return uni.showToast({
+						title: '非法token,请重新登录',
+						icon: 'none'
+					});
+				}
+			}
+			
+			return new Promise((res,rej)=>{
+				uni.uploadFile({
+					...options,
+					success: (uploadFileRes) => {
+						if(uploadFileRes.statusCode !== 200){
+							return uni.showToast({
+								title: '上传图片失败',
+								icon: 'none'
+							});
+						}
+						let data = JSON.parse(uploadFileRes.data)
+						res(data)
+					},
+					fail:(err)=>{
+						rej(err)
+					}
+				});
+			})
+			
+		}
 }
