@@ -52,9 +52,9 @@ if (uni.restoreGlobal) {
     },
     methods: {
       //打开个人空间
-      openSpace() {
+      openSpace(user_id) {
         uni.navigateTo({
-          url: "/pages/user-space/user-space"
+          url: "/pages/user-space/user-space?user_id=" + user_id
         });
       },
       //打开详情页
@@ -141,7 +141,7 @@ if (uni.restoreGlobal) {
             src: $props.item.userpic,
             style: { "width": "65rpx", "height": "65rpx" },
             "lazy-load": "",
-            onClick: _cache[0] || (_cache[0] = (...args) => $options.openSpace && $options.openSpace(...args))
+            onClick: _cache[0] || (_cache[0] = ($event) => $options.openSpace($props.item.user_id))
           }, null, 8, ["src"]),
           vue.createCommentVNode(" 昵称发布时间 "),
           vue.createElementVNode("view", null, [
@@ -150,7 +150,7 @@ if (uni.restoreGlobal) {
               {
                 class: "font",
                 style: { "line-height": "25rpx" },
-                onClick: _cache[1] || (_cache[1] = (...args) => $options.openSpace && $options.openSpace(...args))
+                onClick: _cache[1] || (_cache[1] = ($event) => $options.openSpace($props.item.user_id))
               },
               vue.toDisplayString($props.item.username),
               1
@@ -341,11 +341,22 @@ if (uni.restoreGlobal) {
             break;
         }
       });
+      uni.$on("updateCommentsCount", ({ id, count }) => {
+        this.newList.forEach((tab) => {
+          tab.list.forEach((item) => {
+            if (item.id === id) {
+              item.comment_count = count;
+            }
+          });
+        });
+      });
     },
     onUnload() {
       uni.$off("updateFollowOrLiked", (e) => {
       });
       uni.$off("updateIndex", (e) => {
+      });
+      uni.$off("updateCommentsCount", (e) => {
       });
     },
     methods: {
@@ -1142,7 +1153,7 @@ if (uni.restoreGlobal) {
     )) : vue.createCommentVNode("v-if", true);
   }
   const uniPopup = /* @__PURE__ */ _export_sfc(_sfc_main$C, [["render", _sfc_render$B], ["__scopeId", "data-v-fda68b36"], ["__file", "F:/project/社区交友/components/uni-uni/uni-popup/uni-popup.vue"]]);
-  const demo$3 = [{
+  const demo = [{
     headshot: "/static/common/demo6.jpg",
     username: "星期四的微信",
     update_time: 1752722735,
@@ -1180,7 +1191,7 @@ if (uni.restoreGlobal) {
     },
     // 页面加载
     onLoad() {
-      this.list = demo$3;
+      this.list = demo;
     },
     // 监听原生导航栏按钮事件
     onNavigationBarButtonTap(e) {
@@ -1210,7 +1221,7 @@ if (uni.restoreGlobal) {
       //下拉刷新
       refresh() {
         setTimeout(() => {
-          this.list = demo$3;
+          this.list = demo;
           uni.stopPullDownRefresh();
         }, 2e3);
       },
@@ -2917,24 +2928,38 @@ if (uni.restoreGlobal) {
       }),
       // 用户头像
       avatar() {
-        return this.user.userpic ? this.user.userpic : "/static/common/demo6.jpg";
+        return this.user.userpic && this.user ? this.user.userpic : "/static/common/demo6.jpg";
       }
     },
     mounted() {
     },
     onShow() {
-      this.getCounts();
+      if (this.loginStatus) {
+        this.getCounts();
+      }
+    },
+    watch: {
+      loginStatus(newValue, oldValue) {
+        if (newValue) {
+          this.getCounts();
+        } else {
+          this.myData.forEach((item) => {
+            item.num = 0;
+          });
+        }
+      }
     },
     methods: {
       // 获取用户相关统计数据
       getCounts() {
         this.$H.get("/user/getcounts/" + this.user.id, {}, {
-          token: true
+          token: true,
+          notoast: true
         }).then((res) => {
           this.myData[0].num = res.data.data.post_count;
           this.myData[1].num = res.data.data.today_posts_count;
           this.myData[2].num = res.data.data.withfollow_count;
-          this.myData[3].num = res.data.data.fens_count;
+          this.myData[3].num = res.data.data.withfen_count;
         });
       },
       // 打开登录页
@@ -3415,60 +3440,14 @@ if (uni.restoreGlobal) {
     ]);
   }
   const topicList = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["render", _sfc_render$r], ["__file", "F:/project/社区交友/components/find/topic-list.vue"]]);
-  const demo$2 = [
-    {
-      username: "昵称",
-      userpic: "/static/tabber/msg2.png",
-      nowstime: "2019-10-20 下午04:30",
-      isFollow: true,
-      title: "我是标题",
-      titlepic: "/static/common/demo2.jpg",
-      liked: {
-        type: "liked",
-        liked_count: 1,
-        disliked_count: 2
-      },
-      comment_count: 2,
-      share_count: 2
-    },
-    {
-      username: "昵称",
-      userpic: "/static/tabber/msg2.png",
-      nowstime: "2019-10-20 下午04:30",
-      isFollow: true,
-      title: "我是标题",
-      titlepic: "",
-      liked: {
-        type: "disliked",
-        liked_count: 1,
-        disliked_count: 2
-      },
-      comment_count: 2,
-      share_count: 2
-    },
-    {
-      username: "昵称",
-      userpic: "/static/tabber/msg2.png",
-      nowstime: "2019-10-20 下午04:30",
-      isFollow: true,
-      title: "我是标题",
-      titlepic: "/static/common/demo2.jpg",
-      liked: {
-        type: "",
-        liked_count: 1,
-        disliked_count: 2
-      },
-      comment_count: 2,
-      share_count: 2
-    }
-  ];
   const _sfc_main$r = {
     components: {
       uniNavBar,
       commonList,
       loadMore,
       hotClick,
-      topicList
+      topicList,
+      noThing
     },
     data() {
       return {
@@ -3484,6 +3463,7 @@ if (uni.restoreGlobal) {
         ],
         list: [],
         loadmore: "上拉加载更多",
+        page: 1,
         hotClick: [],
         topicList: [],
         swiperList: []
@@ -3495,12 +3475,32 @@ if (uni.restoreGlobal) {
           this.scrollH = res.windowHeight - res.statusBarHeight - 44;
         }
       });
-      this.list = demo$2;
       this.getTopicNav();
       this.getHotTopic();
       this.getSwipers();
     },
+    onShow() {
+      this.page = 1;
+      this.getList();
+    },
     methods: {
+      // 获取关注好友文章列表
+      getList() {
+        let isrefresh = this.page === 1;
+        this.$H.get("/followpost/" + this.page, {}, {
+          token: true,
+          notoast: true
+        }).then((res) => {
+          let list = res.data.data.list.map((v) => {
+            return this.$U.formatCommonList(v);
+          });
+          this.list = isrefresh ? list : [...this.list, ...list], this.loadmore = list.length < 10 ? "没有更多了" : "上拉加载更多";
+        }).catch((err) => {
+          if (!isrefresh) {
+            this.page--;
+          }
+        });
+      },
       // 获取热门分类
       getTopicNav() {
         this.$H.get("/topicclass").then((res) => {
@@ -3570,10 +3570,8 @@ if (uni.restoreGlobal) {
         if (this.loadmore !== "上拉加载更多")
           return;
         this.loadmore = "加载中";
-        setTimeout(() => {
-          this.list = [...this.list, ...this.list];
-          this.loadmore = "上拉加载更多";
-        }, 2e3);
+        this.page++;
+        this.getList();
       },
       // 打开搜索页
       openSearch() {
@@ -3587,6 +3585,7 @@ if (uni.restoreGlobal) {
     const _component_uni_nav_bar = vue.resolveComponent("uni-nav-bar");
     const _component_common_list = vue.resolveComponent("common-list");
     const _component_load_more = vue.resolveComponent("load-more");
+    const _component_no_thing = vue.resolveComponent("no-thing");
     const _component_hot_click = vue.resolveComponent("hot-click");
     const _component_topic_list = vue.resolveComponent("topic-list");
     return vue.openBlock(), vue.createElementBlock("view", null, [
@@ -3660,7 +3659,10 @@ if (uni.restoreGlobal) {
                 128
                 /* KEYED_FRAGMENT */
               )),
-              vue.createVNode(_component_load_more, { loadmore: $data.loadmore }, null, 8, ["loadmore"])
+              $data.list.length ? (vue.openBlock(), vue.createBlock(_component_load_more, {
+                key: 0,
+                loadmore: $data.loadmore
+              }, null, 8, ["loadmore"])) : (vue.openBlock(), vue.createBlock(_component_no_thing, { key: 1 }))
             ],
             36
             /* STYLE, NEED_HYDRATION */
@@ -3901,7 +3903,7 @@ if (uni.restoreGlobal) {
       //关注
       follow(user_id) {
         this.searchList.forEach((item) => {
-          if (item.user_id === user_id) {
+          if (item.id === user_id) {
             item.isFollow = true;
           }
         });
@@ -3925,9 +3927,9 @@ if (uni.restoreGlobal) {
           this.list.unshift(this.searchText);
         }
         uni.setStorageSync("historySearchText", JSON.stringify(this.list));
-        this.getDate();
+        this.getData();
       },
-      getDate(isrefresh = true, callback = false) {
+      getData(isrefresh = true, callback = false) {
         uni.showLoading({
           title: "加载中...",
           mask: false
@@ -3957,7 +3959,16 @@ if (uni.restoreGlobal) {
               });
               break;
             case "user":
-              pageTitle = "用户";
+              list = res.data.data.list.map((v) => {
+                return {
+                  id: v.id,
+                  headshot: v.userpic,
+                  username: v.username,
+                  gender: v.userinfo.sex,
+                  age: v.userinfo.age,
+                  isFollow: false
+                };
+              });
               break;
           }
           this.searchList = isrefresh ? [...list] : [...this.searchList, ...list];
@@ -4075,8 +4086,8 @@ if (uni.restoreGlobal) {
                       vue.createCommentVNode(" 用户 "),
                       vue.createVNode(_component_user_list, {
                         item,
-                        indexe: index
-                      }, null, 8, ["item", "indexe"])
+                        index
+                      }, null, 8, ["item", "index"])
                     ],
                     64
                     /* STABLE_FRAGMENT */
@@ -5355,35 +5366,6 @@ if (uni.restoreGlobal) {
     ]);
   }
   const PagesTopicDetailTopicDetail = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["render", _sfc_render$j], ["__file", "F:/project/社区交友/pages/topic-detail/topic-detail.vue"]]);
-  const demo$1 = [{
-    headshot: "/static/common/demo6.jpg",
-    username: "烦躁杏鲍菇",
-    gender: 1,
-    //0未知 1女性 2男性
-    age: 24,
-    isFollow: true
-  }, {
-    headshot: "/static/common/demo6.jpg",
-    username: "烦躁杏鲍菇",
-    gender: 0,
-    //0未知 1女性 2男性
-    age: 24,
-    isFollow: true
-  }, {
-    headshot: "/static/common/demo6.jpg",
-    username: "烦躁杏鲍菇",
-    gender: 2,
-    //0未知 1女性 2男性
-    age: 24,
-    isFollow: true
-  }, {
-    headshot: "/static/common/demo6.jpg",
-    username: "烦躁杏鲍菇",
-    gender: 1,
-    //0未知 1女性 2男性
-    age: 24,
-    isFollow: false
-  }];
   const _sfc_main$j = {
     components: {
       loadMore,
@@ -5397,15 +5379,18 @@ if (uni.restoreGlobal) {
         tabIndex: 0,
         tabBars: [{
           name: "互关",
-          num: 0
+          num: 0,
+          key: "friends"
         }, {
           name: "关注",
-          num: 3
+          num: 0,
+          key: "follows"
         }, {
           name: "粉丝",
-          num: 2
+          num: 0,
+          key: "fens"
         }],
-        newsList: []
+        newList: []
       };
     },
     onLoad() {
@@ -5427,7 +5412,23 @@ if (uni.restoreGlobal) {
         delta: 1
       });
     },
+    filters: {
+      formatNum(value) {
+        return value > 99 ? "99+" : value;
+      }
+    },
     methods: {
+      // 获取用户相关统计数据
+      getCounts() {
+        this.$H.get("/user/getcounts/" + this.user.id, {}, {
+          token: true,
+          notoast: true
+        }).then((res) => {
+          this.tabBars[0].num = res.data.data.friend_count;
+          this.tabBars[1].num = res.data.data.withfollow_count;
+          this.tabBars[2].num = res.data.data.withfen_count;
+        });
+      },
       //获取数据
       getData() {
         var arr = [];
@@ -5435,14 +5436,47 @@ if (uni.restoreGlobal) {
           let obj = {
             //1.上拉加载更多 2.加载中 3...没有更多了
             loadmore: "上拉加载更多",
-            list: []
+            list: [],
+            page: 1,
+            firstLoad: false
           };
-          if (i < 2) {
-            obj.list = demo$1;
-          }
           arr.push(obj);
         }
         this.newList = arr;
+        this.getList();
+      },
+      // 获取指定分类下的列表数据
+      getList() {
+        let index = this.tabIndex;
+        this.tabBars[index].id;
+        let page = this.newList[index].page;
+        let isrefresh = page === 1;
+        this.$H.get("/" + this.tabBars[index].key + "/" + page, {}, {
+          token: true,
+          noCheck: true
+        }).then((res2) => {
+          let list = res2.data.data.list.map((v) => {
+            return {
+              id: v.id,
+              headshot: v.userpic,
+              username: v.username,
+              gender: v.userinfo.sex,
+              age: v.userinfo.age,
+              isFollow: index !== 2
+            };
+          });
+          this.newList[index].list = isrefresh ? list : [
+            ...this.newList[index].list,
+            ...list
+          ], this.newList[index].loadmore = list.length < 10 ? "没有更多了" : "上拉加载更多";
+          if (isrefresh) {
+            this.newList[index].firstLoad = true;
+          }
+        }).catch((err) => {
+          if (!isrefresh) {
+            this.newList[index].page--;
+          }
+        });
       },
       // tab切换
       changeTab(index) {
@@ -5451,6 +5485,9 @@ if (uni.restoreGlobal) {
       //监听滑动
       onChangeTab(e) {
         this.changeTab(e.detail.current);
+        if (!this.newList[e.detail.current].firstLoad) {
+          this.getList();
+        }
       },
       //上拉加载更多
       loadmore(index) {
@@ -5458,10 +5495,8 @@ if (uni.restoreGlobal) {
         if (item.loadmore !== "上拉加载更多")
           return;
         item.loadmore = "加载中...";
-        setTimeout(() => {
-          item.list = [...item.list, ...item.list];
-          item.loadmore = "上拉加载更多";
-        }, 2e3);
+        item.page++;
+        this.getList();
       }
     }
   };
@@ -5495,7 +5530,7 @@ if (uni.restoreGlobal) {
                   key: 0,
                   class: "ml-2"
                 },
-                vue.toDisplayString(item.num),
+                vue.toDisplayString(item.num | _ctx.formatNum),
                 1
                 /* TEXT */
               )) : vue.createCommentVNode("v-if", true)
@@ -5515,7 +5550,7 @@ if (uni.restoreGlobal) {
         (vue.openBlock(true), vue.createElementBlock(
           vue.Fragment,
           null,
-          vue.renderList(_ctx.newList, (item, index) => {
+          vue.renderList($data.newList, (item, index) => {
             return vue.openBlock(), vue.createElementBlock("swiper-item", { key: index }, [
               vue.createElementVNode("scroll-view", {
                 "scroll-y": "true",
@@ -5638,6 +5673,12 @@ if (uni.restoreGlobal) {
   }
   const userChatPage = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$h], ["__file", "F:/project/社区交友/components/users-chat/user-chat-page.vue"]]);
   const _sfc_main$h = {
+    props: {
+      focus: {
+        type: Boolean,
+        default: false
+      }
+    },
     data() {
       return {
         content: ""
@@ -5661,27 +5702,23 @@ if (uni.restoreGlobal) {
       class: "fixed-bottom flex align-center border-top bg-white",
       style: { "height": "100rpx" }
     }, [
-      vue.withDirectives(vue.createElementVNode(
-        "input",
-        {
-          type: "text",
-          "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $data.content = $event),
-          class: "flex-1 rounded bg-light ml-2",
-          style: { "padding": "5rpx" },
-          placeholder: "文明发言",
-          onConfirm: _cache[1] || (_cache[1] = (...args) => $options.submit && $options.submit(...args))
-        },
-        null,
-        544
-        /* NEED_HYDRATION, NEED_PATCH */
-      ), [
+      vue.withDirectives(vue.createElementVNode("input", {
+        type: "text",
+        "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $data.content = $event),
+        class: "flex-1 rounded bg-light ml-2",
+        style: { "padding": "5rpx" },
+        focus: $props.focus,
+        placeholder: "文明发言",
+        onConfirm: _cache[1] || (_cache[1] = (...args) => $options.submit && $options.submit(...args)),
+        onBlur: _cache[2] || (_cache[2] = ($event) => _ctx.$emit("blur"))
+      }, null, 40, ["focus"]), [
         [vue.vModelText, $data.content]
       ]),
       vue.createElementVNode("view", {
         class: "iconfont icon-fabu flex align-center justify-center font-md animated",
         style: { "width": "100rpx" },
         "hover-class": "rubberBand color-global",
-        onClick: _cache[2] || (_cache[2] = ($event) => $options.submit())
+        onClick: _cache[3] || (_cache[3] = ($event) => $options.submit())
       })
     ]);
   }
@@ -6137,7 +6174,6 @@ if (uni.restoreGlobal) {
     );
   }
   const shareTo = /* @__PURE__ */ _export_sfc(_sfc_main$f, [["render", _sfc_render$e], ["__file", "F:/project/社区交友/components/common/share-to.vue"]]);
-  const _imports_0 = "/static/common/demo5.jpg";
   const _sfc_main$e = {
     components: {
       commonList,
@@ -6165,7 +6201,12 @@ if (uni.restoreGlobal) {
           share_count: 2,
           content: "地煞编程学院:多热烈的白羊,热烈得好抽象,抽象掩盖欲望,却又欲盖弥彰"
         },
-        images: []
+        images: [],
+        comments: [],
+        focus: false,
+        reply_id: 0,
+        temp_reply_id: 0
+        // 新增临时存储
       };
     },
     onLoad(e) {
@@ -6214,6 +6255,7 @@ if (uni.restoreGlobal) {
           this.info.content = res.data.data.detail.content;
           this.images = res.data.data.detail.images;
         });
+        this.getComment();
       },
       // 点击评论
       doComment() {
@@ -6259,7 +6301,78 @@ if (uni.restoreGlobal) {
         });
       },
       // 提交评论
-      submit() {
+      submit(data) {
+        if (data === "") {
+          return uni.showToast({
+            title: "评论不能为空",
+            icon: "none"
+          });
+        }
+        uni.showLoading({
+          title: "评论中...",
+          mask: false
+        });
+        this.$H.post("/post/comment", {
+          fid: this.temp_reply_id,
+          data,
+          post_id: this.info.id
+        }, {
+          token: true
+        }).then((res) => {
+          uni.hideLoading();
+          this.temp_reply_id = 0;
+          this.getComment();
+        }).catch((err) => {
+          uni.hideLoading();
+          this.temp_reply_id = 0;
+        });
+      },
+      // 获取评论
+      getComment() {
+        this.$H.get("/post/" + this.info.id + "/comment").then((res) => {
+          this.comments = this.__ArrSort(res.data.data.list);
+          this.info.comment_count = this.comments.length;
+          uni.$emit("updateCommentsCount", {
+            id: this.info.id,
+            count: this.info.comment_count
+          });
+        });
+      },
+      // 重新整理评论格式
+      __ArrSort(arr, id = 0) {
+        var temp = [], lev = 0;
+        var forFn = function(arr2, id2, lev2) {
+          for (var i = 0; i < arr2.length; i++) {
+            var item = arr2[i];
+            if (item.fid == id2) {
+              item.lev = lev2;
+              temp.push({
+                id: item.id,
+                fid: item.fid,
+                userid: item.user.id,
+                userpic: item.user.userpic,
+                username: item.user.username,
+                time: item.create_time,
+                // time:$T.gettime(item.create_time),
+                data: item.data
+              });
+              forFn(arr2, item.id, lev2 + 1);
+            }
+          }
+        };
+        forFn(arr, id, lev);
+        return temp;
+      },
+      // 回复评论
+      reply(id) {
+        this.temp_reply_id = id;
+        this.reply_id = id;
+        this.focus = true;
+      },
+      // 输入框失去焦点
+      blur() {
+        this.reply_id = 0;
+        this.focus = false;
       }
     }
   };
@@ -6309,28 +6422,68 @@ if (uni.restoreGlobal) {
       vue.createElementVNode(
         "view",
         { class: "p-2 font-md font-weight-bold" },
-        " 最新评论 " + vue.toDisplayString($data.info.comment_count),
+        " 最新评论 " + vue.toDisplayString($data.comments.length),
         1
         /* TEXT */
       ),
       vue.createElementVNode("view", { class: "px-2" }, [
-        vue.createElementVNode("view", { class: "uni-comment-list" }, [
-          vue.createElementVNode("view", { class: "uni-comment-face" }, [
-            vue.createElementVNode("image", {
-              src: _imports_0,
-              mode: "widthFix"
-            })
-          ]),
-          vue.createElementVNode("view", { class: "uni-comment-body" }, [
-            vue.createElementVNode("view", { class: "uni-comment-top" }, [
-              vue.createElementVNode("text", null, "花开富贵")
-            ]),
-            vue.createElementVNode("view", { class: "uni-comment-content" }, "支持爱你"),
-            vue.createElementVNode("view", { class: "uni-comment-date" }, [
-              vue.createElementVNode("view", null, "2天前")
-            ])
-          ])
-        ])
+        (vue.openBlock(true), vue.createElementBlock(
+          vue.Fragment,
+          null,
+          vue.renderList($data.comments, (item, index) => {
+            return vue.openBlock(), vue.createElementBlock("view", {
+              class: "uni-comment-list",
+              key: index
+            }, [
+              item.fid ? (vue.openBlock(), vue.createElementBlock("view", {
+                key: 0,
+                style: { "width": "60rpx" }
+              })) : vue.createCommentVNode("v-if", true),
+              vue.createElementVNode(
+                "view",
+                {
+                  class: vue.normalizeClass(["flex w-100", item.fid ? "bg-light rounded p-2" : ""])
+                },
+                [
+                  vue.createElementVNode("view", { class: "uni-comment-face" }, [
+                    vue.createElementVNode("image", {
+                      src: item.userpic,
+                      mode: "widthFix"
+                    }, null, 8, ["src"])
+                  ]),
+                  vue.createElementVNode("view", { class: "uni-comment-body" }, [
+                    vue.createElementVNode("view", { class: "uni-comment-top" }, [
+                      vue.createElementVNode(
+                        "text",
+                        null,
+                        vue.toDisplayString(item.username),
+                        1
+                        /* TEXT */
+                      )
+                    ]),
+                    vue.createElementVNode("view", {
+                      class: "uni-comment-content",
+                      onClick: ($event) => $options.reply(item.id)
+                    }, vue.toDisplayString(item.data), 9, ["onClick"]),
+                    vue.createElementVNode("view", { class: "uni-comment-date" }, [
+                      vue.createElementVNode(
+                        "view",
+                        null,
+                        vue.toDisplayString(item.time),
+                        1
+                        /* TEXT */
+                      )
+                    ])
+                  ])
+                ],
+                2
+                /* CLASS */
+              )
+            ]);
+          }),
+          128
+          /* KEYED_FRAGMENT */
+        ))
       ]),
       vue.createCommentVNode(" 弹出分享 "),
       vue.createVNode(
@@ -6343,7 +6496,11 @@ if (uni.restoreGlobal) {
       vue.createCommentVNode(" 占位 "),
       vue.createElementVNode("view", { style: { "height": "100rpx" } }),
       vue.createCommentVNode(" 底部发送框 "),
-      vue.createVNode(_component_bottom_input, { onSubmit: $options.submit }, null, 8, ["onSubmit"])
+      vue.createVNode(_component_bottom_input, {
+        focus: $data.focus,
+        onBlur: $options.blur,
+        onSubmit: $options.submit
+      }, null, 8, ["focus", "onBlur", "onSubmit"])
     ]);
   }
   const PagesPostDetailPostDetail = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["render", _sfc_render$d], ["__file", "F:/project/社区交友/pages/post-detail/post-detail.vue"]]);
@@ -21954,6 +22111,7 @@ if (uni.restoreGlobal) {
     ]);
   }
   const PagesUserFeedbackUserFeedback = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__file", "F:/project/社区交友/pages/user-feedback/user-feedback.vue"]]);
+  const _imports_0 = "/static/common/demo5.jpg";
   const _sfc_main$5 = {
     components: {
       uniList,
@@ -22237,53 +22395,6 @@ if (uni.restoreGlobal) {
     ]);
   }
   const PagesLoginLogin = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__file", "F:/project/社区交友/pages/login/login.vue"]]);
-  const demo = [
-    {
-      username: "昵称",
-      userpic: "/static/common/demo5.jpg",
-      nowstime: "2019-10-20 下午04:30",
-      isFollow: false,
-      title: "我是标题",
-      titlepic: "/static/common/demo2.jpg",
-      liked: {
-        type: "liked",
-        liked_count: 1,
-        disliked_count: 2
-      },
-      comment_count: 2,
-      share_count: 2
-    },
-    {
-      username: "昵称",
-      userpic: "/static/common/demo5.jpg",
-      nowstime: "2019-10-20 下午04:30",
-      isFollow: false,
-      title: "我是标题",
-      titlepic: "",
-      liked: {
-        type: "disliked",
-        liked_count: 1,
-        disliked_count: 2
-      },
-      comment_count: 2,
-      share_count: 2
-    },
-    {
-      username: "昵称",
-      userpic: "/static/common/demo5.jpg",
-      nowstime: "2019-10-20 下午04:30",
-      isFollow: false,
-      title: "我是标题",
-      titlepic: "/static/common/demo2.jpg",
-      liked: {
-        type: "",
-        liked_count: 1,
-        disliked_count: 2
-      },
-      comment_count: 2,
-      share_count: 2
-    }
-  ];
   const _sfc_main$3 = {
     components: {
       commonList,
@@ -22292,24 +22403,87 @@ if (uni.restoreGlobal) {
     },
     data() {
       return {
+        user_id: 0,
+        userinfo: {
+          userpic: "/static/common/demo5.jpg",
+          username: "",
+          sex: 0,
+          age: 20,
+          isFollow: false,
+          regtime: "",
+          birthday: "",
+          job: "",
+          path: "",
+          qg: ""
+        },
+        counts: [{
+          name: "帖子",
+          num: 0
+        }, {
+          name: "关注",
+          num: 0
+        }, {
+          name: "粉丝",
+          num: 0
+        }],
         tabIndex: 0,
         tabBars: [{
           name: "首页"
         }, {
           name: "帖子",
-          list: demo,
+          list: [],
           //1.上拉加载更多 2.加载中 3...没有更多了
-          loadmore: "上拉加载更多"
+          loadmore: "上拉加载更多",
+          page: 1
         }, {
           name: "动态",
-          list: demo,
+          list: [],
           //1.上拉加载更多 2.加载中 3...没有更多了
-          loadmore: "上拉加载更多"
+          loadmore: "上拉加载更多",
+          page: 1
         }]
       };
     },
     onNavigationBarButtonTap() {
       this.$refs.popup.open();
+    },
+    onLoad(e) {
+      if (!e.user_id) {
+        return uni.showToast({
+          title: "非法参数",
+          icon: "none"
+        });
+      }
+      this.user_id = e.user_id;
+      this.getUserInfo();
+      this.getCounts();
+      uni.$on("updateFollowOrLiked", (e2) => {
+        switch (e2.type) {
+          case "follow":
+            this.follow(e2.data.user_id);
+            break;
+          case "liked":
+            this.liked(e2.data);
+            break;
+        }
+      });
+      uni.$on("updateCommentsCount", ({ id, count }) => {
+        this.tabBars.forEach((tab) => {
+          if (tab.list) {
+            tab.list.forEach((item) => {
+              if (item.id === id) {
+                item.comment_count = count;
+              }
+            });
+          }
+        });
+      });
+    },
+    onUnload() {
+      uni.$off("updateFollowOrLiked", (e) => {
+      });
+      uni.$off("updateCommentsCount", (e) => {
+      });
     },
     computed: {
       list() {
@@ -22320,34 +22494,116 @@ if (uni.restoreGlobal) {
       }
     },
     methods: {
+      // 获取用户相关统计数据
+      getCounts() {
+        this.$H.get("/user/getcounts/" + this.user_id).then((res) => {
+          this.counts[0].num = res.data.data.post_count;
+          this.counts[1].num = res.data.data.withfollow_count;
+          this.counts[2].num = res.data.data.withfen_count;
+        });
+      },
+      // 获取用户个人信息
+      getUserInfo() {
+        this.$H.post("/getuserinfo", {
+          user_id: this.user_id
+        }, {
+          token: true,
+          notoast: true
+        }).then((res) => {
+          this.userinfo = {
+            userpic: res.data.data.userpic,
+            username: res.data.data.username,
+            sex: res.data.data.userinfo.sex,
+            age: res.data.data.userinfo.age,
+            isFollow: res.data.data.fens.length > 0,
+            isblack: res.data.data.blacklist.length > 0,
+            regtime: $T.getAgeByBirthday(res.data.data.create_time),
+            birthday: $T.getHoroscope(res.data.data.userinfo.birthday),
+            job: res.data.data.userinfo.job,
+            path: res.data.data.userinfo.path,
+            qg: res.data.data.userinfo.qg
+          };
+        });
+      },
       changeTab(index) {
         this.tabIndex = index;
+        this.getList();
       },
       //关注
-      follow(e) {
-        let list = this.tabBars[this.tabIndex].list;
-        list[e].isFollow = true;
+      follow(user_id) {
+        this.tabBars.forEach((tab) => {
+          if (tab.list) {
+            tab.list.forEach((item) => {
+              if (item.user_id === user_id) {
+                item.isFollow = true;
+              }
+            });
+          }
+        });
         uni.showToast({
-          title: "关注成功"
+          title: "关注成功",
+          icon: "none"
         });
       },
       //顶踩
       liked(e) {
-        let list = this.tabBars[this.tabIndex].list;
-        let item = list[e.index];
+        this.tabBars[this.tabIndex].list.forEach((item) => {
+          if (item.id === e.id) {
+            if (item.liked.type === "") {
+              item.liked[e.type + "_count"]++;
+            } else if (item.liked.type === "liked" && e.type === "disliked") {
+              item.liked.liked_count--;
+              item.liked.disliked_count++;
+            } else if (item.liked.type === "disliked" && e.type === "liked") {
+              item.liked.liked_count++;
+              item.liked.disliked_count--;
+            }
+            item.liked.type = e.type;
+          }
+        });
         let msg = e.type === "liked" ? "赞" : "踩";
-        if (item.liked.type === "") {
-          item.liked[e.type + "_count"]++;
-        } else if (item.liked.type === "liked" && e.type === "disliked") {
-          item.liked.liked_count--;
-          item.liked.disliked_count++;
-        } else if (item.liked.type === "disliked" && e.type === "liked") {
-          item.liked.liked_count++;
-          item.liked.disliked_count--;
-        }
-        item.liked.type = e.type;
         uni.showToast({
-          title: msg + "成功"
+          title: msg + "成功",
+          icon: "none"
+        });
+      },
+      // 获取文章列表
+      getList() {
+        let index = this.tabIndex;
+        let page = this.tabBars[index].page;
+        let isrefresh = page === 1;
+        this.$H.get("/user/" + this.user_id + "/post/" + page).then((res) => {
+          let list = res.data.data.list.map((v) => {
+            return this.$U.formatCommonList(v);
+          });
+          this.tabBars[index].list = isrefresh ? [...list] : [
+            ...this.tabBars[index].list,
+            ...list
+          ], this.tabBars[index].loadmore = list.length < 10 ? "没有更多了" : "上拉加载更多";
+        }).catch((err) => {
+          if (!isrefresh) {
+            this.newList[index].page--;
+          }
+        });
+      },
+      // 关注/取消关注
+      doFollow() {
+        this.checkAuth(() => {
+          let url = this.userinfo.isFollow ? "/unfollow" : "/follow";
+          let msg = this.userinfo.isFollow ? "取消关注" : "关注";
+          this.$H.post(url, {
+            follow_id: this.user_id
+          }, {
+            token: true
+          }).then((res) => {
+            this.userinfo.isFollow = !this.userinfo.isFollow;
+            uni.showToast({
+              title: msg + "成功",
+              icon: "none"
+            });
+            uni.$emit("updateIndex");
+            this.getList();
+          });
         });
       }
     }
@@ -22360,32 +22616,54 @@ if (uni.restoreGlobal) {
       vue.createCommentVNode(" 头部 "),
       vue.createElementVNode("view", { class: "flex align-center p-4 border-bottom border-light-secondary" }, [
         vue.createElementVNode("image", {
-          src: _imports_0,
+          src: $data.userinfo.userpic,
           style: { "width": "180rpx", "height": "180rpx" },
           class: "rounded-circle"
-        }),
+        }, null, 8, ["src"]),
         vue.createElementVNode("view", { class: "pl-3 flex flex-column flex-1" }, [
           vue.createElementVNode("view", { class: "flex align-center" }, [
-            vue.createElementVNode("view", { class: "flex-1 flex flex-column align-center justify-center" }, [
-              vue.createElementVNode("text", { class: "font-lg font-weight-bold" }, "1"),
-              vue.createElementVNode("text", { class: "font text-muted" }, "粉丝")
-            ]),
-            vue.createElementVNode("view", { class: "flex-1 flex flex-column align-center justify-center" }, [
-              vue.createElementVNode("text", { class: "font-lg font-weight-bold" }, "1"),
-              vue.createElementVNode("text", { class: "font text-muted" }, "粉丝")
-            ]),
-            vue.createElementVNode("view", { class: "flex-1 flex flex-column align-center justify-center" }, [
-              vue.createElementVNode("text", { class: "font-lg font-weight-bold" }, "1"),
-              vue.createElementVNode("text", { class: "font text-muted" }, "粉丝")
-            ])
+            (vue.openBlock(true), vue.createElementBlock(
+              vue.Fragment,
+              null,
+              vue.renderList($data.counts, (item, index) => {
+                return vue.openBlock(), vue.createElementBlock("view", {
+                  class: "flex-1 flex flex-column align-center justify-center",
+                  key: index
+                }, [
+                  vue.createElementVNode(
+                    "text",
+                    { class: "font-lg font-weight-bold" },
+                    vue.toDisplayString(item.num),
+                    1
+                    /* TEXT */
+                  ),
+                  vue.createElementVNode(
+                    "text",
+                    { class: "font text-muted" },
+                    vue.toDisplayString(item.name),
+                    1
+                    /* TEXT */
+                  )
+                ]);
+              }),
+              128
+              /* KEYED_FRAGMENT */
+            ))
           ]),
           vue.createElementVNode("view", { class: "flex align-center justify-center" }, [
-            vue.createElementVNode("button", {
-              type: "primary",
-              size: "mini",
-              class: "bg-color",
-              style: { "width": "80%" }
-            }, "关注")
+            vue.createElementVNode(
+              "button",
+              {
+                type: "primary",
+                size: "mini",
+                class: vue.normalizeClass($data.userinfo.isFollow ? "bg-light text-dark" : "bg-color"),
+                style: { "width": "80%" },
+                onClick: _cache[0] || (_cache[0] = (...args) => $options.doFollow && $options.doFollow(...args))
+              },
+              vue.toDisplayString($data.userinfo.isFollow ? "已关注" : "关注"),
+              3
+              /* TEXT, CLASS */
+            )
           ])
         ])
       ]),
@@ -22414,15 +22692,51 @@ if (uni.restoreGlobal) {
         [
           vue.createElementVNode("view", { class: "p-3 border-bottom" }, [
             vue.createElementVNode("view", { class: "font-md" }, "账号信息"),
-            vue.createElementVNode("view", { class: "font" }, "账号年龄:12个月"),
-            vue.createElementVNode("view", { class: "font" }, "账号ID:1")
+            vue.createElementVNode(
+              "view",
+              { class: "font" },
+              "账号年龄:" + vue.toDisplayString($data.userinfo.regtime),
+              1
+              /* TEXT */
+            ),
+            vue.createElementVNode(
+              "view",
+              { class: "font" },
+              "账号ID:" + vue.toDisplayString($data.user_id),
+              1
+              /* TEXT */
+            )
           ]),
           vue.createElementVNode("view", { class: "p-3 border-bottom" }, [
             vue.createElementVNode("view", { class: "font-md" }, "个人信息"),
-            vue.createElementVNode("view", { class: "font" }, "星座:白羊座"),
-            vue.createElementVNode("view", { class: "font" }, "职业:老师"),
-            vue.createElementVNode("view", { class: "font" }, "故乡:广东"),
-            vue.createElementVNode("view", { class: "font" }, "情感:已婚")
+            vue.createElementVNode(
+              "view",
+              { class: "font" },
+              "星座:" + vue.toDisplayString($data.userinfo.birthday),
+              1
+              /* TEXT */
+            ),
+            vue.createElementVNode(
+              "view",
+              { class: "font" },
+              "职业:" + vue.toDisplayString($data.userinfo.job),
+              1
+              /* TEXT */
+            ),
+            vue.createElementVNode(
+              "view",
+              { class: "font" },
+              "故乡:" + vue.toDisplayString($data.userinfo.path),
+              1
+              /* TEXT */
+            ),
+            vue.createElementVNode(
+              "view",
+              { class: "font" },
+              "情感:" + vue.toDisplayString($data.userinfo.qg),
+              1
+              /* TEXT */
+            )
           ])
         ],
         64
@@ -22465,7 +22779,7 @@ if (uni.restoreGlobal) {
               class: "flex align-center justify-center color-aliceblue w-100 font-md border-bottom py-1",
               style: { "height": "100rpx" },
               "hover-class": "color-global",
-              onClick: _cache[0] || (_cache[0] = ($event) => _ctx.popupEvent("friend"))
+              onClick: _cache[1] || (_cache[1] = ($event) => _ctx.popupEvent("friend"))
             }, [
               vue.createElementVNode("text", { class: "iconfont icon-icon-1 mr-2" }),
               vue.createTextVNode(" 加入黑名单 ")
@@ -22474,7 +22788,7 @@ if (uni.restoreGlobal) {
               class: "flex align-center justify-center color-aliceblue w-100 font-md py-1",
               style: { "height": "100rpx" },
               "hover-class": "color-global",
-              onClick: _cache[1] || (_cache[1] = ($event) => _ctx.popupEvent("clear"))
+              onClick: _cache[2] || (_cache[2] = ($event) => _ctx.popupEvent("clear"))
             }, [
               vue.createElementVNode("text", { class: "iconfont icon-qingchu mr-2" }),
               vue.createTextVNode(" 开始聊天 ")
@@ -22963,7 +23277,7 @@ if (uni.restoreGlobal) {
         options.header = options.header || this.common.header;
         if (options.token) {
           options.header.token = store.state.token;
-          if (!options.noCheck && !options.header.token) {
+          if (!options.noCheck && !options.header.token && !options.notoast) {
             return uni.showToast({
               title: "非法token，请重新登录",
               icon: "none"
@@ -23029,7 +23343,7 @@ if (uni.restoreGlobal) {
       });
     }
   };
-  const checkAuth = (callback) => {
+  const checkAuth = (callback, checkPhone2 = true) => {
     if (!store.state.loginStatus) {
       uni.showToast({
         title: "请先登录",
@@ -23039,9 +23353,18 @@ if (uni.restoreGlobal) {
         url: "/pages/login/login"
       });
     }
+    if (checkPhone2 && !store.state.user.phone) {
+      uni.showToast({
+        title: "请先登录",
+        icon: "none"
+      });
+      return uni.navigateTo({
+        url: "/pages/user-phone/user-phone"
+      });
+    }
     callback();
   };
-  const navigateTo = (options) => {
+  const navigateTo = (options, chechPhone = true) => {
     if (!store.state.loginStatus) {
       uni.showToast({
         title: "请先登录",
@@ -23049,6 +23372,15 @@ if (uni.restoreGlobal) {
       });
       return uni.navigateTo({
         url: "/pages/login/login"
+      });
+    }
+    if (checkPhone && !store.state.user.phone) {
+      uni.showToast({
+        title: "请先登录",
+        icon: "none"
+      });
+      return uni.navigateTo({
+        url: "/pages/user-phone/user-phone"
       });
     }
     uni.navigateTo(options);

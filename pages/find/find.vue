@@ -23,8 +23,8 @@
 						<common-list :item="item" :index="index" @liked="liked"></common-list>
 						<view class="divider"></view>					
 					</block>
-					<load-more :loadmore="loadmore"></load-more>
-					
+					<load-more v-if="list.length" :loadmore="loadmore"></load-more>
+					<no-thing v-else></no-thing>
 				</scroll-view>
 			</swiper-item>
 			<!-- 话题 -->
@@ -54,7 +54,7 @@
 					<block v-for="(item,index) in topicList" :key="index">
 						<topic-list :item="item" :index="index"></topic-list>
 					</block>
-				</scroll-view>												
+				</scroll-view>
 			</swiper-item>
 		</swiper>
 		
@@ -62,65 +62,20 @@
 </template>
 
 <script>
-	const demo = [{
-		username:"昵称",
-		userpic:"/static/tabber/msg2.png",
-		nowstime:"2019-10-20 下午04:30",
-		isFollow:true,
-		title:"我是标题",
-		titlepic:"/static/common/demo2.jpg",
-		liked:{
-			type:"liked",
-			liked_count:1,
-			disliked_count:2
-		},
-		comment_count:2,
-		share_count:2
-	},
-	{
-		username:"昵称",
-		userpic:"/static/tabber/msg2.png",
-		nowstime:"2019-10-20 下午04:30",
-		isFollow:true,
-		title:"我是标题",
-		titlepic:"",
-		liked:{
-			type:"disliked",
-			liked_count:1,
-			disliked_count:2
-		},
-		comment_count:2,
-		share_count:2
-	},
-	{
-		username:"昵称",
-		userpic:"/static/tabber/msg2.png",
-		nowstime:"2019-10-20 下午04:30",
-		isFollow:true,
-		title:"我是标题",
-		titlepic:"/static/common/demo2.jpg",
-		liked:{
-			type:"",
-			liked_count:1,
-			disliked_count:2
-		},
-		comment_count:2,
-		share_count:2
-	}
-	];
-	
 	import uniNavBar from '@/components/uni-uni/uni-nav-bar/uni-nav-bar.vue';
 	import commonList from '@/components/common/common-list.vue';
 	import loadMore from '@/components/common/load-more.vue';
 	import hotClick from '@/components/find/hot-click.vue';
 	import topicList from '@/components/find/topic-list.vue';
+	import noThing from '@/components/common/no-thing.vue';
 	export default {
 		components:{
 			uniNavBar,
 			commonList,
 			loadMore,
 			hotClick,
-			topicList
+			topicList,
+			noThing
 		},
 		data() {
 			return {
@@ -136,6 +91,7 @@
 				],
 				list : [],
 				loadmore : "上拉加载更多",
+				page:1,
 				hotClick:[],
 				topicList:[],
 				swiperList:[]
@@ -147,14 +103,34 @@
 					this.scrollH = res.windowHeight - res.statusBarHeight -44
 				}
 			})
-			// 加载数据
-			this.list = demo
 			// 获取数据
 			this.getTopicNav()
 			this.getHotTopic()
 			this.getSwipers()
 		},
+		onShow() {
+			this.page = 1
+			this.getList()
+		},
 		methods: {
+			// 获取关注好友文章列表
+			getList(){
+				let isrefresh = this.page === 1
+				this.$H.get('/followpost/'+this.page,{},{
+					token:true,
+					notoast:true
+				}).then(res=>{
+					let list = res.data.data.list.map(v=>{
+						return this.$U.formatCommonList(v)
+					})
+					this.list = isrefresh ? list : [...this.list,...list],
+					this.loadmore = list.length < 10 ?'没有更多了' : '上拉加载更多'
+				}).catch(err=>{
+					if (!isrefresh) {
+						this.page--
+					}
+				})
+			},
 			// 获取热门分类
 			getTopicNav(){
 				this.$H.get('/topicclass').then(res=>{
@@ -229,13 +205,9 @@
 				if (this.loadmore !== '上拉加载更多') return;
 				// 设置加载状态
 				this.loadmore = '加载中'
-				// 模拟请求数据
-				setTimeout(()=>{
-					// 加载数据
-					this.list = [...this.list,...this.list]
-					// 设置加载状态
-					this.loadmore = '上拉加载更多'
-				},2000)
+				// 请求数据
+				this.page++
+				this.getList()
 			},
 			// 打开搜索页
 			openSearch(){

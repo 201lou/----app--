@@ -19,7 +19,7 @@ export default {
 			// 验证权限token
 			if(options.token) {
 				options.header.token = $store.state.token
-				if(!options.noCheck && !options.header.token) {
+				if(!options.noCheck && !options.header.token && !options.notoast) {
 					return uni.showToast({
 						title:'非法token，请重新登录',
 						icon:'none'

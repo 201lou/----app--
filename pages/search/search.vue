@@ -21,7 +21,7 @@
 				</template>			
 				<template v-else>
 					<!-- 用户 -->
-					<user-list :item="item" :indexe="index"></user-list>
+					<user-list :item="item" :index="index"></user-list>
 				</template>
 			</block>
 			<!-- 上拉加载 -->
@@ -31,32 +31,6 @@
 </template>
 
 <script>
-	const demo_user = [{
-		headshot:"/static/common/demo6.jpg",
-		username:"烦躁杏鲍菇",
-		gender:1,//0未知 1女性 2男性
-		age:24,
-		isFollow:true
-	},{
-		headshot:"/static/common/demo6.jpg",
-		username:"烦躁杏鲍菇",
-		gender:0,//0未知 1女性 2男性
-		age:24,
-		isFollow:true
-	},{
-		headshot:"/static/common/demo6.jpg",
-		username:"烦躁杏鲍菇",
-		gender:2,//0未知 1女性 2男性
-		age:24,
-		isFollow:true
-	},{
-		headshot:"/static/common/demo6.jpg",
-		username:"烦躁杏鲍菇",
-		gender:1,//0未知 1女性 2男性
-		age:24,
-		isFollow:false
-	}];
-	
 	import commonList from '@/components/common/common-list.vue';
 	import topicList from '@/components/find/topic-list.vue';
 	import userList from '@/components/user-list/user-list.vue';
@@ -193,7 +167,7 @@
 			follow(user_id){
 				// 找到当前作者的所有列表
 				this.searchList.forEach((item)=>{
-					if(item.user_id === user_id){
+					if(item.id === user_id){
 						item.isFollow = true
 					}
 				})
@@ -220,9 +194,9 @@
 				}
 				uni.setStorageSync('historySearchText',JSON.stringify(this.list))
 				// 请求搜索
-				this.getDate()
+				this.getData()
 			},
-			getDate(isrefresh = true,callback = false) {
+			getData(isrefresh = true,callback = false) {
 				//处于显示请求中
 				uni.showLoading({
 					title: '加载中...',
@@ -255,7 +229,16 @@
 						})
 							break;
 						case 'user':
-						pageTitle = '用户'
+						list = res.data.data.list.map(v=>{
+							return {
+								id:v.id,
+								headshot:v.userpic,
+								username:v.username,
+								gender:v.userinfo.sex,
+								age:v.userinfo.age,
+								isFollow:false
+							}
+						})
 							break;
 					}
 					// 渲染到页面

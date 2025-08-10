@@ -5,7 +5,7 @@
 			<view class="flex-1 flex align-center justify-center" 
 			v-for="(item,index) in tabBars" :key="index" 
 			:class="index === tabIndex ? 'font-lg font-weight-bold color-global': 'font-md'"
-			@click="changeTab(index)">{{item.name}} <text v-if="item.num > 0" class="ml-2">{{item.num}}</text></view>
+			@click="changeTab(index)">{{item.name}} <text v-if="item.num > 0" class="ml-2">{{item.num |formatNum}}</text></view>
 		</view>
 		
 		<!-- 滑动列表 -->
@@ -74,15 +74,18 @@
 				tabIndex:0,
 				tabBars:[{
 					name:"互关",
-					num:0
+					num:0,
+					key:"friends"
 				},{
 					name:"关注",
-					num:3
+					num:0,
+					key:"follows"
 				},{
 					name:"粉丝",
-					num:2
+					num:0,
+					key:"fens"
 				}],
-				newsList:[]
+				newList:[]
 			}
 		},
 		onLoad() {
@@ -105,7 +108,23 @@
 				delta:1
 			})
 		},
+		filters:{
+			formatNum(value) {
+				return value > 99 ? '99+' : value;
+			}
+		},
 		methods: {
+			// 获取用户相关统计数据
+			getCounts(){
+				this.$H.get('/user/getcounts/'+this.user.id,{},{
+					token:true,
+					notoast:true
+				}).then(res=>{
+					this.tabBars[0].num = res.data.data.friend_count
+					this.tabBars[1].num = res.data.data.withfollow_count
+					this.tabBars[2].num = res.data.data.withfen_count
+				})
+			},
 			//获取数据
 			getData() {
 				var arr = []
@@ -114,14 +133,46 @@
 					let obj = {
 						//1.上拉加载更多 2.加载中 3...没有更多了
 						loadmore:"上拉加载更多",
-						list:[]
-					}
-					if (i < 2) {
-						obj.list = demo
+						list:[],
+						page:1,
+						firstLoad:false
 					}
 					arr.push(obj)
 				}
 				this.newList = arr
+				this.getList()
+			},
+			// 获取指定分类下的列表数据
+			getList(){
+				let index = this.tabIndex
+				let id = this.tabBars[index].id
+				let page = this.newList[index].page
+				let isrefresh = page === 1
+				this.$H.get('/'+this.tabBars[index].key+'/'+page,{},{
+					token:true,
+					noCheck:true
+				}).then(res2=>{
+					let list = res2.data.data.list.map(v=>{
+						return {
+							id:v.id,
+							headshot:v.userpic,
+							username:v.username,
+							gender:v.userinfo.sex,
+							age:v.userinfo.age,
+							isFollow:index !== 2
+						}
+					})
+					this.newList[index].list = isrefresh ? list : [...this.newList[index].list,
+					...list],
+					this.newList[index].loadmore = list.length < 10 ?'没有更多了' : '上拉加载更多'
+					if (isrefresh) {
+						this.newList[index].firstLoad = true
+					}
+				}).catch(err=>{
+					if (!isrefresh) {
+						this.newList[index].page--
+					}
+				})
 			},
 			// tab切换
 			changeTab(index){
@@ -130,6 +181,9 @@
 			//监听滑动
 			onChangeTab(e) {
 				this.changeTab(e.detail.current)
+				if(!this.newList[e.detail.current].firstLoad) {
+					this.getList()
+				}
 			},
 			//上拉加载更多
 			loadmore(index) {
@@ -139,13 +193,9 @@
 				if(item.loadmore !== '上拉加载更多') return;
 				//修改当前列表加载状态
 				item.loadmore = '加载中...'
-				//模拟数据请求
-				setTimeout(()=>{
-					// 加载数据
-					item.list = [...item.list,...item.list]
-					// 恢复加载状态
-					item.loadmore = '上拉加载更多'
-				},2000)
+				//数据请求
+				item.page++
+				this.getList()
 			}
 		}
 	}

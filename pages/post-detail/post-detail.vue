@@ -12,19 +12,22 @@
 		
 		<view class="divider"></view>
 		<view class="p-2 font-md font-weight-bold">
-			最新评论 {{info.comment_count}}
+			最新评论 {{comments.length}}
 		</view>
 		<view class="px-2">
-			<view class="uni-comment-list">
-				<view class="uni-comment-face"><image src="/static/common/demo5.jpg" 
-				mode="widthFix"></image></view>
-				<view class="uni-comment-body">
-					<view class="uni-comment-top">
-						<text>花开富贵</text>
-					</view>
-					<view class="uni-comment-content">支持爱你</view>
-					<view class="uni-comment-date">
-						<view>2天前</view>
+			<view class="uni-comment-list" v-for="(item,index) in comments" :key="index">
+				<view v-if="item.fid" style="width: 60rpx;"></view>
+				<view class="flex w-100" :class="item.fid ? 'bg-light rounded p-2' : ''">
+					<view class="uni-comment-face"><image :src="item.userpic"
+					mode="widthFix"></image></view>
+					<view class="uni-comment-body">
+						<view class="uni-comment-top">
+							<text>{{item.username}}</text>
+						</view>
+						<view class="uni-comment-content" @click="reply(item.id)">{{item.data}}</view>
+						<view class="uni-comment-date">
+							<view>{{item.time}}</view>
+						</view>
 					</view>
 				</view>
 			</view>
@@ -34,7 +37,7 @@
 		<!-- 占位 -->
 		<view style="height: 100rpx;"></view>
 		<!-- 底部发送框 -->
-		<bottom-input @submit="submit"></bottom-input>
+		<bottom-input :focus="focus" @blur="blur" @submit="submit"></bottom-input>
 	</view>
 </template>
 
@@ -69,7 +72,11 @@
 					share_count:2,
 					content:"地煞编程学院:多热烈的白羊,热烈得好抽象,抽象掩盖欲望,却又欲盖弥彰",
 				},
-				images:[]
+				images:[],
+				comments:[],
+				focus:false,
+				reply_id:0,
+				temp_reply_id: 0 // 新增临时存储
 			}
 		},
 		onLoad(e) {
@@ -121,6 +128,7 @@
 					this.info.content = res.data.data.detail.content
 					this.images = res.data.data.detail.images
 				})
+				this.getComment()
 			},
 			// 点击评论
 			doComment() {
@@ -170,8 +178,78 @@
 				})
 			},
 			// 提交评论
-			submit() {
-				
+			submit(data) {
+				if(data === '') {
+					return uni.showToast({
+						title: '评论不能为空',
+						icon:'none'
+					});
+				}
+				uni.showLoading({
+					title:'评论中...',
+					mask:false
+				})
+				this.$H.post('/post/comment',{
+					fid:this.temp_reply_id,
+					data:data,
+					post_id:this.info.id
+				},{
+					token:true
+				}).then(res=>{
+					uni.hideLoading()
+					this.temp_reply_id = 0
+					this.getComment()
+				}).catch(err=>{
+					uni.hideLoading()
+					this.temp_reply_id = 0
+				})
+			},
+			// 获取评论
+			getComment(){
+				this.$H.get('/post/'+this.info.id+'/comment').then(res=>{
+					this.comments = this.__ArrSort(res.data.data.list)
+					this.info.comment_count = this.comments.length
+					uni.$emit('updateCommentsCount',{
+						id:this.info.id,
+						count:this.info.comment_count
+					})
+				})
+			},
+			// 重新整理评论格式
+			__ArrSort(arr,id = 0){
+				var temp = [],lev=0;
+				var forFn = function(arr, id,lev){
+					for (var i = 0; i < arr.length; i++) {
+						var item = arr[i];
+						if (item.fid==id) {
+							item.lev=lev;
+							temp.push({
+								id:item.id,
+								fid:item.fid,
+								userid:item.user.id,
+								userpic:item.user.userpic,
+								username:item.user.username,
+								time:item.create_time,
+								// time:$T.gettime(item.create_time),
+								data:item.data,
+							});
+							forFn(arr,item.id,lev+1);
+						}
+					}
+				};
+				forFn(arr, id,lev);
+				return temp;
+			},
+			// 回复评论
+			reply(id) {
+				this.temp_reply_id = id // 存储到临时变量
+				this.reply_id = id
+				this.focus = true
+			},
+			// 输入框失去焦点
+			blur(){
+				this.reply_id = 0
+				this.focus = false
 			}
 		}
 	}

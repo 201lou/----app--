@@ -97,10 +97,21 @@
 						break;
 				}
 			})
+			// 监听评论数变化
+			uni.$on('updateCommentsCount',({id,count})=>{
+				this.newList.forEach(tab=>{
+					tab.list.forEach(item=>{
+						if(item.id === id) {
+							item.comment_count = count
+						}
+					})
+				})
+			})
 		},
 		onUnload() {
 			uni.$off('updateFollowOrLiked',(e)=>{})
 			uni.$off('updateIndex',(e)=>{})
+			uni.$off('updateCommentsCount',(e)=>{})
 		},
 		methods: {
 			//获取数据

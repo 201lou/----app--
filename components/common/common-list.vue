@@ -4,10 +4,10 @@
 		<view class="flex align-center justify-between"> 
 			<view  class="flex align-center" >
 			<!-- 头像 -->
-				<image class="mr-2 rounded-circle" :src="item.userpic" style="width: 65rpx;height: 65rpx;" lazy-load @click="openSpace"></image>
+				<image class="mr-2 rounded-circle" :src="item.userpic" style="width: 65rpx;height: 65rpx;" lazy-load @click="openSpace(item.user_id)"></image>
 				<!-- 昵称发布时间 -->
 				<view>
-					<view class="font" style="line-height: 25rpx;" @click="openSpace">{{item.username}}</view>
+					<view class="font" style="line-height: 25rpx;" @click="openSpace(item.user_id)">{{item.username}}</view>
 					<text class="font-sm text-light-muted" style="line-height: 25rpx;">{{item.nowstime}}</text>
 				</view>
 			</view>
@@ -72,9 +72,9 @@
 		},
 		methods: {
 			//打开个人空间
-			openSpace(){
+			openSpace(user_id){
 				uni.navigateTo({
-					url:'/pages/user-space/user-space'
+					url:'/pages/user-space/user-space?user_id='+user_id
 				})
 			},
 			//打开详情页

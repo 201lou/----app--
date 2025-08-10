@@ -98,25 +98,40 @@
 			}),
 			// 用户头像
 			avatar(){
-				return this.user.userpic ? this.user.userpic : '/static/common/demo6.jpg'
+				return (this.user.userpic && this.user) ? this.user.userpic : '/static/common/demo6.jpg'
 			}
 		},
 		mounted() {
-		  // console.log(this.user)
+			// console.log(this.loginStatus);
+			// console.log(this.user)
 		},
 		onShow() {
-			this.getCounts()
+			if(this.loginStatus){
+				this.getCounts()
+			}
+		},
+		watch:{
+			loginStatus(newValue,oldValue) {
+				if(newValue){
+					this.getCounts()
+				} else {
+					this.myData.forEach(item=>{
+						item.num = 0
+					})
+				}
+			}
 		},
 		methods: {
 			// 获取用户相关统计数据
 			getCounts(){
 				this.$H.get('/user/getcounts/'+this.user.id,{},{
-					token:true
+					token:true,
+					notoast:true
 				}).then(res=>{
 					this.myData[0].num = res.data.data.post_count
 					this.myData[1].num = res.data.data.today_posts_count
 					this.myData[2].num = res.data.data.withfollow_count
-					this.myData[3].num = res.data.data.fens_count
+					this.myData[3].num = res.data.data.withfen_count
 				})
 			},
 			// 打开登录页

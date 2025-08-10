@@ -37,7 +37,7 @@ import $H from './common/request.js';
 
 import store from './store/index.js'
 
-const checkAuth = (callback)=>{
+const checkAuth = (callback,checkPhone = true)=>{
   	// 权限验证
   	if (!store.state.loginStatus) {
   		uni.showToast({
@@ -48,11 +48,21 @@ const checkAuth = (callback)=>{
   			url:'/pages/login/login'
   		})
   	}
+	// 验证是否绑定手机号
+	if(checkPhone && !store.state.user.phone){
+		uni.showToast({
+			title:'请先登录',
+			icon:'none'
+		});
+		return uni.navigateTo({
+			url:'/pages/user-phone/user-phone'
+		})
+	}
   	callback()
 }
 
 // 权限验证跳转
-const navigateTo = (options)=>{
+const navigateTo = (options,chechPhone = true)=>{
 	if (!store.state.loginStatus) {
 		uni.showToast({
 			title:'请先登录',
@@ -60,6 +70,16 @@ const navigateTo = (options)=>{
 		});
 		return uni.navigateTo({
 			url:'/pages/login/login'
+		})
+	}
+	// 验证是否绑定手机号
+	if(checkPhone && !store.state.user.phone){
+		uni.showToast({
+			title:'请先登录',
+			icon:'none'
+		});
+		return uni.navigateTo({
+			url:'/pages/user-phone/user-phone'
 		})
 	}
 	uni.navigateTo(options);
