@@ -2273,31 +2273,6 @@ if (uni.restoreGlobal) {
     )) : vue.createCommentVNode("v-if", true);
   }
   const uniPopup = /* @__PURE__ */ _export_sfc(_sfc_main$D, [["render", _sfc_render$C], ["__scopeId", "data-v-fda68b36"], ["__file", "F:/project/社区交友/components/uni-uni/uni-popup/uni-popup.vue"]]);
-  const demo = [{
-    headshot: "/static/common/demo6.jpg",
-    username: "星期四的微信",
-    update_time: 1752722735,
-    data: "nrnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn内容 ",
-    notread: 2
-  }, {
-    headshot: "/static/common/demo6.jpg",
-    username: "星期四的微信",
-    update_time: 1752722735,
-    data: "nrnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn内容 ",
-    notread: 2
-  }, {
-    headshot: "/static/common/demo6.jpg",
-    username: "星期四的微信",
-    update_time: 1752722735,
-    data: "nrnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn内容 ",
-    notread: 2
-  }, {
-    headshot: "/static/common/demo6.jpg",
-    username: "星期四的微信",
-    update_time: 1752722735,
-    data: "nrnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn内容 ",
-    notread: 2
-  }];
   const _sfc_main$C = {
     components: {
       msgList,
@@ -2305,13 +2280,15 @@ if (uni.restoreGlobal) {
       uniPopup
     },
     data() {
-      return {
-        list: []
-      };
+      return {};
     },
     // 页面加载
     onLoad() {
-      this.list = demo;
+    },
+    computed: {
+      ...mapState({
+        list: (state) => state.chatList
+      })
     },
     // 监听原生导航栏按钮事件
     onNavigationBarButtonTap(e) {
@@ -2354,7 +2331,7 @@ if (uni.restoreGlobal) {
             });
             break;
           case "clear":
-            formatAppLog("log", "at pages/msg/msg.vue:113", "clear");
+            formatAppLog("log", "at pages/msg/msg.vue:92", "clear");
             break;
         }
         this.$refs.popup.close();
@@ -2366,7 +2343,7 @@ if (uni.restoreGlobal) {
     const _component_no_thing = vue.resolveComponent("no-thing");
     const _component_uni_popup = vue.resolveComponent("uni-popup");
     return vue.openBlock(), vue.createElementBlock("view", null, [
-      $data.list.length > 0 ? (vue.openBlock(), vue.createElementBlock(
+      _ctx.list.length > 0 ? (vue.openBlock(), vue.createElementBlock(
         vue.Fragment,
         { key: 0 },
         [
@@ -2374,7 +2351,7 @@ if (uni.restoreGlobal) {
           (vue.openBlock(true), vue.createElementBlock(
             vue.Fragment,
             null,
-            vue.renderList($data.list, (item, index) => {
+            vue.renderList(_ctx.list, (item, index) => {
               return vue.openBlock(), vue.createBlock(_component_msg_list, {
                 key: index,
                 item,
@@ -23288,7 +23265,7 @@ if (uni.restoreGlobal) {
       formatAppLog("log", "at App.vue:4", "App Launch");
       this.$U.update();
       this.$U.onNetwork();
-      this.$store.commit("initUser");
+      this.$store.dispatch("initUser");
     },
     onShow: function() {
       formatAppLog("log", "at App.vue:14", "App Show");
@@ -23446,15 +23423,6 @@ if (uni.restoreGlobal) {
         uni.setStorageSync("user", JSON.stringify(user));
         uni.$emit("updateIndex");
       },
-      // 初始化登录状态
-      initUser(state) {
-        let user = uni.getStorageSync("user");
-        if (user) {
-          state.user = JSON.parse(user);
-          state.loginStatus = true;
-          state.token = state.user.token;
-        }
-      },
       // 退出登录
       logout(state) {
         state.user = {};
@@ -23483,6 +23451,11 @@ if (uni.restoreGlobal) {
       saveChatList(state, list) {
         uni.setStorageSync("chatlist_" + state.user.id, JSON.stringify(list));
       },
+      // 删除会话列表
+      clearChatList(state, list) {
+        uni.removeStorageSync("chatlist_" + state.user.id);
+        state.chatList = [];
+      },
       // 存储与某个用户聊天内容列表
       saveChatDetail(state, { list, toId }) {
         let myId = state.user.id;
@@ -23492,6 +23465,16 @@ if (uni.restoreGlobal) {
       }
     },
     actions: {
+      // 初始化登录状态
+      initUser({ state, dispatch }) {
+        let user = uni.getStorageSync("user");
+        if (user) {
+          state.user = JSON.parse(user);
+          state.loginStatus = true;
+          state.token = state.user.token;
+          dispatch("openSocket");
+        }
+      },
       // 关闭socket
       closeSocket({ state }) {
         if (state.IsOpen) {
@@ -23510,24 +23493,25 @@ if (uni.restoreGlobal) {
         if (!state.SocketTask)
           return;
         state.SocketTask.onOpen(() => {
-          formatAppLog("log", "at store/index.js:125", "将连接状态设为已连接");
+          formatAppLog("log", "at store/index.js:132", "将连接状态设为已连接");
           state.IsOpen = true;
         });
         state.SocketTask.onClose(() => {
-          formatAppLog("log", "at store/index.js:130", "连接已关闭");
+          formatAppLog("log", "at store/index.js:137", "连接已关闭");
           state.IsOpen = false;
           state.SocketTask = false;
           state.IsOnline = false;
         });
         state.SocketTask.onError(() => {
-          formatAppLog("log", "at store/index.js:139", "连接错误");
+          formatAppLog("log", "at store/index.js:146", "连接错误");
           state.IsOpen = false;
           state.SocketTask = false;
           state.IsOnline = false;
         });
         state.SocketTask.onMessage((e) => {
-          formatAppLog("log", "at store/index.js:147", "接收消息", e);
+          formatAppLog("log", "at store/index.js:153", "接收消息", e);
           let res = JSON.parse(e.data);
+          formatAppLog("log", "at store/index.js:156", res);
           if (res.type == "bind") {
             return dispatch("userBind", res.data);
           }
@@ -23544,22 +23528,25 @@ if (uni.restoreGlobal) {
         }, {
           token: true
         }).then((data) => {
-          formatAppLog("log", "at store/index.js:180", "绑定成功", data);
+          formatAppLog("log", "at store/index.js:199", "绑定成功", data);
           if (data.status && data.type === "bind") {
             state.IsOnline = true;
             dispatch("initChatList");
             dispatch("getUnreadMessages");
+          } else {
+            formatAppLog("error", "at store/index.js:209", "绑定失败，服务器返回:", data);
           }
         }).catch((err) => {
+          formatAppLog("error", "at store/index.js:213", "绑定请求错误:", err);
         });
       },
       // 获取未读信息
       getUnreadMessages({ state, dispatch }) {
-        formatAppLog("log", "at store/index.js:196", "获取未读信息中...");
+        formatAppLog("log", "at store/index.js:219", "获取未读信息中...");
         $H.post("/chat/get", {}, {
           token: true
         }).then((data) => {
-          formatAppLog("log", "at store/index.js:200", "获取未读信息成功", data);
+          formatAppLog("log", "at store/index.js:223", "获取未读信息成功", data);
           data.forEach((msg) => {
             dispatch("handleChatMessage", msg);
           });
@@ -23568,12 +23555,12 @@ if (uni.restoreGlobal) {
       // 初始化会话列表
       async initChatList({ state, dispatch, commit }) {
         state.chatList = await dispatch("getChatList");
-        formatAppLog("log", "at store/index.js:210", "初始化会话列表", state.chatList);
+        formatAppLog("log", "at store/index.js:233", "初始化会话列表", state.chatList);
         dispatch("updateTabbarBadge");
       },
       // 处理接收消息
       handleChatMessage({ state, dispatch }, data) {
-        formatAppLog("log", "at store/index.js:215", "处理接收消息", data);
+        formatAppLog("log", "at store/index.js:238", "处理接收消息", data);
         uni.$emit("UserChat", data);
         dispatch("updateChatDetailToUser", {
           data,
@@ -23586,9 +23573,9 @@ if (uni.restoreGlobal) {
       },
       // 更新聊天会话列表
       async updateChatList({ state, dispatch, commit }, { data, send }) {
-        formatAppLog("log", "at store/index.js:231", "更新聊天会话列表", data);
+        formatAppLog("log", "at store/index.js:254", "更新聊天会话列表", data);
         let isMySend = send;
-        formatAppLog("log", "at store/index.js:234", isMySend ? "本人发送的信息" : "不是本人发送的");
+        formatAppLog("log", "at store/index.js:257", isMySend ? "本人发送的信息" : "不是本人发送的");
         let chatList = await dispatch("getChatList");
         let i = chatList.findIndex((v) => {
           return v.user_id == data.to_id || v.user_id == data.from_id;
@@ -23601,7 +23588,7 @@ if (uni.restoreGlobal) {
           if (!isMySend) {
             obj.noread = 1;
           }
-          formatAppLog("log", "at store/index.js:252", "不存在当前会话,创建", obj);
+          formatAppLog("log", "at store/index.js:275", "不存在当前会话,创建", obj);
           chatList.unshift(obj);
         } else {
           let item = chatList[i];
@@ -23611,7 +23598,7 @@ if (uni.restoreGlobal) {
           if (!isMySend && state.ToUser.user_id !== item.user_id) {
             item.noread++;
           }
-          formatAppLog("log", "at store/index.js:265", "存在当前会话", item);
+          formatAppLog("log", "at store/index.js:288", "存在当前会话", item);
           chatList = $U.__toFirst(chatList, i);
         }
         state.chatList = chatList;
@@ -23649,8 +23636,8 @@ if (uni.restoreGlobal) {
       // 消息转对话对象
       formatChatDetailObject({ state }, e) {
         let data = e.data;
-        formatAppLog("log", "at store/index.js:306", "formatChatDetailObject");
-        formatAppLog("log", "at store/index.js:307", e);
+        formatAppLog("log", "at store/index.js:329", "formatChatDetailObject");
+        formatAppLog("log", "at store/index.js:330", e);
         return {
           user_id: e.send ? state.user.id : data.from_id,
           avatar: e.send ? state.user.userpic : data.from_userpic,
@@ -23663,14 +23650,14 @@ if (uni.restoreGlobal) {
       // 更新未读数
       updateTabbarBadge({ state, getters }) {
         let total = getters.totalNoread;
-        formatAppLog("log", "at store/index.js:320", "更新未读数", total);
+        formatAppLog("log", "at store/index.js:343", "更新未读数", total);
         if (total === 0) {
-          formatAppLog("log", "at store/index.js:323", "移除未读数");
+          formatAppLog("log", "at store/index.js:346", "移除未读数");
           return uni.removeTabBarBadge({
             index: 2
           });
         }
-        formatAppLog("log", "at store/index.js:328", "设置未读数", total);
+        formatAppLog("log", "at store/index.js:351", "设置未读数", total);
         uni.setTabBarBadge({
           index: 2,
           text: total > 99 ? "99+" : total.toString()
@@ -23678,7 +23665,7 @@ if (uni.restoreGlobal) {
       },
       // 更新与某个用户聊天内容列表
       async updateChatDetailToUser({ state, dispatch, commit }, e) {
-        formatAppLog("log", "at store/index.js:336", "更新与某个用户聊天内容列表", e);
+        formatAppLog("log", "at store/index.js:359", "更新与某个用户聊天内容列表", e);
         let data = e.data;
         let toId = e.send ? state.ToUser.user_id : data.from_id;
         let list = await dispatch("getChatDetailToUser", toId);
@@ -23690,9 +23677,9 @@ if (uni.restoreGlobal) {
       },
       // 发送消息
       async sendChatMessage({ dispatch }, data) {
-        formatAppLog("log", "at store/index.js:356", "发送消息");
+        formatAppLog("log", "at store/index.js:378", "发送消息");
         let sendData = await dispatch("formatSendData", data);
-        formatAppLog("log", "at store/index.js:359", "发送消息数据格式", sendData);
+        formatAppLog("log", "at store/index.js:381", "发送消息数据格式", sendData);
         dispatch("updateChatDetailToUser", {
           data: sendData,
           send: true
@@ -23715,36 +23702,9 @@ if (uni.restoreGlobal) {
           time: (/* @__PURE__ */ new Date()).getTime()
         };
       },
-      // 发送消息
-      async sendChatMessage({ dispatch }, data) {
-        formatAppLog("log", "at store/index.js:403", "发送消息");
-        let sendData = await dispatch("formatSendData", data);
-        formatAppLog("log", "at store/index.js:406", "发送消息数据格式", sendData);
-        dispatch("updateChatDetailToUser", {
-          data: sendData,
-          send: true
-        });
-        dispatch("updateChatList", {
-          data: sendData,
-          send: true
-        });
-        return sendData;
-      },
-      // 组织发送格式
-      formatSendData({ state }, data) {
-        return {
-          to_id: state.ToUser.user_id,
-          from_id: state.user.id,
-          from_username: state.user.username,
-          from_userpic: state.user.userpic ? state.user.userpic : "/static/common/demo5.jpg",
-          type: data.type,
-          data: data.data,
-          time: (/* @__PURE__ */ new Date()).getTime()
-        };
-      },
       // 读取当前会话(去除未读数,更新tabbar)
       readChatMessage({ state, commit, dispatch }, item) {
-        formatAppLog("log", "at store/index.js:456", "读取当前会话(去除未读数,更新tabbar)", item);
+        formatAppLog("log", "at store/index.js:431", "读取当前会话(去除未读数,更新tabbar)", item);
         if (item.noread === 0)
           return;
         state.chatList.forEach((v) => {

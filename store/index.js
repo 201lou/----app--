@@ -84,6 +84,11 @@ export default createStore({
 	saveChatList(state,list){
 		uni.setStorageSync('chatlist_'+state.user.id,JSON.stringify(list))
 	},
+	// 删除会话列表
+	clearChatList(state,list){
+		uni.removeStorageSync('chatlist_'+state.user.id)
+		state.chatList = []
+	},
 	// 存储与某个用户聊天内容列表
 	saveChatDetail(state,{list,toId}){
 		// chatdetail_[当前用户id]_[聊天对象id]
@@ -117,10 +122,10 @@ export default createStore({
 			if(state.IsOpen) return
 			// 连接
 			state.SocketTask = uni.connectSocket({
-				url:`${$C.websocketUrl}?token=${state.token}`,
-				complete: () => {}
-			})
-			if (!state.SocketTask) return
+			    url: $C.websocketUrl,
+			    complete: ()=> {}
+			});
+			if (!state.SocketTask) return;
 			// 监听开启
 			state.SocketTask.onOpen(()=>{
 				// 将连接状态设为已连接
@@ -142,17 +147,21 @@ export default createStore({
 				state.IsOpen = false;
 				state.SocketTask = false;
 				state.IsOnline = false
-			
 			})
 			// 监听接收信息
 			state.SocketTask.onMessage((e)=>{
-		  		console.log('接收消息',e);
+				console.log('接收消息',e);
 				// 字符串转json
 				let res = JSON.parse(e.data);
 				// 绑定返回结果
 				if (res.type == 'bind'){
 					// 用户绑定
 					return dispatch('userBind',res.data)
+					// const clientId = res.clientId || res.data?.clientId;
+					    // if (clientId) {
+					    //   return dispatch('userBind', clientId)
+					    // } else {
+					    //   console.error('无效的客户端ID格式', res);
 				}
 				// 处理接收信息
 				if (res.type !== 'text') return;
@@ -176,9 +185,16 @@ export default createStore({
 			$http.post('/chat/bind',{
 				type:"bind",
 				client_id:client_id
+				
 			},{
-				token:true
+				token:true,
 			}).then(data=>{
+				/*
+					{
+						"type":"bind",
+						"status":true
+					}
+				*/
 				console.log('绑定成功',data);
 				// 开始上线
 				if(data.status && data.type === 'bind'){
@@ -188,9 +204,13 @@ export default createStore({
 					dispatch('initChatList')
 					// 获取未读信息
 					dispatch('getUnreadMessages')
+				}else{
+					console.error('绑定失败，服务器返回:', data);
 				}
 			}).catch(err=>{
 				// 失败 退出登录，重新链接等处理
+				console.error('绑定请求错误:', err);
+				
 			})
 		},
 		// 获取未读信息
@@ -254,7 +274,7 @@ export default createStore({
 				console.log('不存在当前会话,创建',obj);
 				// 追加头部
 				chatList.unshift(obj);
-			}else {
+			} else {
 				// 存在：将当前会话置顶,修改当前会话的data和time显示
 				let item = chatList[i]
 				item.data = data.data
@@ -343,11 +363,10 @@ export default createStore({
 			 list.push(await dispatch('formatChatDetailObject',e))
 			 // 存储到本地存储
 			 commit('saveChatDetail',{
-			 	list,toId
+				list,toId
 			 })
 		},
-		
-			// 发送消息
+		// 发送消息
 		async sendChatMessage({dispatch},data){
 			/*
 			{
@@ -390,54 +409,6 @@ export default createStore({
 				from_username:state.user.username,
 				from_userpic:state.user.userpic ? state.user.userpic : '/static/default.jpg',
 				type:data.type,
-				data:data.data,
-				time:new Date().getTime()
-			}
-		},
-		// 发送消息
-		async sendChatMessage({dispatch},data){
-			/*
-			{
-				data:"发送内容",
-				type:"text"
-			}
-			*/
-			console.log('发送消息');
-			// 组织发送消息格式
-			let sendData = await dispatch('formatSendData',data)
-			console.log('发送消息数据格式',sendData);
-			/*
-			{
-				
-				to_id:1,      // 接收人 
-				from_id:12,	  // 发送人id
-				from_username:"某某",  // 发送人昵称
-				from_userpic:"http://pic136.nipic.com/file/20170725/10673188_152559977000_2.jpg",
-				type:"text",	 // 发送类型
-				data:"你好啊",	 // 发送内容
-				time:151235451   // 接收到的时间
-			}
-			*/
-			// 更新与某个用户的消息历史记录
-			dispatch('updateChatDetailToUser',{
-				data:sendData,
-				send:true
-			})
-			// 更新会话列表
-			dispatch('updateChatList',{
-				data:sendData,
-				send:true
-			})
-			return sendData
-		},
-		// 组织发送格式
-		formatSendData({state},data){
-			return {
-				to_id:state.ToUser.user_id,
-				from_id:state.user.id,
-				from_username:state.user.username,
-				from_userpic:state.user.userpic ? state.user.userpic : '/static/common/demo5.jpg',
-				type:data.type || "text",
 				data:data.data,
 				time:new Date().getTime()
 			}
