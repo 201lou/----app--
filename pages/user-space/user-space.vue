@@ -13,7 +13,9 @@
 					</view>
 				</view>
 				<view class="flex align-center justify-center">
-					<button type="primary" size="mini" 
+					<button  v-if="user_id == user.id" type="default" size="mini" 
+					style="width: 80%;" @click="openUserInfo">编辑资料</button>
+					<button v-else type="default" size="mini" 
 					:class="userinfo.isFollow ? 'bg-light text-dark': 'bg-color'" style="width: 80%;"
 					@click="doFollow">{{userinfo.isFollow ? '已关注' : '关注'}}</button>
 				</view>
@@ -52,10 +54,12 @@
 		<!-- 弹出层 -->
 		<uni-popup ref="popup" type="top">
 			<view class="flex align-center justify-center color-aliceblue w-100 font-md border-bottom py-1" 
-			style="height: 100rpx;" hover-class="color-global" @click="popupEvent('friend')">
-				<text class="iconfont icon-icon-1 mr-2"></text> 加入黑名单
+			style="height: 100rpx;" hover-class="color-global" 
+			@click="doBlack">
+				<text class="iconfont icon-icon-1 mr-2"></text> 
+				{{userinfo.isblack ? '移出黑名单' : '加入黑名单'}}
 			</view>
-			<view class="flex align-center justify-center color-aliceblue w-100 font-md py-1"
+			<view v-if="!userinfo.isblack" class="flex align-center justify-center color-aliceblue w-100 font-md py-1"
 			style="height: 100rpx;" hover-class="color-global" @click="popupEvent('clear')">
 				<text class="iconfont icon-qingchu mr-2"></text> 开始聊天
 			</view>
@@ -65,10 +69,12 @@
 </template>
 
 <script>
+	const relationArray = ['保密','未婚','已婚']
 	import commonList from '@/components/common/common-list.vue';
 	import loadMore from '@/components/common/load-more.vue';
 	import uniPopup from '@/components/uni-uni/uni-popup/uni-popup.vue';
 	import $T from '@/common/time.js';
+	import { mapState } from 'vuex'
 	export default {
 		components:{
 			commonList,
@@ -119,6 +125,11 @@
 			}
 		},
 		onNavigationBarButtonTap() {
+			if(this.user_id == this.user.id){
+				return uni.navigateTo({
+					url: '../user-setting/user-setting',
+				});
+			}
 			this.$refs.popup.open()
 		},
 		onLoad(e) {
@@ -162,6 +173,9 @@
 			uni.$off('updateCommentsCount',(e)=>{})
 		},
 		computed: {
+			...mapState({
+				user:state=>state.user
+			}),
 			list() {
 				return this.tabBars[this.tabIndex].list
 			},
@@ -195,10 +209,13 @@
 						isblack:res.data.data.blacklist.length > 0,
 						regtime:$T.getAgeByBirthday(res.data.data.create_time),
 						birthday:$T.getHoroscope(res.data.data.userinfo.birthday),
-						job:res.data.data.userinfo.job,
-						path:res.data.data.userinfo.path,
-						qg:res.data.data.userinfo.qg
+						job:res.data.data.userinfo.job ? res.data.data.userinfo.job : '无',
+						path:res.data.data.userinfo.path ? res.data.data.userinfo.path : '无',
+						qg:relationArray[res.data.data.userinfo.qg]
 					}
+					uni.setNavigationBarTitle({
+						title:this.userinfo.username
+					})
 				})
 			},
 			changeTab(index) {
@@ -283,7 +300,36 @@
 						this.getList()
 					})
 				})
-			}
+			},
+			// 进入编辑资料
+			openUserInfo(){
+				uni.navigateTo({
+					url:'/pages/user-ownerinfo/user-ownerinfo'
+				})
+			},
+			// 加入或移出黑名单
+			doBlack(){
+				this.checkAuth(()=>{
+					let url = this.userinfo.isblack ? '/moveoutblack' : '/addblack'
+					let msg = this.userinfo.isblack ? '移出黑名单' : '加入黑名单'
+					uni.showModal({
+						content: '是否要'+msg,
+						success: res => {
+							this.$H.post(url,{
+								id:this.user_id
+							},{
+								token:true
+							}).then(res=>{
+								this.userinfo.isblack = !this.userinfo.isblack
+								uni.showToast({
+									title: msg+'成功',
+									icon:'none'
+								});
+							})
+						},
+					});
+				})
+			},
 		}
 	}
 </script>

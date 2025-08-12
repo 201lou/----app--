@@ -24,35 +24,10 @@
 </template>
 
 <script>
-	const demo = [{
-					headshot:"/static/common/demo6.jpg",
-					username:"星期四的微信",
-					update_time:1752722735,
-					data:"nrnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn内容 ",
-					notread:2
-				},{
-					headshot:"/static/common/demo6.jpg",
-					username:"星期四的微信",
-					update_time:1752722735,
-					data:"nrnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn内容 ",
-					notread:2
-				},{
-					headshot:"/static/common/demo6.jpg",
-					username:"星期四的微信",
-					update_time:1752722735,
-					data:"nrnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn内容 ",
-					notread:2
-				},{
-					headshot:"/static/common/demo6.jpg",
-					username:"星期四的微信",
-					update_time:1752722735,
-					data:"nrnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn内容 ",
-					notread:2
-				}];
-	
 	import msgList from '@/components/msg/msg-list.vue';
 	import noThing from '@/components/common/no-thing.vue';
 	import uniPopup from '@/components/uni-uni/uni-popup/uni-popup.vue';
+	import { mapState } from 'vuex'
 	export default {
 		components: {
 			msgList,
@@ -61,12 +36,16 @@
 		},
 		data() {
 			return {
-				list:[]
 			}
 		},
 		// 页面加载
 		onLoad() {
-			this.list = demo
+			
+		},
+		computed:{
+			...mapState({
+				list:state=>state.chatList
+			})
 		},
 		// 监听原生导航栏按钮事件
 		onNavigationBarButtonTap(e) {

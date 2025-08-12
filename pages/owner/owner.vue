@@ -37,7 +37,7 @@
 		</view>
 		
 		<uni-list>
-			<uni-list-item title="浏览历史" showExtraIcon>
+			<uni-list-item title="浏览历史" showExtraIcon @click="openHistory">
 				<template v-slot:icon>
 		            <text class="iconfont icon-icon-"></text>
 				</template>
@@ -139,6 +139,11 @@
 				uni.navigateTo({
 					url: '/pages/login/login',
 				});
+			},
+			openHistory(){
+				uni.navigateTo({
+					url:'/pages/history/history'
+				})
 			}
 		}
 	}

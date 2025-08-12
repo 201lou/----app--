@@ -285,6 +285,22 @@
 			{
 				"navigationBarTitleText" : "绑定手机号"
 			}
+		},
+		{
+			"path" : "pages/history/history",
+			"style" : 
+			{
+				"navigationBarTitleText" : "浏览历史",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [
+							{
+								"type": "menu"
+							}
+						]
+					}
+				}
+			}
 		}
 	],
 	"globalStyle": {

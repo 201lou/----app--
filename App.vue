@@ -8,7 +8,7 @@
 			this.$U.onNetwork()
 			// 初始化数据
 			// 初始化用户登录状态
-			this.$store.commit('initUser')
+			this.$store.dispatch('initUser')
 		},
 		onShow: function() {
 			console.log('App Show')

@@ -156,6 +156,8 @@
 				}).then(res=>{
 					// 修改vuex的state,持久化存储
 					this.$store.commit('login',res.data.data)
+					// 开启socket
+					this.$store.dispatch('openSocket')
 					// 提示和跳转
 					uni.navigateBack({
 						delta:1

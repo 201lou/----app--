@@ -13,7 +13,8 @@
 			</view>
 			<!-- 按钮 -->
 			<view class="flex align-center justify-center rounded text-white bg-color animated faster" 
-			style="width: 90rpx;height: 50rpx;" hover-class="rubberBand" @click="follow" v-if="!item.isFollow">
+			style="width: 90rpx;height: 50rpx;" hover-class="rubberBand" @click="follow" 
+			v-if="!item.isFollow && user.id !== item.user_id">
 			关注
 			</view>
 		</view>
@@ -58,6 +59,7 @@
 </template>
 
 <script>
+	import { mapState } from 'vuex'
 	export default {
 		props: {
 			item: Object,
@@ -69,6 +71,11 @@
 				type:Boolean,
 				default:false
 			}
+		},
+		computed: {
+			...mapState({
+				user:state=>state.user 
+			})
 		},
 		methods: {
 			//打开个人空间
@@ -83,7 +90,15 @@
 				if (this.isdetail) return;
 				uni.navigateTo({
 					url:'/pages/post-detail/post-detail?detail='+JSON.stringify(this.item)
-				})
+				});
+				// 取出历史记录
+				let list = uni.getStorageSync('history')
+				list = list ? JSON.parse(list) : []
+				let index = list.findIndex(v=>v.id === this.item.id)
+				if(index === -1){
+					list.unshift(this.item)
+					uni.setStorageSync('history',JSON.stringify(list))
+				}
 			},
 			//关注操作
 			follow(){
