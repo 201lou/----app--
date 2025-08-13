@@ -1,0 +1,1 @@
+{"version":3,"file":"config.js","sources":["common/config.js"],"sourcesContent":["export default {\r\n\t// api请求前缀\r\n\twebUrl:'https://ceshi.virtualfri.asia/',\r\n\t// websocket地址\r\n\twebsocketUrl:'wss://ceshi.virtualfri.asia/wss',\r\n}"],"names":[],"mappings":";AAAA,MAAe,KAAA;AAAA;AAAA,EAEd,QAAO;AAAA;AAAA,EAEP,cAAa;AACd;;"}

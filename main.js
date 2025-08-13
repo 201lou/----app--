@@ -62,7 +62,7 @@ const checkAuth = (callback,checkPhone = true)=>{
 }
 
 // 权限验证跳转
-const navigateTo = (options,chechPhone = true)=>{
+const navigateTo = (options,checkPhone = true)=>{
 	if (!store.state.loginStatus) {
 		uni.showToast({
 			title:'请先登录',

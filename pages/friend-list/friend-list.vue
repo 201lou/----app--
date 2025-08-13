@@ -1,5 +1,17 @@
 <template>
 	<view>
+		<!-- #ifdef MP -->
+		<uni-nav-bar :shadow="false" :border="false" @click-right="goBack">
+			<!-- 中间搜索框 -->
+			<view class="flex justify-center align-center rounded text-muted bg-light flex-1 mt-1" style="margin-left: -46upx;height: 60upx;" @tap="openSearch">
+				<view class="iconfont icon-sousuo mr-1"></view>搜索帖子
+			</view>
+			<!-- 右边图标 -->
+			<block slot="right">
+				<view class="text-dark font">取消</view>
+			</block>
+		</uni-nav-bar>
+		<!-- #endif -->
 		<!-- tab -->
 		<view class="flex align-center py-2" style="height: 100rpx;">
 			<view class="flex-1 flex align-center justify-center" 
@@ -32,32 +44,7 @@
 </template>
 
 <script>
-	const demo = [{
-		headshot:"/static/common/demo6.jpg",
-		username:"烦躁杏鲍菇",
-		gender:1,//0未知 1女性 2男性
-		age:24,
-		isFollow:true
-	},{
-		headshot:"/static/common/demo6.jpg",
-		username:"烦躁杏鲍菇",
-		gender:0,//0未知 1女性 2男性
-		age:24,
-		isFollow:true
-	},{
-		headshot:"/static/common/demo6.jpg",
-		username:"烦躁杏鲍菇",
-		gender:2,//0未知 1女性 2男性
-		age:24,
-		isFollow:true
-	},{
-		headshot:"/static/common/demo6.jpg",
-		username:"烦躁杏鲍菇",
-		gender:1,//0未知 1女性 2男性
-		age:24,
-		isFollow:false
-	}]
-	
+	import uniNavBar from '@/components/uni-uni/uni-nav-bar/uni-nav-bar.vue';
 	import loadMore from '@/components/common/load-more.vue';
 	import noThing from '@/components/common/no-thing.vue';
 	import userList from '@/components/user-list/user-list.vue';
@@ -65,7 +52,8 @@
 		components: {
 			loadMore,
 			noThing,
-			userList
+			userList,
+			uniNavBar
 		},
 		data() {
 			return {

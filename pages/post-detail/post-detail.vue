@@ -115,6 +115,15 @@
 		onBackPress() {
 			this.$refs.share.close()
 		},
+		// #ifndef APP-PLUS
+		// 微信小程序分享
+		onShareAppMessage(res) {
+			return {
+			  title: this.info.title,
+			  path: '/pages/post-detail/post-detail?detail='+JSON.stringify(this.info)
+			}
+		 },
+		// #endif
 		methods: {
 			__init(data) {
 				// 修改标题

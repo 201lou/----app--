@@ -31,4 +31,15 @@
 	@import "./common/style_owner.css";
 	/* 本项目样式库 */
 	@import "./common/global.css";
+	
+	page{
+		background: #FFFFFF; 
+		height: 100%;
+	}
+	::-webkit-scrollbar{
+		display: none;
+	}
+	image{
+		background-color: #CCCCCC;
+	}
 </style>

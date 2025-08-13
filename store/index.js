@@ -6,103 +6,132 @@ import $U from '@/common/utill.js';
 
 // 创建 Vuex store 实例（Vue3 风格）
 export default createStore({
-  state: {
-    loginStatus: false,
-	user:{},
-	token:false,
-	// Socket连接状态
-	IsOpen:false,
-	// SocketTask
-	SocketTask:false,
-	// 是否上线（会员id绑定客户端id，验证用户身份，通过则绑定）
-	IsOnline:false, 
-	// 当前聊天对象（进入聊天页面获取）
-	ToUser:{
-		user_id:0, // 通过判断user_id是否为0，当前用户处在什么场景下
-		username:"",
-		userpic:""
-	},
-	// 聊天会话列表
-	chatList:[]
-  },
-  getters:{
-  		// 总未读数
-  		totalNoread(state){
-  			let total = 0
-  			state.chatList.forEach(item=>{
-  				total += item.noread
-  			})
-  			return total
-  		}
-  	},
-  mutations: {
-	// 创建聊天对象
-	createToUser(state,ToUser){
-		state.ToUser = ToUser
-	},
-	// 关闭聊天对象
-	closeToUser(state){
-		state.ToUser = {
-			user_id:0, 
+	state:{
+		// 登录
+		loginStatus:false,
+		token:false,
+		user:{
+			// "id": 7,
+			// "username": "zcmcss",
+			// "userpic": "https://tangzhe123-com.oss-cn-shenzhen.aliyuncs.com/Appstatic/qsbk/demo/userpic/1.jpg",
+			// "password": true,
+			// "phone": "13450772004",
+			// "email": "123@qq.com",
+			// "status": 1,
+			// "create_time": null,
+			// "logintype": "username",
+			// "token": "a8bb3f6f50ff5049d70b6022b48e1f45c24a96f8",
+			// "userinfo": {
+			// 	"id": 1,
+			// 	"user_id": 7,
+			// 	"age": 23,
+			// 	"sex": 1,
+			// 	"qg": 1,
+			// 	"job": "IT",
+			// 	"path": "北京市-市辖区-朝阳区",
+			// 	"birthday": "1996-06-12"
+			// },
+			// user_bind:{
+			// 	"qq": {
+			// 		"id": 229,
+			// 		"nickname": "airson"
+			// 	}
+			// }
+		},
+		
+		// Socket连接状态
+		IsOpen:false,
+		// SocketTask
+		SocketTask:false,
+		// 是否上线（会员id绑定客户端id，验证用户身份，通过则绑定）
+		IsOnline:false, 
+		// 当前聊天对象（进入聊天页面获取）
+		ToUser:{
+			user_id:0, // 通过判断user_id是否为0，当前用户处在什么场景下
 			username:"",
 			userpic:""
+		},
+		// 聊天会话列表
+		chatList:[]
+	},
+	getters:{
+		// 总未读数
+		totalNoread(state){
+			let total = 0
+			state.chatList.forEach(item=>{
+				total += item.noread
+			})
+			return total
 		}
 	},
-    // 登录
-	login(state,user){
-		state.loginStatus = true
-		state.user = user
-		state.token = state.user.token
-		uni.setStorageSync('user',JSON.stringify(user));
-		uni.$emit('updateIndex')
+	mutations:{
+		// 创建聊天对象
+		createToUser(state,ToUser){
+			state.ToUser = ToUser
+		},
+		// 关闭聊天对象
+		closeToUser(state){
+			state.ToUser = {
+				user_id:0, 
+				username:"",
+				userpic:""
+			}
+		},
+		// 登录
+		login(state,user){
+			state.loginStatus = true
+			state.user = user
+			state.token = state.user.token
+			uni.setStorageSync('user', JSON.stringify(user));
+			uni.$emit('updateIndex')
+		},
+		// 退出登录
+		logout(state){
+			state.loginStatus = false
+			state.user = {}
+			state.token = false
+			uni.removeStorageSync('user');
+			uni.$emit('updateIndex')
+		},
+		// 修改用户信息(手机号,邮箱,密码)
+		editUserInfo(state,{ key,value }){
+			state.user[key] = value
+			uni.setStorageSync('user', JSON.stringify(state.user));
+		},
+		// 修改资料
+		editUserUserInfo(state,obj){
+			if(state.user.userinfo){
+				state.user.userinfo.sex = obj.sex
+				state.user.userinfo.qg = obj.qg
+				state.user.userinfo.job = obj.job
+				state.user.userinfo.path = obj.path
+				state.user.userinfo.birthday = obj.birthday
+				uni.setStorageSync('user', JSON.stringify(state.user));
+			}
+		},
+		// 存储会话列表
+		saveChatList(state,list){
+			uni.setStorageSync('chatlist_'+state.user.id,JSON.stringify(list))
+		},
+		// 删除会话列表
+		clearChatList(state,list){
+			uni.removeStorageSync('chatlist_'+state.user.id)
+			state.chatList = []
+		},
+		// 存储与某个用户聊天内容列表
+		saveChatDetail(state,{list,toId}){
+			// chatdetail_[当前用户id]_[聊天对象id]
+			let myId = state.user.id
+			toId = toId ? toId : state.ToUser.user_id
+			let key = 'chatdetail_'+myId+'_'+toId
+			uni.setStorageSync(key,JSON.stringify(list))
+		},
 	},
-	// 退出登录
-	logout(state){
-		state.user = {}
-		state.loginStatus = false
-		state.token = false
-		uni.removeStorageSync('user')
-		uni.$emit('updateIndex')
-	},
-	// 修改用户信息（手机号，邮箱，密码）
-	editUserInfo(state,{ key,value }) {
-		state.user[key] = value
-		uni.setStorageSync('user',JSON.stringify(state.user));
-	},
-	// 修改资料
-	editUserUserInfo(state,obj) {
-		if(state.user.userinfo){
-			state.user.userinfo.sex = obj.sex
-			state.user.userinfo.qg = obj.qg
-			state.user.userinfo.qg = obj.qg
-			state.user.userinfo.path = obj.path
-			state.user.userinfo.birthday = obj.birthday
-			uni.setStorageSync('user',JSON.stringify(state.user));
-		}
-	},
-	// 存储会话列表
-	saveChatList(state,list){
-		uni.setStorageSync('chatlist_'+state.user.id,JSON.stringify(list))
-	},
-	// 删除会话列表
-	clearChatList(state,list){
-		uni.removeStorageSync('chatlist_'+state.user.id)
-		state.chatList = []
-	},
-	// 存储与某个用户聊天内容列表
-	saveChatDetail(state,{list,toId}){
-		// chatdetail_[当前用户id]_[聊天对象id]
-		let myId = state.user.id
-		toId = toId ? toId : state.ToUser.user_id
-		let key = 'chatdetail_'+myId+'_'+toId
-		uni.setStorageSync(key,JSON.stringify(list))
-	},
-  },
-	actions: {
+	actions:{
 		// 初始化登录状态
 		initUser({state,dispatch}){
 			let user = uni.getStorageSync('user');
-			if(user) {
+			if(user){
 				state.user = JSON.parse(user)
 				state.loginStatus = true
 				state.token = state.user.token
@@ -157,11 +186,6 @@ export default createStore({
 				if (res.type == 'bind'){
 					// 用户绑定
 					return dispatch('userBind',res.data)
-					// const clientId = res.clientId || res.data?.clientId;
-					    // if (clientId) {
-					    //   return dispatch('userBind', clientId)
-					    // } else {
-					    //   console.error('无效的客户端ID格式', res);
 				}
 				// 处理接收信息
 				if (res.type !== 'text') return;
@@ -185,9 +209,8 @@ export default createStore({
 			$http.post('/chat/bind',{
 				type:"bind",
 				client_id:client_id
-				
 			},{
-				token:true,
+				token:true
 			}).then(data=>{
 				/*
 					{
@@ -204,13 +227,9 @@ export default createStore({
 					dispatch('initChatList')
 					// 获取未读信息
 					dispatch('getUnreadMessages')
-				}else{
-					console.error('绑定失败，服务器返回:', data);
 				}
 			}).catch(err=>{
 				// 失败 退出登录，重新链接等处理
-				console.error('绑定请求错误:', err);
-				
 			})
 		},
 		// 获取未读信息
@@ -363,7 +382,7 @@ export default createStore({
 			 list.push(await dispatch('formatChatDetailObject',e))
 			 // 存储到本地存储
 			 commit('saveChatDetail',{
-				list,toId
+			 	list,toId
 			 })
 		},
 		// 发送消息
@@ -391,8 +410,8 @@ export default createStore({
 			*/
 		   // 更新与某个用户的消息历史记录
 		   dispatch('updateChatDetailToUser',{
-			 data:sendData,
-			 send:true
+		   	 data:sendData,
+		   	 send:true
 		   })
 		   // 更新会话列表
 		   dispatch('updateChatList',{
@@ -441,6 +460,5 @@ export default createStore({
 			// 更新未读数
 			dispatch('updateTabbarBadge')
 		},
-  },
-  modules: {}
+	}
 })

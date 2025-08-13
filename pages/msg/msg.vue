@@ -1,5 +1,23 @@
 <template>
 	<view>
+		<!-- 导航 -->
+		<!-- #ifndef APP-PLUS -->
+		<uni-nav-bar :shadow="false" :border="false"
+		@click-left="clickLeft" @click-right="clickRight" title="消息">
+			<!-- 左边图标 -->
+			<block slot="left">
+				<view class="flex align-center justify-center" style="height: 44px">
+					<view class="iconfont icon-haoyou mx-2" style="font-size: 22px;"></view>
+				</view>
+			</block>
+			<!-- 右边图标 -->
+			<block slot="right">
+				<view class="flex align-center justify-center" style="height: 44px">
+					<view class="iconfont icon-icon-1 mx-2" style="font-size: 22px;"></view>
+				</view>
+			</block>
+		</uni-nav-bar>
+		<!-- #endif -->
 		<template v-if="list.length > 0">
 			<!-- 消息列表 -->
 			<block v-for="(item,index) in list" :key="index">
@@ -62,17 +80,25 @@
 					break;
 			}
 		},
-		// 过滤器
-		// filters: {
-		// 	formaTime(value) {
-		// 		return $T.gettime(Number(value));
-		// 	}
-		// },
 		// 监听下拉刷新
 		onPullDownRefresh() {
 			this.refresh()
 		},
 		methods: {
+			// #ifndef APP-PLUS
+			clickLeft(){
+				uni.navigateTo({
+					url:'/pages/friend-list/friend-list'
+				});
+				// 关闭弹出层
+				this.$refs.popup && this.$refs.popup.close()
+				// this.$refs.popup.close()
+			},
+			clickRight(){
+				// this.$refs.popup.open()
+				this.$refs.popup && this.$refs.popup.open()
+			},
+			// #endif
 			//下拉刷新
 			refresh() {
 				setTimeout(()=>{

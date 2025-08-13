@@ -1,5 +1,18 @@
 <template>
 	<view>
+		<!-- 自定义导航 -->
+		<!-- #ifndef APP-PLUS -->
+		<view style="height: 88rpx;z-index: 9999;"
+		class="flex align-center px-2 position-fixed left-0 top-0 right-0 bg-white">
+			<view class="iconfont icon-sousuo position-absolute text-muted" 
+			style="left: 30rpx;"></view>
+			<input class="flex-1 rounded bg-light" style="padding: 5rpx 0 5rpx 50rpx;" type="text" v-model="searchText" @confirm="searchEvent"
+			placeholder="搜索" 
+			placeholder-style="color: #CCCCCC;"/>
+			<text class="pl-2" @click="goBack">取消</text>
+		</view>
+		<view style="height: 88rpx;"></view>
+		<!-- #endif -->
 		<template v-if="searchList.length === 0">
 			<!-- 搜索历史 -->
 			<view class="py-2 font-md px-2">搜索历史</view>
@@ -139,6 +152,13 @@
 			this.getData(false)
 		},
 		methods: {
+			// #ifndef APP-PLUS
+			goBack(){
+				uni.navigateBack({
+					delta: 1
+				});
+			},
+			// #endif
 			//顶踩
 			liked(e){
 				this.searchList.forEach(item=>{

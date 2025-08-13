@@ -54,6 +54,13 @@
 			</uni-list-item>
 			
 		</uni-list>
+		<!-- #ifdef MP -->
+		<navigator url="../user-setting/user-setting" hover-class="none">
+		<uni-list-item title="我的设置" showExtraIcon>
+			<text slot="icon" class="iconfont icon-wode"></text>
+		</uni-list-item>
+		</navigator>
+		<!-- #endif -->
 		
 	</view>
 </template>

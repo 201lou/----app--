@@ -1,11 +1,28 @@
 <template>
 	<view>
 		<!-- 自定义导航 -->
-		<uni-nav-bar left-icon="back" statusBar :border="false" @click-left="back">
+		<!-- #ifdef MP -->
+		<uni-nav-bar :border="false">
+			<view class="flex align-center justify-center w-100"
+			@click="changeOpen">
+				{{isOpenText}}<text class="iconfont icon-shezhi1"></text>
+			</view>
+		</uni-nav-bar>
+		<!-- #endif -->
+		<!-- #ifndef MP -->
+		<uni-nav-bar left-icon="back" statusBar :border="false" @click-left="goBack">
+			<view class="flex align-center justify-center w-100"
+			@click="changeOpen">
+				{{isOpenText}}<text class="iconfont icon-shezhi1"></text>
+			</view>
+		</uni-nav-bar>
+		<!-- #endif -->
+		<!-- 自定义导航 -->
+		<!-- <uni-nav-bar left-icon="back" statusBar :border="false" @click-left="back">
 			<view class="flex align-center justify-center w-100" @click="changeOpen">
 			{{isOpenText}}<text class="iconfont icon-shezhi1"></text>
 			</view>
-		</uni-nav-bar>
+		</uni-nav-bar> -->
 		<!-- 文本域组件 -->
 		<textarea v-model="content" placeholder="说一句话吧~" class="w-100 px-2"/>
 		<!-- 选中的分类 -->
@@ -28,7 +45,7 @@
 		<upload-image :show="show" ref="uploadImage" :list="imageList" @change="changeImage"></upload-image>
 		<!-- 底部操作条 -->
 		<view class="fixed-bottom bg-white flex align-center justify-center" style="height: 85rpx;">
-			<<picker mode="selector" :range="range" @change="choosePostClass">
+			<picker mode="selector" :range="range" @change="choosePostClass">
 				<view class="footer-btn iconfont icon-caidan animated faster"
 				hover-calss="jello"></view>
 			</picker>
@@ -212,6 +229,10 @@
 						this.isOpen = res.tapIndex
 					}
 				})
+			},
+			// 返回上一步
+			goBack(){
+				uni.navigateBack({ delta: 1 });
 			},
 			// 选中图片
 			changeImage(e){

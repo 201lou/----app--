@@ -6,7 +6,7 @@
 			<block v-for="(item,index) in list" :key="index">
 				<view :id="'chat'+index">
 					<user-chat-page :item="item" :index="index"
-					:pretime="index>0?list[index-1].nows_time : 0"></user-chat-page>
+					:pretime="index>0?list[index-1].create_time : 0"></user-chat-page>
 				</view>				
 			</block>			
 		</scroll-view>
@@ -36,97 +36,77 @@ import bottomInput from '@/components/common/bottom-input.vue';
 				scrollInto:"",
 				content2:"",
 				scrollH:500,
-				list:[{
-					user_id:2,
-					headshot:"/static/common/demo5.jpg",
-					username:"昵称",
-					content:"你好哈哈哈哈哈哈红红火火恍恍惚惚",
-					type:"text",
-					nows_time:1752722735
-				},{
-					user_id:1,
-					headshot:"/static/common/demo5.jpg",
-					username:"昵称",
-					content:"你好哈哈哈哈哈哈红红火火恍恍惚惚",
-					type:"text",
-					nows_time:1752722735
-				},{
-					user_id:2,
-					headshot:"/static/common/demo5.jpg",
-					username:"昵称",
-					content:"你好哈哈哈哈哈哈红红火火恍恍惚惚",
-					type:"text",
-					nows_time:1752722735
-				},{
-					user_id:2,
-					headshot:"/static/common/demo5.jpg",
-					username:"昵称",
-					content:"你好哈哈哈哈哈哈红红火火恍恍惚惚",
-					type:"text",
-					nows_time:1752722735
-				},{
-					user_id:1,
-					headshot:"/static/common/demo5.jpg",
-					username:"昵称",
-					content:"你好哈哈哈哈哈哈红红火火恍恍惚惚",
-					type:"text",
-					nows_time:1752722735
-				},{
-					user_id:2,
-					headshot:"/static/common/demo5.jpg",
-					username:"昵称",
-					content:"你好哈哈哈哈哈哈红红火火恍恍惚惚",
-					type:"text",
-					nows_time:1752722735
-				},{
-					user_id:2,
-					headshot:"/static/common/demo5.jpg",
-					username:"昵称",
-					content:"你好哈哈哈哈哈哈红红火火恍恍惚惚",
-					type:"text",
-					nows_time:1752722735
-				},{
-					user_id:1,
-					headshot:"/static/common/demo5.jpg",
-					username:"昵称",
-					content:"你好哈哈哈哈哈哈红红火火恍恍惚惚",
-					type:"text",
-					nows_time:1752722735
-				},{
-					user_id:1,
-					headshot:"/static/common/demo5.jpg",
-					username:"昵称",
-					content:"你好哈哈哈哈哈哈红红火火恍恍惚惚",
-					type:"text",
-					nows_time:1752722735
-				}]
+				list:[]
 			}
 		},
-		// 页面加载的时候滚动到底部
+		// 页面加载完成的时候滚动到底部
 		onReady() {
 			this.toBottom()
 		},
-		onLoad() {
+		onLoad(e) {
 			uni.getSystemInfo({
 				success:(res) => {
 					this.scrollH = res.windowHeight -uni.upx2px(101)
 				}
 			})
+			if(!e.user){
+				uni.navigateBack({
+					delta:1
+				});
+				return uni.showToast({
+					title:'聊天对象不存在',
+					icon:'none'
+				})
+			}
+			let ToUser = JSON.parse(e.user)
+			// 创建聊天对象
+			this.$store.commit('createToUser',ToUser)
+			// 获取当前聊天对象的聊天记录
+			this.$store.dispatch('getChatDetailToUser').then(list=>{
+				this.list = list
+			})
+			// 开启监听接受聊天信息
+			uni.$on('UserChat',(res)=>{
+				console.log('[user-chat]chatmsg',res);
+				if(res.form_id === ToUser.user_id){
+					this.randerPage({
+						data:res,
+						send:false
+					})
+				}
+			})
+		},
+		// 页面销毁之前
+		beforeDestroy() {
+			// 关闭聊天对象
+			this.$store.commit('closeToUser')
+			// 移除监听聊天信息事件
+			uni.$off('UserChat',()=>{})
 		},
 		methods: {
+			// 渲染到页面
+			randerPage(e){
+				this.$store.dispatch('formatChatDetailObject',e).then(msg=>{
+					this.list.push(msg)
+					// 滚动到底部
+					this.toBottom()
+				})
+			},
 			// 发送
-			submit(data) {
-				let obj = {
-					user_id:1,
-					headshot:"/static/common/demo5.jpg",
-					username:"昵称",
-					content:data,
-					type:"text",
-					nows_time:(new Date()).getTime()		
-				}				
-				this.list.push(obj)				
-				// 滚动到底部
-				this.toBottom()
+			async submit(data) {
+				let result = await this.$store.dispatch('sendChatMessage',{
+					data,
+					type:"text"
+				})
+				// 请求发送接口
+				this.$H.post('/chat/send',result,{
+					token:true
+				}).then(res=>{
+					this.randerPage({
+						data:result,
+						send:true
+					})
+				})
 			},
 			// 滚动到底部
 			toBottom() {

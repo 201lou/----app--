@@ -1,6 +1,6 @@
 <template>
 	<view class="flex align-center p-2 border-bottom border-light-secondary" hover-class="bg-light" @click="openChat">
-		<image class="rounded-circle mr-2" :src="item.headshot" 
+		<image class="rounded-circle mr-2" :src="item.headshot ? item.headshot : '/static/common/demo6.jpg'" 
 		style="width: 80rpx;height: 80rpx;"></image>
 		<view class="flex flex-column flex-1">
 			<view class="flex align-center justify-between">
@@ -31,8 +31,17 @@
 				return $T.gettime(value);
 			},
 			openChat() {
+				let user = {
+					user_id:this.item.user_id,
+					username:this.item.username,
+					userpic:this.item.avatar
+				}
 				uni.navigateTo({
-					url:'/pages/users-chat/users-chat'
+					url:'/pages/users-chat/users-chat?user='+JSON.stringify(user),
+					success: () => {
+						// 清除未读数，更新底部导航消息数显示
+						this.$store.dispatch('readChatMessage',this.item)
+					}
 				})
 			}
 		}

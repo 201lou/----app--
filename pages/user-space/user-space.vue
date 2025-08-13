@@ -1,5 +1,8 @@
 <template>
 	<view>
+		<!-- #ifdef MP -->
+		<uni-nav-bar :shadow="false" :fixed="true" :border="false" right-text="菜单" @click-right="clickNavigationButton"></uni-nav-bar>
+		<!-- #endif -->
 		<!-- 头部 -->
 		<view class="flex align-center p-4 border-bottom border-light-secondary">
 			<image :src="userinfo.userpic" style="width: 180rpx;height: 180rpx;" 
@@ -60,7 +63,7 @@
 				{{userinfo.isblack ? '移出黑名单' : '加入黑名单'}}
 			</view>
 			<view v-if="!userinfo.isblack" class="flex align-center justify-center color-aliceblue w-100 font-md py-1"
-			style="height: 100rpx;" hover-class="color-global" @click="popupEvent('clear')">
+			style="height: 100rpx;" hover-class="color-global" @click="openChat">
 				<text class="iconfont icon-qingchu mr-2"></text> 开始聊天
 			</view>
 		</uni-popup>
@@ -73,13 +76,15 @@
 	import commonList from '@/components/common/common-list.vue';
 	import loadMore from '@/components/common/load-more.vue';
 	import uniPopup from '@/components/uni-uni/uni-popup/uni-popup.vue';
+	import uniNavBar from '@/components/uni-uni/uni-nav-bar/uni-nav-bar.vue';
 	import $T from '@/common/time.js';
 	import { mapState } from 'vuex'
 	export default {
 		components:{
 			commonList,
 			loadMore,
-			uniPopup
+			uniPopup,
+			uniNavBar
 		},
 		data() {
 			return {
@@ -125,12 +130,7 @@
 			}
 		},
 		onNavigationBarButtonTap() {
-			if(this.user_id == this.user.id){
-				return uni.navigateTo({
-					url: '../user-setting/user-setting',
-				});
-			}
-			this.$refs.popup.open()
+			this.clickNavigationButton()
 		},
 		onLoad(e) {
 			if(!e.user_id){
@@ -184,6 +184,14 @@
 			}
 		},
 		methods: {
+			clickNavigationButton(){
+				if(this.user_id == this.user.id){
+					return uni.navigateTo({
+						url: '../user-set/user-set',
+					});
+				}
+				this.$refs.popup.open()
+			},
 			// 获取用户相关统计数据
 			getCounts(){
 				this.$H.get('/user/getcounts/'+this.user_id).then(res=>{
@@ -330,6 +338,17 @@
 					});
 				})
 			},
+			// 打开聊天页
+			openChat(){
+				let user = {
+					user_id:this.user_id,
+					username:this.userinfo.username,
+					userpic:this.userinfo.userpic
+				}
+				this.navigateTo({
+					url:"/pages/users-chat/users-chat?user="+JSON.stringify(user)
+				})
+			}
 		}
 	}
 </script>

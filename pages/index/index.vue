@@ -1,5 +1,26 @@
 <template>
 	<view>
+		<!-- 导航栏 -->
+		<!-- #ifdef MP -->
+		<uni-nav-bar :shadow="false" :border="false"@click-left="clickLeft" 
+		@click-right="clickRight">
+			<!-- 左边图标 -->
+			<block slot="left">
+				<view class="iconfont icon-qiandao ml-2 mr-2" 
+				style="font-size: 22px;color: #FF9619;"></view>
+			</block>
+			<!-- 中间搜索框 -->
+			<view class="flex justify-center align-center rounded text-muted bg-light flex-1 mt-1" 
+			style="margin-left: -46upx;height: 60upx;" @tap="openSearch">
+				<view class="iconfont icon-sousuo mr-1"></view>搜索帖子
+			</view>
+			<!-- 右边图标 -->
+			<block slot="right">
+				<view class="icon iconfont icon-bianji1 text-dark" 
+				style="font-size: 22px;"></view>
+			</block>
+		</uni-nav-bar>
+		<!-- #endif -->
 		<!-- 顶部选项卡 -->
 		<scroll-view scroll-x :scroll-into-view="scrollInto" 
 		scroll-with-animation class="scroll-row" style="height: 100rpx;">
@@ -41,13 +62,14 @@
 </template>
 
 <script>
-	
+	import uniNavBar from '@/components/uni-uni/uni-nav-bar/uni-nav-bar.vue';
 	import commonList from '@/components/common/common-list.vue';
 	import loadMore from '@/components/common/load-more.vue';
 	export default {
 		components: {
 			commonList,
-			loadMore
+			loadMore,
+			uniNavBar
 		},
 		data() {
 			return {
@@ -114,6 +136,22 @@
 			uni.$off('updateCommentsCount',(e)=>{})
 		},
 		methods: {
+			// #ifndef APP-PLUS
+			clickLeft(){
+				// console.log('左边事件')
+			},
+			clickRight(){
+				// 打开发布页面
+				this.navigateTo({
+					url: '../add-input/add-input',
+				})
+			},
+			openSearch(){
+				uni.navigateTo({
+					url: '../search/search',
+				});
+			},
+			// #endif
 			//获取数据
 			getData() {
 				// 获取分类

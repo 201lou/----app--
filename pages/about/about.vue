@@ -3,10 +3,12 @@
 		<view class="flex align-center justify-center flex-column pt-4 pb-3">
 			<image src="/static/common/demo5.jpg" style="width: 200rpx;height: 200rpx;"
 			class="rounded-circle"></image>
-			<text class="font text-muted mt-2">version 1.0.1</text>
+			<text class="font text-muted mt-2">version {{version}}</text>
 		</view>
 		<uni-list>
-			<uni-list-item title="新版本检测"></uni-list-item>
+			<!-- #ifdef APP-PLUS -->
+			<uni-list-item title="新版本检测" @click="update"></uni-list-item>
+			<!-- #endif -->
 			<uni-list-item title="社区用户协议"></uni-list-item>
 		</uni-list>
 	</view>
@@ -22,11 +24,20 @@
 		},
 		data() {
 			return {
-				
+				version:"",
 			}
 		},
+		onLoad() {
+			// #ifdef APP-PLUS
+			plus.runtime.getProperty(plus.runtime.appid, (widgetInfo)=>{ 
+				this.version = widgetInfo.version;
+			})
+			// #endif
+		},
 		methods: {
-			
+			update(){
+				this.$U.update(true)
+			}
 		}
 	}
 </script>

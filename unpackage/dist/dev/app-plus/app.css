@@ -3417,3 +3417,13 @@ to {
 .color-aliceblue{
 	background-color: aliceblue;
 }
+body{
+		background: #FFFFFF; 
+		height: 100%;
+}
+::-webkit-scrollbar{
+		display: none;
+}
+uni-image{
+		background-color: #CCCCCC;
+}
