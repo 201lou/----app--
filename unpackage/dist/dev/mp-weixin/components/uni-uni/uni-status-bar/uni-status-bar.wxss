@@ -1,0 +1,7 @@
+
+.uni-status-bar.data-v-25810fe1 {
+		width: 750rpx;
+		height: 20px;
+		/* height: var(--status-bar-height);
+ */
+}

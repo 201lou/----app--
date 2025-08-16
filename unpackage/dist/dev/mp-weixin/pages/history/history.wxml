@@ -1,0 +1,1 @@
+<view><common-list wx:for="{{a}}" wx:for-item="item" wx:key="a" u-i="{{item.b}}" bind:__l="__l" u-p="{{item.c}}"></common-list><no-thing wx:if="{{b}}" u-i="6bc00a16-1" bind:__l="__l"></no-thing></view>

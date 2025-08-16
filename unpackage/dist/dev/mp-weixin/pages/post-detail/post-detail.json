@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "common-list": "../../components/common/common-list",
+    "bottom-input": "../../components/common/bottom-input",
+    "share-to": "../../components/common/share-to"
+  }
+}

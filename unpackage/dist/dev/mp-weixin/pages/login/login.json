@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "other-login": "../../components/common/other-login",
+    "uni-status-bar": "../../components/uni-uni/uni-status-bar/uni-status-bar"
+  }
+}

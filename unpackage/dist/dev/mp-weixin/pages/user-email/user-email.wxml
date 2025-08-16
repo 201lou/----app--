@@ -1,0 +1,1 @@
+<view><input class="uni-input" type="text" placeholder="请输入你想要绑定的邮箱" disabled="{{a}}" value="{{b}}" bindinput="{{c}}"/><view class="py-2 px-3"><button style="border-radius:50rpx;border:0" type="primary" disabled="{{d}}" class="{{['bg-color', 'text-white', e]}}" bindtap="{{f}}">绑定</button></view></view>

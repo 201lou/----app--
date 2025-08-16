@@ -1,0 +1,48 @@
+
+.uni-transition.data-v-fbf5fe9e {
+		transition-timing-function: ease;
+		transition-duration: 0.3s;
+		transition-property: transform, opacity;
+}
+.fade-in.data-v-fbf5fe9e {
+		opacity: 0;
+}
+.fade-active.data-v-fbf5fe9e {
+		opacity: 1;
+}
+.slide-top-in.data-v-fbf5fe9e {
+		/* transition-property: transform, opacity; */
+		transform: translateY(-100%);
+}
+.slide-top-active.data-v-fbf5fe9e {
+		transform: translateY(0);
+		/* opacity: 1; */
+}
+.slide-right-in.data-v-fbf5fe9e {
+		transform: translateX(100%);
+}
+.slide-right-active.data-v-fbf5fe9e {
+		transform: translateX(0);
+}
+.slide-bottom-in.data-v-fbf5fe9e {
+		transform: translateY(100%);
+}
+.slide-bottom-active.data-v-fbf5fe9e {
+		transform: translateY(0);
+}
+.slide-left-in.data-v-fbf5fe9e {
+		transform: translateX(-100%);
+}
+.slide-left-active.data-v-fbf5fe9e {
+		transform: translateX(0);
+		opacity: 1;
+}
+.zoom-in-in.data-v-fbf5fe9e {
+		transform: scale(0.8);
+}
+.zoom-out-active.data-v-fbf5fe9e {
+		transform: scale(1);
+}
+.zoom-out-in.data-v-fbf5fe9e {
+		transform: scale(1.2);
+}

@@ -1,0 +1,9 @@
+{
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "common-list": "../../components/common/common-list",
+    "topic-list": "../../components/find/topic-list",
+    "user-list": "../../components/user-list/user-list",
+    "load-more": "../../components/common/load-more"
+  }
+}

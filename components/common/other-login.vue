@@ -1,5 +1,16 @@
 <template>
-	<view class="flex align-center justify-center px-2 py-3">
+	<!-- #ifdef APP-PLUS || MP-ALIPAY -->
+	<view class="flex-1 flex align-center justify-center"
+	v-for="(item,index) in providerList" :key="index"
+	@click="login(item)">
+		<view :class="item.icon + ' '+item.bgColor" class="iconfont font-lg text-white flex align-center justify-center rounded-circle" style="width: 100rpx;height: 100rpx;"></view>
+	</view>
+	<!-- #endif -->
+	
+	<!-- #ifdef MP-WEIXIN -->
+	<button type="primary" open-type="getUserInfo" @getuserinfo="mpGetUserInfo">微信登录</button>
+	<!-- #endif -->
+	<!-- <view class="flex align-center justify-center px-2 py-3">
 			<view class="flex-1 flex align-center justify-center" 
 			v-for="(item,index) in providerList" :key="index" @click="login(item)">
 				<view :class="item.icon + ' '+item.bgColor" 
@@ -7,7 +18,7 @@
 				style="width: 100rpx;height: 100rpx;"></view>
 			</view>
 			
-	</view>
+	</view> -->
 </template>
 
 <script>
@@ -68,6 +79,9 @@
 			login(item) {
 				uni.login({
 					provider:item.id,
+					// #ifdef MP-ALIPAY
+					scopes: 'auth_user',  //支付宝小程序需设置授权类型
+					// #endif
 					success: res => {
 						uni.getUserInfo({
 							provider:item.id,
@@ -106,7 +120,57 @@
 						icon:'none'
 					})
 				})
-			}
+			},
+			// #ifdef MP-WEIXIN
+			mpGetUserInfo(result) {
+				uni.showLoading({ title: '登录中...', mask: true });
+				// 获取失败
+				if (result.detail.errMsg !== 'getUserInfo:ok') {
+					uni.hideLoading();
+					uni.showModal({
+						title: '获取用户信息失败',
+						content: '错误原因' + result.detail.errMsg,
+						showCancel: false
+					});
+					return;
+				}
+				let userinfo = result.detail.userInfo;
+				uni.login({
+					provider:"weixin",
+					success: (res) => {
+						this.MpLogin({
+							url:"/wxlogin",
+							code:res.code,
+							nickName:userinfo.nickName,
+							avatarUrl:userinfo.avatarUrl
+						})
+					},
+					complete: () => {
+						uni.hideLoading();
+					}
+				})
+			},
+			// #endif
+			MpLogin(options){
+				this.$H.post(options.url,{
+					code:options.code,
+					nickName:options.nickName,
+					avatarUrl:options.avatarUrl
+				}).then(data=>{
+					// 修改vuex的state,持久化存储
+					this.$store.commit('login',this.$U.formatUserinfo(data))
+					// 返回上一页
+					if(this.back){
+						uni.navigateBack({
+							delta: 1
+						});
+					}
+					uni.showToast({
+						title: '登录成功',
+						icon: 'none'
+					});
+				});
+			},
 		}
 	}
 </script>

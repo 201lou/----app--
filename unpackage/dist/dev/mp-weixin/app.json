@@ -1,0 +1,67 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/msg/msg",
+    "pages/owner/owner",
+    "pages/find/find",
+    "pages/search/search",
+    "pages/add-input/add-input",
+    "pages/topic-nav/topic-nav",
+    "pages/topic-detail/topic-detail",
+    "pages/friend-list/friend-list",
+    "pages/users-chat/users-chat",
+    "pages/post-detail/post-detail",
+    "pages/user-setting/user-setting",
+    "pages/user-password/user-password",
+    "pages/user-email/user-email",
+    "pages/user-ownerinfo/user-ownerinfo",
+    "pages/user-feedback/user-feedback",
+    "pages/about/about",
+    "pages/login/login",
+    "pages/user-space/user-space",
+    "pages/user-safe/user-safe",
+    "pages/user-phone/user-phone",
+    "pages/history/history"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "backgroundColor": "#ffffff"
+  },
+  "tabBar": {
+    "color": "#3333333",
+    "selectedColor": "black",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "/static/tabber/firstpage.png",
+        "selectedIconPath": "/static/tabber/firstpage2.png"
+      },
+      {
+        "pagePath": "pages/find/find",
+        "text": "发现",
+        "iconPath": "/static/tabber/find.png",
+        "selectedIconPath": "/static/tabber/found.png"
+      },
+      {
+        "pagePath": "pages/msg/msg",
+        "text": "消息",
+        "iconPath": "/static/tabber/msg.png",
+        "selectedIconPath": "/static/tabber/msg2.png"
+      },
+      {
+        "pagePath": "pages/owner/owner",
+        "text": "我的",
+        "iconPath": "/static/tabber/owner.png",
+        "selectedIconPath": "/static/tabber/owner2.png"
+      }
+    ]
+  },
+  "usingComponents": {
+    "no-thing": "/components/common/no-thing"
+  }
+}

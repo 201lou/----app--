@@ -1,0 +1,20 @@
+
+.uni-list.data-v-3751c120 {
+
+		display: flex;
+
+		background-color: #ffffff;
+		position: relative;
+		flex-direction: column;
+		/* border-bottom-color: $uni-border-color; */
+		/* border-bottom-style: solid; */
+		/* border-bottom-width: 1px; */
+}
+.uni-list.data-v-3751c120:before {
+		height: 0;
+}
+.uni-list.data-v-3751c120:after {
+		height: 0;
+}
+
+

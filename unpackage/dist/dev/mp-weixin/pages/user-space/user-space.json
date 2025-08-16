@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "个人空间",
+  "usingComponents": {
+    "common-list": "../../components/common/common-list",
+    "load-more": "../../components/common/load-more",
+    "uni-popup": "../../components/uni-uni/uni-popup/uni-popup",
+    "uni-nav-bar": "../../components/uni-uni/uni-nav-bar/uni-nav-bar"
+  }
+}

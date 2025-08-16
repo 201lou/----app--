@@ -1,0 +1,10 @@
+{
+  "usingComponents": {
+    "uni-nav-bar": "../../components/uni-uni/uni-nav-bar/uni-nav-bar",
+    "common-list": "../../components/common/common-list",
+    "load-more": "../../components/common/load-more",
+    "hot-click": "../../components/find/hot-click",
+    "topic-list": "../../components/find/topic-list",
+    "no-thing": "../../components/common/no-thing"
+  }
+}

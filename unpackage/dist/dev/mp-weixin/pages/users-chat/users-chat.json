@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "user-chat-page": "../../components/users-chat/user-chat-page",
+    "bottom-input": "../../components/common/bottom-input"
+  }
+}
